@@ -484,14 +484,6 @@ const LandingPage = () => {
       {/* Footer with Hand + Logo */}
       <footer className="py-24 px-6 border-t border-border">
         <AnimatedSection className="max-w-4xl mx-auto flex flex-col items-center">
-          {/* Hand holding logo recreation */}
-          <div className="relative mb-12">
-            <div className="absolute inset-0 bg-primary/30 rounded-full blur-[80px] animate-glow-pulse" />
-            <div className="relative w-24 h-24 rounded-2xl bg-primary flex items-center justify-center shadow-[0_0_60px_rgba(178,255,0,0.5)] animate-float">
-              <img src={lynxLogoIcon} alt="Lynx Media" className="w-16 h-16 object-contain" />
-            </div>
-          </div>
-          
           <p className="text-muted-foreground text-lg mb-8">The only Amazon PPC analytics tool you'll ever need.</p>
           
           <img src={lynxLogoDark} alt="Lynx Media" className="h-8 opacity-60 hover:opacity-100 transition-opacity" />
