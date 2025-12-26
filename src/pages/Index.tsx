@@ -1,6 +1,5 @@
 
 import React, { useState, useCallback } from 'react';
-import * as XLSX from 'xlsx';
 import { Layout } from '../components/Layout';
 import { 
   ExecutiveDashboard, 
@@ -13,14 +12,14 @@ import {
   DiagnosticsDashboard, 
   SettingsDashboard 
 } from '../views/Dashboards';
-import { parseExcelFile } from '../services/dataProcessor';
+import { processBulkFile, processBusinessReport } from '../services/dataProcessor';
 import { generateMockData } from '../services/mockData';
 import { DashboardData, AppSettings, ProductGoal } from '../types';
 import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle } from 'lucide-react';
 
 const EMPTY_DATA: DashboardData = {
   portfolios: [], spCampaigns: [], spAdGroups: [], spKeywords: [], spProductTargets: [], spPlacements: [], spSkus: [],
-  sbCampaigns: [], sbKeywords: [], sbTargets: [], sbPlacements: [],
+  sbCampaigns: [], sbKeywords: [], sbTargets: [], sbPlacements: [], sbAds: [], sbMagEntities: [],
   sdCampaigns: [], sdTargets: [],
   searchTerms: [], businessReport: []
 };
@@ -49,18 +48,19 @@ const Index = () => {
     setError(null);
 
     try {
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array' });
-      const parsed = parseExcelFile(workbook, type);
-
-      setDashboardData(prev => {
-        const base = prev || EMPTY_DATA;
-        if (type === 'bulk') {
+      if (type === 'bulk') {
+        const parsed = await processBulkFile(file);
+        setDashboardData(prev => {
+          const base = prev || EMPTY_DATA;
           return { ...base, ...parsed };
-        } else {
-          return { ...base, businessReport: parsed.businessReport };
-        }
-      });
+        });
+      } else {
+        const businessReport = await processBusinessReport(file);
+        setDashboardData(prev => {
+          const base = prev || EMPTY_DATA;
+          return { ...base, businessReport };
+        });
+      }
     } catch (err) {
       console.error('Error parsing file:', err);
       setError('Failed to parse file. Please ensure it is a valid Amazon Bulk Operations or Business Report file.');
