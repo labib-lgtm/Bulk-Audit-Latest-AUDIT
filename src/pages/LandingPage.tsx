@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, BarChart3, Target, TrendingUp, Zap, Shield, Clock } from "lucide-react";
+import { 
+  ArrowRight, BarChart3, Target, TrendingUp, Zap, Shield, Clock, 
+  Search, Package, Layers, Activity, FileDown, CheckCircle, Upload,
+  PieChart, Video, Monitor, AlertCircle, Sparkles
+} from "lucide-react";
 import { AnimatedSection } from "@/hooks/useScrollAnimation";
 import lynxLogoDark from "@/assets/lynx-logo-dark.png";
 import lynxLogoIcon from "@/assets/lynx-logo-icon.png";
@@ -8,36 +12,110 @@ import lynxLogoIcon from "@/assets/lynx-logo-icon.png";
 const LandingPage = () => {
   const navigate = useNavigate();
 
-  const features = [
+  const mainFeatures = [
     {
       icon: BarChart3,
       title: "Executive Dashboard",
-      description: "See your entire ad performance at a glance. Total spend, revenue, ACOS, ROAS — all in one view."
+      description: "Your command center for Amazon PPC. See total spend, revenue, ACOS, ROAS, impressions, clicks, and conversion rates across all campaign types in one unified view. Includes channel-by-channel breakdown (SP, SB, SD), branded vs non-branded analysis, and detailed target type distribution.",
+      highlights: ["Real-time KPI matrix", "Channel performance comparison", "Branded vs Non-Branded insights", "Target type breakdown"]
     },
     {
       icon: Target,
-      title: "Campaign Breakdown",
-      description: "SP, SB, SD campaigns dissected. Know exactly which campaign types are printing money and which are burning it."
+      title: "Sponsored Products (SP) Dashboard",
+      description: "Deep-dive into your SP campaigns with campaign-level summaries, keyword and product target analysis, match type performance (Exact, Phrase, Broad, Auto), and placement insights (Top of Search, Product Pages, Rest of Search).",
+      highlights: ["Campaign performance tables", "Match type distribution", "Placement analysis", "Target-level metrics"]
     },
     {
-      icon: TrendingUp,
-      title: "Search Term Analysis",
-      description: "Find the gold. Discover which search terms convert and which ones are just eating your budget."
+      icon: Video,
+      title: "Sponsored Brands (SB) Dashboard",
+      description: "Analyze Headline Search Ads, Video campaigns, and Store Spotlight performance. Track keywords, product targets, and see how different ad formats (HSA, Video, Store) compare against each other.",
+      highlights: ["Video vs HSA comparison", "Store Spotlight tracking", "Format-level ROAS", "Keyword analysis"]
     },
     {
-      icon: Shield,
-      title: "ASIN Audit",
-      description: "Product-level performance. See which ASINs deserve more ad spend and which ones need to be cut."
+      icon: Monitor,
+      title: "Sponsored Display (SD) Dashboard",
+      description: "Master your retargeting and audience campaigns. Analyze product contextual targeting vs audience targeting, track viewable impressions, and optimize your display strategy with tactic-level insights.",
+      highlights: ["Audience vs Contextual", "Viewable impressions", "Tactic breakdown", "Retargeting analysis"]
     },
     {
-      icon: Clock,
-      title: "Portfolio Insights",
-      description: "Organize and analyze by portfolio. Perfect for brands managing multiple product lines."
+      icon: Search,
+      title: "Search Term Intelligence",
+      description: "The most powerful search term analysis tool for Amazon. Aggregated search term performance, N-Gram analysis (1, 2, 3-word phrases), branded vs non-branded segmentation, ACOS/CVR distribution charts, wasted spend identification, and keyword harvesting candidates.",
+      highlights: ["N-Gram analysis", "Harvesting candidates", "Wasted spend finder", "Match type coverage"]
     },
     {
-      icon: Zap,
-      title: "Instant Upload",
-      description: "Just upload your bulk reports. No API connections. No technical setup. Results in seconds."
+      icon: Package,
+      title: "ASIN-Level Audit",
+      description: "Product-level profitability analysis. See which ASINs are printing money and which are draining your budget. Includes TACOS (Total ACOS), ad dependency ratio, organic win rate, and the ability to group by Parent ASIN for variation analysis.",
+      highlights: ["TACOS tracking", "Ad dependency %", "Organic win rate", "Parent/Child grouping"]
+    },
+    {
+      icon: Layers,
+      title: "Portfolio Performance",
+      description: "Organize and analyze by portfolio. See budget allocation, utilization rates, spend vs sales by portfolio, and identify which product lines are performing best. Perfect for multi-brand sellers and agencies.",
+      highlights: ["Budget utilization", "Portfolio-level ROAS", "Spend allocation charts", "Cross-portfolio comparison"]
+    },
+    {
+      icon: Activity,
+      title: "Diagnostics & Optimization",
+      description: "Automated bid optimization recommendations. Find 'bleeders' (keywords with spend but zero sales) and high-ACOS targets that need bid adjustments. Export ready-to-upload bulk files for instant implementation.",
+      highlights: ["Auto-detect bleeders", "Bid recommendations", "Bulk export files", "Custom ACOS targets"]
+    }
+  ];
+
+  const tableFeatures = [
+    {
+      title: "Campaign Summary Tables",
+      description: "Sortable, searchable tables with columns for Spend, Sales, ROAS, ACOS, Orders, CPC, CTR, CVR, and more. Filter by campaign state, search by name.",
+      icon: BarChart3
+    },
+    {
+      title: "Target Analysis Tables",
+      description: "Drill into keywords and product targets. See bid, spend, spend share, sales, ROAS, ACOS, orders, and CVR for every single target.",
+      icon: Target
+    },
+    {
+      title: "Match Type Breakdown",
+      description: "Visual pie charts and detailed tables showing performance by match type. Identify which match types drive the best ROI.",
+      icon: PieChart
+    },
+    {
+      title: "Placement Performance",
+      description: "Understand where your ads perform best: Top of Search, Product Pages, or Rest of Search. Optimize placement bids based on data.",
+      icon: Monitor
+    },
+    {
+      title: "Search Term Tables",
+      description: "Every search term with impressions, clicks, CTR, CPC, spend, spend share, orders, CVR, sales, ACOS, ROAS, and match type coverage indicators.",
+      icon: Search
+    },
+    {
+      title: "Export to Excel",
+      description: "Export negative keyword bulk files, bid optimization files, and full data exports ready for Amazon Seller Central upload.",
+      icon: FileDown
+    }
+  ];
+
+  const benefits = [
+    {
+      title: "No API Required",
+      description: "Just download your bulk reports from Amazon and upload. No complex API setup, no developer needed.",
+      icon: Upload
+    },
+    {
+      title: "Instant Analysis",
+      description: "Results in seconds, not hours. Upload your files and immediately see insights across all dashboards.",
+      icon: Zap
+    },
+    {
+      title: "Actionable Exports",
+      description: "Generate bulk upload files for bid changes, negative keywords, and pauses—ready to upload to Amazon.",
+      icon: FileDown
+    },
+    {
+      title: "Product-Level Goals",
+      description: "Set different ACOS targets per ASIN. The diagnostics engine uses your custom goals for smarter recommendations.",
+      icon: Target
     }
   ];
 
@@ -127,30 +205,102 @@ const LandingPage = () => {
         </AnimatedSection>
       </section>
 
-      {/* Features Section */}
+      {/* Main Features Section */}
       <section id="features" className="py-24 px-6 bg-card/50">
         <div className="max-w-7xl mx-auto">
           <AnimatedSection className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-black mb-4">
-              Everything You Need. <span className="text-primary">Nothing You Don't.</span>
+              8 Powerful Dashboards. <span className="text-primary">One Platform.</span>
             </h2>
-            <p className="text-xl text-muted-foreground">
-              No fluff. No complexity. Just the insights that actually matter.
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Every tool you need to analyze, optimize, and scale your Amazon PPC campaigns—without the complexity.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {mainFeatures.map((feature, index) => (
+              <AnimatedSection 
+                key={index}
+                delay={index * 100}
+                className="p-8 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-[0_0_40px_rgba(178,255,0,0.1)]"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-all group-hover:scale-110">
+                    <feature.icon className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-3 text-foreground">{feature.title}</h3>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">{feature.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {feature.highlights.map((highlight, i) => (
+                        <span 
+                          key={i}
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
+                        >
+                          <CheckCircle className="w-3 h-3" />
+                          {highlight}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Data Tables Section */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">
+              Tables That <span className="text-primary">Actually Make Sense</span>
+            </h2>
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Every table is sortable, searchable, and packed with the metrics that matter. No more spreadsheet hell.
             </p>
           </AnimatedSection>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
+            {tableFeatures.map((feature, index) => (
+              <AnimatedSection 
+                key={index}
+                delay={index * 80}
+                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300"
+              >
+                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                  <feature.icon className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">{feature.title}</h3>
+                <p className="text-muted-foreground text-sm">{feature.description}</p>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Use This Tool Section */}
+      <section className="py-24 px-6 bg-card/50">
+        <div className="max-w-6xl mx-auto">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">
+              Why Sellers <span className="text-primary">Love This Tool</span>
+            </h2>
+          </AnimatedSection>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {benefits.map((benefit, index) => (
               <AnimatedSection 
                 key={index}
                 delay={index * 100}
-                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 group hover:shadow-[0_0_40px_rgba(178,255,0,0.1)] hover:-translate-y-1"
+                className="text-center p-6"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-all group-hover:scale-110">
-                  <feature.icon className="w-6 h-6 text-primary" />
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                  <benefit.icon className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-foreground">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <h3 className="text-lg font-bold mb-2 text-foreground">{benefit.title}</h3>
+                <p className="text-muted-foreground text-sm">{benefit.description}</p>
               </AnimatedSection>
             ))}
           </div>
@@ -258,16 +408,67 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* How It Works Section */}
+      <section className="py-24 px-6 bg-card/50">
+        <div className="max-w-5xl mx-auto">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">
+              How It <span className="text-primary">Works</span>
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Three simple steps to unlock your PPC insights.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: "01",
+                title: "Download Your Reports",
+                description: "Export your bulk reports from Amazon Seller Central (Sponsored Products, Brands, Display campaigns, and Business Report)."
+              },
+              {
+                step: "02",
+                title: "Upload & Analyze",
+                description: "Drop your files into Lynx Media. Our engine processes everything instantly—campaigns, keywords, targets, search terms, and ASINs."
+              },
+              {
+                step: "03",
+                title: "Take Action",
+                description: "Use the insights to optimize bids, find wasted spend, identify winning keywords, and export bulk files for immediate implementation."
+              }
+            ].map((item, index) => (
+              <AnimatedSection 
+                key={index}
+                delay={index * 150}
+                className="text-center"
+              >
+                <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center mx-auto mb-6 text-2xl font-black">
+                  {item.step}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-foreground">{item.title}</h3>
+                <p className="text-muted-foreground">{item.description}</p>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-primary/5 via-transparent to-transparent pointer-events-none" />
         
         <AnimatedSection className="relative z-10 max-w-4xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="text-sm font-medium text-primary">Start analyzing in under 60 seconds</span>
+          </div>
+          
           <h2 className="text-3xl md:text-5xl font-black mb-6">
             Ready To See <span className="text-primary">The Truth?</span>
           </h2>
-          <p className="text-xl text-muted-foreground mb-10">
-            Upload your Amazon bulk reports and get instant insights. No credit card. No strings attached.
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
+            Upload your Amazon bulk reports and get instant insights across all 8 dashboards. No credit card required. No strings attached.
           </p>
           <Button 
             onClick={() => navigate("/auth")}
@@ -291,7 +492,7 @@ const LandingPage = () => {
             </div>
           </div>
           
-          <p className="text-muted-foreground text-lg mb-8">Designed with versatility in mind</p>
+          <p className="text-muted-foreground text-lg mb-8">The only Amazon PPC analytics tool you'll ever need.</p>
           
           <img src={lynxLogoDark} alt="Lynx Media" className="h-8 opacity-60 hover:opacity-100 transition-opacity" />
           
