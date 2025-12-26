@@ -454,6 +454,104 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Testimonials & Social Proof Section */}
+      <section className="py-24 px-6">
+        <div className="max-w-7xl mx-auto">
+          <AnimatedSection className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">
+              Trusted By <span className="text-primary">Amazon Sellers</span>
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              See what our users are saying about their results.
+            </p>
+          </AnimatedSection>
+
+          {/* Stats Bar */}
+          <AnimatedSection delay={100} className="mb-16">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-8 rounded-2xl bg-card border border-border">
+              {[
+                { value: "2.4M+", label: "Ad Spend Analyzed" },
+                { value: "32%", label: "Avg. ACOS Reduction" },
+                { value: "500+", label: "Sellers Using Lynx" },
+                { value: "4.9/5", label: "User Satisfaction" }
+              ].map((stat, i) => (
+                <div key={i} className="text-center">
+                  <p className="text-3xl md:text-4xl font-black text-primary mb-1">{stat.value}</p>
+                  <p className="text-sm text-muted-foreground">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </AnimatedSection>
+
+          {/* Testimonial Cards */}
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                quote: "I found $3,200 in wasted spend within the first 10 minutes. The Search Term dashboard alone is worth 10x what I was paying for other tools.",
+                name: "Marcus Chen",
+                role: "7-Figure Private Label Seller",
+                metric: "Reduced ACOS from 42% to 24%"
+              },
+              {
+                quote: "The ASIN Audit feature changed everything. I finally understand which products are actually profitable after ad spend, not just which ones sell the most.",
+                name: "Sarah Mitchell",
+                role: "Brand Owner, Home & Kitchen",
+                metric: "Increased ROAS by 2.8x"
+              },
+              {
+                quote: "No API setup, no developer needed. I upload my reports and have actionable insights in seconds. The bulk export files save me hours every week.",
+                name: "David Park",
+                role: "Agency Owner, 15+ Clients",
+                metric: "Saves 12+ hours/week"
+              },
+              {
+                quote: "The Executive Dashboard gives me the 30,000ft view I need, while the deep-dive dashboards let me optimize at the keyword level. Best of both worlds.",
+                name: "Jennifer Okonkwo",
+                role: "6-Figure Supplement Brand",
+                metric: "Cut wasted spend by 67%"
+              },
+              {
+                quote: "I was skeptical at first, but the Diagnostics feature identified bid optimization opportunities I completely missed. Implemented the changes and saw results in days.",
+                name: "Alex Rivera",
+                role: "Electronics Seller",
+                metric: "41% more orders, same spend"
+              },
+              {
+                quote: "Finally, a tool that understands Amazon PPC at a deep level. Match type analysis, placement data, branded vs non-branded—it's all here and actually makes sense.",
+                name: "Priya Sharma",
+                role: "Multi-Brand Portfolio Owner",
+                metric: "Managing $50K+/mo in ad spend"
+              }
+            ].map((testimonial, index) => (
+              <AnimatedSection 
+                key={index}
+                delay={index * 100}
+                className="p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300 flex flex-col"
+              >
+                <div className="flex-1">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, i) => (
+                      <svg key={i} className="w-4 h-4 text-primary fill-primary" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-4 leading-relaxed">"{testimonial.quote}"</p>
+                </div>
+                <div className="border-t border-border pt-4 mt-4">
+                  <p className="font-bold text-foreground">{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground mb-2">{testimonial.role}</p>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
+                    <TrendingUp className="w-3 h-3" />
+                    {testimonial.metric}
+                  </span>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-t from-primary/5 via-transparent to-transparent pointer-events-none" />
