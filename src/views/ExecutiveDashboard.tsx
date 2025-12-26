@@ -178,12 +178,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sp', 
             label: 'Sponsored Products', 
             icon: LayoutGrid,
-            bg: 'bg-brand-50',
-            border: 'border-brand-200',
-            text: 'text-brand-900',
-            iconColor: 'text-brand-600',
-            valueColor: 'text-brand-950',
-            subColor: 'text-brand-800',
+            bg: 'bg-primary/10',
+            border: 'border-primary/30',
+            text: 'text-primary',
+            iconColor: 'text-primary',
+            valueColor: 'text-foreground',
+            subColor: 'text-muted-foreground',
             ...sp, 
             roas: safeDiv(sp.sales, sp.spend), 
             share: safeDiv(sp.sales, div),
@@ -202,12 +202,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sb', 
             label: 'Sponsored Brands', 
             icon: Video,
-            bg: 'bg-blue-50',
-            border: 'border-blue-200',
-            text: 'text-blue-900',
-            iconColor: 'text-blue-600',
-            valueColor: 'text-blue-950',
-            subColor: 'text-blue-800',
+            bg: 'bg-blue-500/10',
+            border: 'border-blue-500/30',
+            text: 'text-blue-400',
+            iconColor: 'text-blue-400',
+            valueColor: 'text-foreground',
+            subColor: 'text-muted-foreground',
             ...sb, 
             roas: safeDiv(sb.sales, sb.spend), 
             share: safeDiv(sb.sales, div),
@@ -226,12 +226,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sd', 
             label: 'Sponsored Display', 
             icon: Target,
-            bg: 'bg-fuchsia-50',
-            border: 'border-fuchsia-200',
-            text: 'text-fuchsia-900',
-            iconColor: 'text-fuchsia-600',
-            valueColor: 'text-fuchsia-950',
-            subColor: 'text-fuchsia-800',
+            bg: 'bg-fuchsia-500/10',
+            border: 'border-fuchsia-500/30',
+            text: 'text-fuchsia-400',
+            iconColor: 'text-fuchsia-400',
+            valueColor: 'text-foreground',
+            subColor: 'text-muted-foreground',
             ...sd, 
             roas: safeDiv(sd.sales, sd.spend), 
             share: safeDiv(sd.sales, div),
@@ -549,31 +549,31 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
       <SectionHeader title="Executive Summary" description="High-level performance overview across all ad types." />
 
       {/* 1. PERFORMANCE OVERVIEW MATRIX */}
-      <div className="rounded-xl shadow-sm border border-slate-200 overflow-hidden bg-white">
-          <div className="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-100">
-             <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2">
-               <TrendingUp className="w-4 h-4 text-brand-500" />
+      <div className="rounded-xl shadow-sm border border-border overflow-hidden bg-card">
+          <div className="flex items-center justify-between px-6 py-4 bg-card border-b border-border">
+             <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-foreground">
+               <TrendingUp className="w-4 h-4 text-primary" />
                Performance Overview
              </h3>
-             <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">Real-time</span>
+             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border">Real-time</span>
           </div>
           
           <div className="overflow-x-auto custom-scrollbar">
              <div className="min-w-[1000px]">
-                 {/* Top Row: Total / Organic (Dark Theme) */}
-                 <div className="grid grid-cols-11 bg-[#0f172a] text-white">
+                 {/* Top Row: Total / Organic */}
+                 <div className="grid grid-cols-11 bg-muted text-foreground">
                      {matrixCols.map((col, idx) => (
-                        <div key={`top-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-slate-700' : ''}`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400 mb-1.5">{col.top.l}</span>
+                        <div key={`top-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-border' : ''}`}>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1.5">{col.top.l}</span>
                             <span className="text-base font-bold font-heading">{col.top.v}</span>
                         </div>
                      ))}
                  </div>
-                 {/* Bottom Row: Ad Metrics (Light Theme) */}
-                 <div className="grid grid-cols-11 bg-white text-slate-900">
+                 {/* Bottom Row: Ad Metrics */}
+                 <div className="grid grid-cols-11 bg-card text-foreground">
                      {matrixCols.map((col, idx) => (
-                        <div key={`bot-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-slate-100' : ''}`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">{col.bot.l}</span>
+                        <div key={`bot-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-border' : ''}`}>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">{col.bot.l}</span>
                             <span className="text-base font-bold font-heading">{col.bot.v}</span>
                         </div>
                      ))}
@@ -584,7 +584,7 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
 
       {/* 2. CHANNEL PERFORMANCE WITH BREAKDOWN */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-slate-500 pl-1">
+        <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-muted-foreground pl-1">
              <PieChart className="w-4 h-4" /> Channel Performance & Targets
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

@@ -36,41 +36,41 @@ export const MetricCard: React.FC<MetricCardProps> = ({
       className={`relative rounded-xl p-4 sm:p-5 border transition-all duration-200 h-full flex flex-col justify-between group
         ${onClick ? 'cursor-pointer' : ''}
         ${isSelected 
-          ? 'bg-brand-50 border-brand-500 shadow-lg shadow-brand-400/20 ring-1 ring-brand-500' 
-          : 'bg-white border-slate-200 hover:border-brand-400 hover:shadow-md'
+          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 ring-1 ring-primary' 
+          : 'bg-card border-border hover:border-primary/50 hover:shadow-md'
         }`}
     >
       <div className="flex items-center gap-1.5 mb-2 sm:mb-3">
-        <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider leading-tight ${isSelected ? 'text-brand-900' : 'text-slate-500'}`}>
+        <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider leading-tight ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
           {title}
         </span>
-        <Info size={14} className={`${isSelected ? 'text-brand-600' : 'text-slate-300'} cursor-help opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block`} />
+        <Info size={14} className={`${isSelected ? 'text-primary' : 'text-muted-foreground/50'} cursor-help opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block`} />
       </div>
       
       <div className="flex items-baseline gap-1.5 flex-wrap">
-        <span className={`text-xl sm:text-[26px] font-heading font-bold tracking-tight ${isSelected ? 'text-slate-900' : 'text-slate-900'}`}>
+        <span className={`text-xl sm:text-[26px] font-heading font-bold tracking-tight text-foreground`}>
           {value || '—'}
         </span>
         {typeLabel && value !== '—' && (
-          <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-brand-700' : 'text-slate-400'}`}>
+          <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
             {typeLabel}
           </span>
         )}
       </div>
       
       {subValue && (
-        <div className={`mt-2 text-[10px] sm:text-[11px] font-semibold ${isSelected ? 'text-brand-800' : 'text-slate-500'}`}>
+        <div className={`mt-2 text-[10px] sm:text-[11px] font-semibold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
           {subValue}
         </div>
       )}
       
       {/* Visual selection indicator */}
       {isSelected && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-brand-500 rounded-b-xl"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-b-xl"></div>
       )}
       
       {alert && (
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-2 h-2 bg-rose-500 rounded-full animate-pulse"></div>
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
       )}
     </div>
   );
@@ -79,8 +79,8 @@ export const MetricCard: React.FC<MetricCardProps> = ({
 export const SectionHeader: React.FC<{ title: string; description: string; rightElement?: React.ReactNode }> = ({ title, description, rightElement }) => (
   <div className="mb-6 sm:mb-8 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
     <div>
-      <h2 className="text-2xl sm:text-3xl font-bold font-heading text-slate-900 tracking-tight">{title}</h2>
-      <p className="mt-1 text-sm sm:text-base text-slate-500 max-w-2xl">{description}</p>
+      <h2 className="text-2xl sm:text-3xl font-bold font-heading text-foreground tracking-tight">{title}</h2>
+      <p className="mt-1 text-sm sm:text-base text-muted-foreground max-w-2xl">{description}</p>
     </div>
     {rightElement && <div className="w-full lg:w-auto">{rightElement}</div>}
   </div>
@@ -340,18 +340,18 @@ export const DataTable = <T extends Record<string, any>>({
   const visibleColumns = columns.filter(col => !hiddenColumns.has(String(col.key)));
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 shadow-sm flex flex-col relative min-h-[400px]">
+    <div className="bg-card rounded-xl sm:rounded-2xl border border-border shadow-sm flex flex-col relative min-h-[400px]">
       
       {/* Top Controls Bar */}
-      <div className={`px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white gap-3 rounded-t-xl sm:rounded-t-2xl z-20`}>
+      <div className={`px-4 py-3 sm:px-6 sm:py-4 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center bg-card gap-3 rounded-t-xl sm:rounded-t-2xl z-20`}>
         <div className="flex items-center gap-4">
-             <div className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest hidden sm:block">
+             <div className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:block">
                 Table Controls
              </div>
              {Object.keys(filters).length > 0 && (
                 <button 
                   onClick={clearAllFilters}
-                  className="flex items-center gap-1.5 px-2 py-1 bg-rose-50 text-rose-600 rounded-lg text-xs font-bold hover:bg-rose-100 transition-colors"
+                  className="flex items-center gap-1.5 px-2 py-1 bg-destructive/10 text-destructive rounded-lg text-xs font-bold hover:bg-destructive/20 transition-colors"
                 >
                     <Trash2 size={12} /> Clear Filters ({Object.keys(filters).length})
                 </button>
@@ -362,7 +362,7 @@ export const DataTable = <T extends Record<string, any>>({
           {enableExport && (
               <button 
                  onClick={handleExport}
-                 className="flex items-center px-3 py-2 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-brand-50 hover:text-brand-900 hover:border-brand-200 transition-colors"
+                 className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
                  title="Export current view to Excel"
               >
                   <Download size={14} className="mr-2" />
@@ -372,7 +372,7 @@ export const DataTable = <T extends Record<string, any>>({
 
           <button 
               onClick={() => setIsAutoFit(!isAutoFit)}
-              className="flex items-center px-3 py-2 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-muted hover:text-foreground transition-colors"
           >
               {isAutoFit ? <Maximize2 size={14} className="mr-2" /> : <Minimize2 size={14} className="mr-2" />}
               <span className="hidden sm:inline">{isAutoFit ? 'Stretch' : 'Auto Fit'}</span>
@@ -382,25 +382,25 @@ export const DataTable = <T extends Record<string, any>>({
           <div className="relative" ref={colMenuRef}>
             <button 
               onClick={() => setIsColumnMenuOpen(!isColumnMenuOpen)}
-              className="flex items-center px-3 py-2 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100 hover:text-slate-900 transition-colors"
+              className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-muted hover:text-foreground transition-colors"
             >
               <SlidersHorizontal size={14} className="mr-2" />
               Columns
             </button>
             
             {isColumnMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-100 z-50 p-3 animate-fadeIn">
-                <div className="text-[10px] font-bold text-slate-400 px-2 py-1 uppercase mb-2 tracking-widest border-b border-slate-50">Filter Columns</div>
+              <div className="absolute right-0 mt-2 w-64 bg-popover rounded-2xl shadow-2xl border border-border z-50 p-3 animate-fadeIn">
+                <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase mb-2 tracking-widest border-b border-border">Filter Columns</div>
                 <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mt-2">
                   {columns.map(col => (
-                    <label key={String(col.key)} className="flex items-center px-2 py-2 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
+                    <label key={String(col.key)} className="flex items-center px-2 py-2 hover:bg-muted rounded-lg cursor-pointer transition-colors">
                       <input 
                         type="checkbox" 
                         checked={!hiddenColumns.has(String(col.key))}
                         onChange={() => toggleColumn(String(col.key))}
-                        className="w-4 h-4 text-brand-600 rounded-md border-slate-300 focus:ring-brand-500"
+                        className="w-4 h-4 text-primary rounded-md border-border focus:ring-primary bg-background"
                       />
-                      <span className="ml-3 text-sm font-medium text-slate-700">{col.header}</span>
+                      <span className="ml-3 text-sm font-medium text-foreground">{col.header}</span>
                     </label>
                   ))}
                 </div>
@@ -415,9 +415,9 @@ export const DataTable = <T extends Record<string, any>>({
         onScroll={handleScroll}
         className="overflow-x-auto custom-scrollbar flex-1 relative min-h-[300px]"
       >
-        <table className={`${isAutoFit ? 'w-auto' : 'min-w-full'} divide-y divide-slate-100 border-separate border-spacing-0`}>
-          <thead className="bg-slate-50 z-10 sticky top-0">
-            <tr className="divide-x divide-slate-200">
+        <table className={`${isAutoFit ? 'w-auto' : 'min-w-full'} divide-y divide-border border-separate border-spacing-0`}>
+          <thead className="bg-muted z-10 sticky top-0">
+            <tr className="divide-x divide-border">
               {visibleColumns.map((col, i) => {
                  const colKey = String(col.key);
                  const isFiltered = !!filters[colKey];
@@ -427,17 +427,17 @@ export const DataTable = <T extends Record<string, any>>({
                  return (
                   <th 
                     key={colKey} 
-                    className={`px-3 py-3 text-left text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-wider font-heading border-b border-slate-200 bg-slate-50 z-20 group`}
+                    className={`px-3 py-3 text-left text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-wider font-heading border-b border-border bg-muted z-20 group`}
                     style={{ textAlign: col.align || 'left', minWidth: '150px' }}
                   >
                     <div className={`flex items-center justify-between w-full`}>
                       <div 
-                         className={`flex items-center gap-2 cursor-pointer hover:text-brand-600 truncate flex-1 select-none`} 
+                         className={`flex items-center gap-2 cursor-pointer hover:text-primary truncate flex-1 select-none`} 
                          onClick={() => col.sortable !== false && handleSort(colKey)}
                       >
-                        <span className={`truncate ${isSorted ? 'text-brand-600' : ''}`}>{col.header}</span>
+                        <span className={`truncate ${isSorted ? 'text-primary' : ''}`}>{col.header}</span>
                         {isSorted && (
-                          <span className="text-brand-500">
+                          <span className="text-primary">
                             {sortConfig.direction === 'asc' ? <ArrowUp size={12} strokeWidth={3} /> : <ArrowDown size={12} strokeWidth={3} />}
                           </span>
                         )}
@@ -447,7 +447,7 @@ export const DataTable = <T extends Record<string, any>>({
                          <button 
                             data-filter-trigger="true"
                             onClick={(e) => handleFilterClick(e, colKey)}
-                            className={`p-1.5 rounded-md transition-colors ml-2 flex-shrink-0 ${isFiltered || isActive ? 'bg-brand-100 text-brand-700 ring-1 ring-brand-200' : 'text-slate-400 hover:text-slate-800 hover:bg-slate-100'}`}
+                            className={`p-1.5 rounded-md transition-colors ml-2 flex-shrink-0 ${isFiltered || isActive ? 'bg-primary/20 text-primary ring-1 ring-primary/30' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                             title="Filter Column"
                          >
                             <ListFilter size={14} strokeWidth={isFiltered ? 2.5 : 2} />
@@ -458,12 +458,12 @@ export const DataTable = <T extends Record<string, any>>({
               )})}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 bg-white z-0 relative">
+          <tbody className="divide-y divide-border bg-card z-0 relative">
             {paginatedData.length > 0 ? (
               paginatedData.map((row, i) => (
-                <tr key={i} className="hover:bg-brand-50/30 transition-colors group divide-x divide-slate-100 bg-white">
+                <tr key={i} className="hover:bg-primary/5 transition-colors group divide-x divide-border bg-card">
                   {visibleColumns.map((col, j) => (
-                    <td key={j} className={`px-3 py-3 whitespace-nowrap text-xs sm:text-sm text-slate-700 font-medium`} style={{ textAlign: col.align || 'left' }}>
+                    <td key={j} className={`px-3 py-3 whitespace-nowrap text-xs sm:text-sm text-foreground font-medium`} style={{ textAlign: col.align || 'left' }}>
                       {col.render ? col.render(row) : safeRender(row[col.key])}
                     </td>
                   ))}
@@ -471,11 +471,11 @@ export const DataTable = <T extends Record<string, any>>({
               ))
             ) : (
               <tr>
-                <td colSpan={visibleColumns.length} className="px-6 py-16 text-center text-slate-400 bg-white">
+                <td colSpan={visibleColumns.length} className="px-6 py-16 text-center text-muted-foreground bg-card">
                   <div className="flex flex-col items-center justify-center">
-                    <Search className="w-12 h-12 mb-4 text-slate-200" />
-                    <p className="font-heading font-medium text-lg text-slate-600">No matching records</p>
-                    <p className="text-sm text-slate-400">Try adjusting your filters or upload a different file.</p>
+                    <Search className="w-12 h-12 mb-4 text-muted-foreground/30" />
+                    <p className="font-heading font-medium text-lg text-foreground">No matching records</p>
+                    <p className="text-sm text-muted-foreground">Try adjusting your filters or upload a different file.</p>
                   </div>
                 </td>
               </tr>
@@ -488,7 +488,7 @@ export const DataTable = <T extends Record<string, any>>({
       {activeFilterCol && menuPosition && (
           <div 
              ref={filterMenuRef}
-             className="fixed w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 z-[9999] overflow-hidden text-slate-700 animate-fadeIn"
+             className="fixed w-72 bg-popover rounded-2xl shadow-2xl border border-border z-[9999] overflow-hidden text-foreground animate-fadeIn"
              style={{ top: menuPosition.top, left: menuPosition.left }}
              onClick={(e) => e.stopPropagation()} 
           >
@@ -504,21 +504,21 @@ export const DataTable = <T extends Record<string, any>>({
       )}
 
       {/* Pagination Controls */}
-      <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-t border-slate-100 bg-white gap-4 z-20 rounded-b-xl sm:rounded-b-2xl">
-        <div className="text-[10px] sm:text-xs font-medium text-slate-500 text-center sm:text-left">
-          Showing <span className="font-bold text-slate-900">{Math.min(startIndex + 1, totalItems)}</span> to <span className="font-bold text-slate-900">{endIndex}</span> of <span className="font-bold text-slate-900">{totalItems}</span> results
+      <div className="flex flex-col sm:flex-row items-center justify-between px-4 py-3 sm:px-6 sm:py-4 border-t border-border bg-card gap-4 z-20 rounded-b-xl sm:rounded-b-2xl">
+        <div className="text-[10px] sm:text-xs font-medium text-muted-foreground text-center sm:text-left">
+          Showing <span className="font-bold text-foreground">{Math.min(startIndex + 1, totalItems)}</span> to <span className="font-bold text-foreground">{endIndex}</span> of <span className="font-bold text-foreground">{totalItems}</span> results
         </div>
         
         <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 w-full sm:w-auto">
            <div className="flex items-center gap-2">
-             <span className="text-[10px] sm:text-xs font-bold text-slate-500 uppercase tracking-wide">Rows:</span>
+             <span className="text-[10px] sm:text-xs font-bold text-muted-foreground uppercase tracking-wide">Rows:</span>
              <select 
                value={rowsPerPage} 
                onChange={(e) => {
                  setRowsPerPage(Number(e.target.value));
                  setCurrentPage(1);
                }}
-               className="bg-slate-50 border border-slate-200 text-slate-900 text-xs rounded-lg focus:ring-brand-500 focus:border-brand-500 block p-1.5 font-bold outline-none"
+               className="bg-muted border border-border text-foreground text-xs rounded-lg focus:ring-primary focus:border-primary block p-1.5 font-bold outline-none"
              >
                <option value={10}>10</option>
                <option value={25}>25</option>
@@ -531,19 +531,19 @@ export const DataTable = <T extends Record<string, any>>({
              <button 
                 onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${currentPage === 1 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${currentPage === 1 ? 'text-muted-foreground/50 cursor-not-allowed' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
              >
                <ChevronLeft size={14} /> Prev
              </button>
              
-             <span className="text-xs font-bold text-slate-900 px-2">
+             <span className="text-xs font-bold text-foreground px-2">
                {currentPage} / {Math.max(1, totalPages)}
              </span>
              
              <button 
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages || totalPages === 0}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${currentPage === totalPages || totalPages === 0 ? 'text-slate-300 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'}`}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${currentPage === totalPages || totalPages === 0 ? 'text-muted-foreground/50 cursor-not-allowed' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
              >
                Next <ChevronRight size={14} />
              </button>
@@ -623,27 +623,27 @@ const FilterMenu: React.FC<{
     return (
         <div className="flex flex-col max-h-[450px]">
             {/* Header: Sort & Close */}
-            <div className="p-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <span className="text-xs font-bold text-slate-500 uppercase">{column.header}</span>
-                <button onClick={onClose} className="text-slate-400 hover:text-slate-700"><X size={14}/></button>
+            <div className="p-3 border-b border-border flex items-center justify-between bg-muted">
+                <span className="text-xs font-bold text-muted-foreground uppercase">{column.header}</span>
+                <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X size={14}/></button>
             </div>
             
-            <div className="flex p-2 gap-2 border-b border-slate-100">
-                <button onClick={() => onSort('asc')} className="flex-1 py-1.5 px-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg flex items-center justify-center gap-1 border border-slate-100"><SortAsc size={14}/> Asc</button>
-                <button onClick={() => onSort('desc')} className="flex-1 py-1.5 px-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg flex items-center justify-center gap-1 border border-slate-100"><SortDesc size={14}/> Desc</button>
+            <div className="flex p-2 gap-2 border-b border-border">
+                <button onClick={() => onSort('asc')} className="flex-1 py-1.5 px-2 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg flex items-center justify-center gap-1 border border-border"><SortAsc size={14}/> Asc</button>
+                <button onClick={() => onSort('desc')} className="flex-1 py-1.5 px-2 text-xs font-bold text-muted-foreground hover:bg-muted rounded-lg flex items-center justify-center gap-1 border border-border"><SortDesc size={14}/> Desc</button>
             </div>
 
             {/* Mode Tabs */}
-            <div className="flex border-b border-slate-100">
+            <div className="flex border-b border-border">
                 <button 
                     onClick={() => setMode('values')} 
-                    className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${mode === 'values' ? 'border-brand-500 text-brand-700 bg-brand-50/50' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                    className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${mode === 'values' ? 'border-primary text-primary bg-primary/10' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                 >
                     Values
                 </button>
                 <button 
                     onClick={() => setMode('condition')} 
-                    className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${mode === 'condition' ? 'border-brand-500 text-brand-700 bg-brand-50/50' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+                    className={`flex-1 py-2 text-xs font-bold border-b-2 transition-colors ${mode === 'condition' ? 'border-primary text-primary bg-primary/10' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
                 >
                     Conditions
                 </button>
@@ -653,56 +653,56 @@ const FilterMenu: React.FC<{
             <div className="flex-1 overflow-hidden flex flex-col min-h-[250px]">
                 {mode === 'values' ? (
                     <>
-                        <div className="p-3 border-b border-slate-100">
+                        <div className="p-3 border-b border-border">
                             <div className="relative">
-                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" size={12} />
+                                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={12} />
                                 <input 
                                     type="text" 
                                     placeholder="Search values..." 
                                     value={searchTerm}
                                     onChange={e => setSearchTerm(e.target.value)}
-                                    className="w-full pl-8 pr-3 py-1.5 text-xs border border-slate-200 rounded-lg focus:border-brand-500 outline-none"
+                                    className="w-full pl-8 pr-3 py-1.5 text-xs border border-border rounded-lg focus:border-primary outline-none bg-background text-foreground"
                                 />
                             </div>
                         </div>
                         <div className="overflow-y-auto custom-scrollbar p-2 space-y-0.5 flex-1">
-                            <label className="flex items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer group">
+                            <label className="flex items-center px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer group">
                                 <div className="relative flex items-center justify-center w-4 h-4 mr-2">
-                                    <input type="checkbox" checked={isAllSelected} ref={input => { if (input) input.indeterminate = isIndeterminate; }} onChange={toggleAll} className="peer appearance-none w-4 h-4 border border-slate-300 rounded bg-white checked:bg-brand-500 checked:border-brand-500 transition-colors" />
-                                    <Check size={10} className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={4} />
-                                    {isIndeterminate && <div className="absolute w-2 h-0.5 bg-brand-500 pointer-events-none" />}
+                                    <input type="checkbox" checked={isAllSelected} ref={input => { if (input) input.indeterminate = isIndeterminate; }} onChange={toggleAll} className="peer appearance-none w-4 h-4 border border-border rounded bg-background checked:bg-primary checked:border-primary transition-colors" />
+                                    <Check size={10} className="absolute text-primary-foreground opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={4} />
+                                    {isIndeterminate && <div className="absolute w-2 h-0.5 bg-primary pointer-events-none" />}
                                 </div>
-                                <span className="text-xs font-medium text-slate-700 group-hover:text-slate-900">(Select All)</span>
+                                <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">(Select All)</span>
                             </label>
-                            <div className="h-px bg-slate-100 my-1" />
+                            <div className="h-px bg-border my-1" />
                             {filteredValues.length > 0 ? (
                                 filteredValues.map(val => (
-                                    <label key={val} className="flex items-center px-2 py-1.5 hover:bg-slate-50 rounded-md cursor-pointer group">
+                                    <label key={val} className="flex items-center px-2 py-1.5 hover:bg-muted rounded-md cursor-pointer group">
                                         <div className="relative flex items-center justify-center w-4 h-4 mr-2">
                                             <input 
                                                 type="checkbox" 
                                                 checked={checkedItems.has(val)} 
                                                 onChange={() => toggleItem(val)}
-                                                className="peer appearance-none w-4 h-4 border border-slate-300 rounded bg-white checked:bg-brand-500 checked:border-brand-500 transition-colors" 
+                                                className="peer appearance-none w-4 h-4 border border-border rounded bg-background checked:bg-primary checked:border-primary transition-colors" 
                                             />
-                                            <Check size={10} className="absolute text-white opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={4} />
+                                            <Check size={10} className="absolute text-primary-foreground opacity-0 peer-checked:opacity-100 pointer-events-none" strokeWidth={4} />
                                         </div>
-                                        <span className="text-xs text-slate-600 truncate group-hover:text-slate-900 select-none">{val || '(Empty)'}</span>
+                                        <span className="text-xs text-muted-foreground truncate group-hover:text-foreground select-none">{val || '(Empty)'}</span>
                                     </label>
                                 ))
                             ) : (
-                                <div className="text-xs text-slate-400 text-center py-4">No values found</div>
+                                <div className="text-xs text-muted-foreground text-center py-4">No values found</div>
                             )}
                         </div>
                     </>
                 ) : (
                     <div className="p-4 space-y-4">
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 mb-1.5">Operator</label>
+                            <label className="block text-xs font-bold text-muted-foreground mb-1.5">Operator</label>
                             <select 
                                 value={operator} 
                                 onChange={(e) => setOperator(e.target.value)} 
-                                className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-brand-500 bg-white"
+                                className="w-full text-xs p-2 border border-border rounded-lg outline-none focus:border-primary bg-background text-foreground"
                             >
                                 <option value="contains">Contains</option>
                                 <option value="equals">Equals</option>
@@ -716,16 +716,16 @@ const FilterMenu: React.FC<{
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-bold text-slate-500 mb-1.5">Value</label>
+                            <label className="block text-xs font-bold text-muted-foreground mb-1.5">Value</label>
                             <input 
                                 type="text" 
                                 value={conditionVal}
                                 onChange={(e) => setConditionVal(e.target.value)}
                                 placeholder="Enter value..."
-                                className="w-full text-xs p-2 border border-slate-200 rounded-lg outline-none focus:border-brand-500"
+                                className="w-full text-xs p-2 border border-border rounded-lg outline-none focus:border-primary bg-background text-foreground"
                             />
                         </div>
-                        <div className="text-[10px] text-slate-400 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <div className="text-[10px] text-muted-foreground bg-muted p-2 rounded-lg border border-border">
                             Use numeric operators for price, spend, etc. String operators are case-insensitive.
                         </div>
                     </div>
@@ -733,16 +733,16 @@ const FilterMenu: React.FC<{
             </div>
 
             {/* Footer Buttons */}
-            <div className="p-3 border-t border-slate-100 bg-slate-50 flex gap-2">
+            <div className="p-3 border-t border-border bg-muted flex gap-2">
                 <button 
                     onClick={() => onApply(null)} 
-                    className="flex-1 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50"
+                    className="flex-1 py-2 text-xs font-bold text-muted-foreground bg-background border border-border rounded-lg hover:bg-muted"
                 >
                     Clear
                 </button>
                 <button 
                     onClick={handleApply} 
-                    className="flex-1 py-2 text-xs font-bold text-brand-900 bg-brand-400 border border-brand-500 rounded-lg hover:bg-brand-300 shadow-sm"
+                    className="flex-1 py-2 text-xs font-bold text-primary-foreground bg-primary border border-primary rounded-lg hover:bg-primary/90 shadow-sm"
                 >
                     Apply Filter
                 </button>
@@ -778,7 +778,7 @@ export const FilterDropdown: React.FC<{ label: string; options: { label: string;
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={`inline-flex items-center justify-between w-full px-5 py-2.5 text-sm font-bold border rounded-xl shadow-sm focus:outline-none transition-all ${
-          selectedValues.length > 0 ? 'bg-brand-50 text-brand-900 border-brand-300' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+          selectedValues.length > 0 ? 'bg-primary/10 text-primary border-primary/30' : 'bg-card text-foreground border-border hover:border-primary/50'
         }`}
       >
         <span>{label} {selectedValues.length > 0 && `(${selectedValues.length})`}</span>
@@ -786,16 +786,16 @@ export const FilterDropdown: React.FC<{ label: string; options: { label: string;
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 z-50 w-full sm:w-64 mt-2 origin-top-right bg-white rounded-2xl shadow-2xl border border-slate-100 ring-1 ring-black ring-opacity-5 focus:outline-none max-h-72 overflow-y-auto custom-scrollbar">
+        <div className="absolute left-0 z-50 w-full sm:w-64 mt-2 origin-top-right bg-popover rounded-2xl shadow-2xl border border-border ring-1 ring-background/5 focus:outline-none max-h-72 overflow-y-auto custom-scrollbar">
           <div className="p-3 space-y-1">
             {options.map((option) => (
               <div
                 key={option.value}
-                className={`flex items-center px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors ${selectedValues.includes(option.value) ? 'bg-brand-50 text-brand-900' : 'text-slate-700 hover:bg-slate-50'}`}
+                className={`flex items-center px-3 py-2.5 rounded-xl text-sm font-medium cursor-pointer transition-colors ${selectedValues.includes(option.value) ? 'bg-primary/10 text-primary' : 'text-foreground hover:bg-muted'}`}
                 onClick={() => handleToggle(option.value)}
               >
-                <div className={`w-5 h-5 mr-3 rounded-lg border flex items-center justify-center transition-all ${selectedValues.includes(option.value) ? 'bg-brand-500 border-brand-500 shadow-inner' : 'border-slate-300 bg-white'}`}>
-                  {selectedValues.includes(option.value) && <div className="w-2 h-2 bg-black rounded-sm" />}
+                <div className={`w-5 h-5 mr-3 rounded-lg border flex items-center justify-center transition-all ${selectedValues.includes(option.value) ? 'bg-primary border-primary shadow-inner' : 'border-border bg-background'}`}>
+                  {selectedValues.includes(option.value) && <div className="w-2 h-2 bg-primary-foreground rounded-sm" />}
                 </div>
                 <span className="truncate flex-1">{option.label}</span>
               </div>
