@@ -14,8 +14,10 @@ import {
   Settings,
   ScanSearch,
   Shield,
-  Package
+  Package,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LayoutProps {
   currentView: string;
@@ -38,7 +40,7 @@ const NAV_ITEMS = [
 
 export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-
+  const { user, signOut } = useAuth();
   return (
     <div className="flex h-screen bg-slate-50 overflow-hidden text-slate-900 font-sans">
       {/* Mobile Backdrop Overlay */}
@@ -102,12 +104,19 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
         <div className="p-4 border-t border-white/10 bg-black">
           <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/5 border border-white/5">
             <div className="w-9 h-9 rounded-full bg-brand-400 flex items-center justify-center text-xs font-black text-black">
-              LM
+              {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <div>
-              <p className="text-sm font-bold text-white">Lynx User</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-white truncate">{user?.email || 'User'}</p>
               <p className="text-xs text-brand-400 font-medium">Expert Mode</p>
             </div>
+            <button
+              onClick={signOut}
+              className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+              title="Sign out"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </div>
       </aside>
