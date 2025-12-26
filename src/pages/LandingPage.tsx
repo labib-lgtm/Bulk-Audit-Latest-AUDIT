@@ -5,7 +5,7 @@ import {
   Search, Package, Layers, Activity, FileDown, CheckCircle, Upload,
   PieChart, Video, Monitor, ChevronRight, Plus, Minus
 } from "lucide-react";
-import { AnimatedSection } from "@/hooks/useScrollAnimation";
+import { AnimatedSection, AnimatedCounter, StaggeredContainer } from "@/hooks/useScrollAnimation";
 import lynxLogoDark from "@/assets/lynx-logo-dark.png";
 import { useState } from "react";
 
@@ -215,7 +215,7 @@ const LandingPage = () => {
       {/* Problem Statement - Large Typography */}
       <section className="py-32 px-6">
         <div className="max-w-5xl mx-auto">
-          <AnimatedSection>
+          <AnimatedSection animation="blur">
             <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground">
               After years of managing Amazon PPC, one thing hasn't changed: 
               <span className="text-foreground"> sellers are drowning in spreadsheets </span>
@@ -223,7 +223,7 @@ const LandingPage = () => {
             </p>
           </AnimatedSection>
           
-          <AnimatedSection delay={200} className="mt-12">
+          <AnimatedSection delay={300} animation="blur" className="mt-12">
             <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-primary">
               It's time for a new approach.
             </p>
@@ -233,12 +233,15 @@ const LandingPage = () => {
 
       {/* Stats Section - Dark Card */}
       <section className="py-24 px-6">
-        <AnimatedSection>
+        <AnimatedSection animation="scale">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 p-10 md:p-16 rounded-3xl bg-card/80 border border-border backdrop-blur-sm">
               {stats.map((stat, i) => (
                 <div key={i} className="text-center">
-                  <p className="text-4xl md:text-5xl lg:text-6xl font-black text-primary mb-2">{stat.value}</p>
+                  <AnimatedCounter 
+                    value={stat.value} 
+                    className="text-4xl md:text-5xl lg:text-6xl font-black text-primary mb-2 block"
+                  />
                   <p className="text-sm md:text-base text-muted-foreground">{stat.label}</p>
                 </div>
               ))}
@@ -250,7 +253,7 @@ const LandingPage = () => {
       {/* Features Grid - Clean Cards */}
       <section className="py-24 px-6">
         <div className="max-w-7xl mx-auto">
-          <AnimatedSection className="text-center mb-20">
+          <AnimatedSection animation="blur" className="text-center mb-20">
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6">
               8 Dashboards.<br />
               <span className="text-primary">One Platform.</span>
@@ -260,21 +263,20 @@ const LandingPage = () => {
             </p>
           </AnimatedSection>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StaggeredContainer className="grid md:grid-cols-2 lg:grid-cols-4 gap-4" staggerDelay={80}>
             {features.map((feature, index) => (
-              <AnimatedSection 
+              <div 
                 key={index}
-                delay={index * 50}
-                className="group p-6 rounded-2xl bg-card/50 border border-border hover:border-primary/50 hover:bg-card transition-all duration-300"
+                className="group p-6 rounded-2xl bg-card/50 border border-border hover:border-primary/50 hover:bg-card transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5"
               >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                   <feature.icon className="w-6 h-6 text-primary" />
                 </div>
                 <h3 className="text-lg font-bold mb-2 text-foreground">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-              </AnimatedSection>
+              </div>
             ))}
-          </div>
+          </StaggeredContainer>
         </div>
       </section>
 
