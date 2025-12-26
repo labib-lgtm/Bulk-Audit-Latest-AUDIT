@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart3, Target, TrendingUp, Zap, Shield, Clock } from "lucide-react";
 import { AnimatedSection } from "@/hooks/useScrollAnimation";
-import lynxLogoFull from "@/assets/lynx-logo-full.png";
+import lynxLogoDark from "@/assets/lynx-logo-dark.png";
 import lynxLogoIcon from "@/assets/lynx-logo-icon.png";
 
 const LandingPage = () => {
@@ -46,7 +46,7 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border animate-fade-in-down">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <img src={lynxLogoFull} alt="Lynx Media" className="h-10" />
+          <img src={lynxLogoDark} alt="Lynx Media" className="h-10" />
           <Button 
             onClick={() => navigate("/auth")}
             className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold transition-all hover:scale-105"
@@ -293,7 +293,7 @@ const LandingPage = () => {
           
           <p className="text-muted-foreground text-lg mb-8">Designed with versatility in mind</p>
           
-          <img src={lynxLogoFull} alt="Lynx Media" className="h-8 opacity-60 hover:opacity-100 transition-opacity" />
+          <img src={lynxLogoDark} alt="Lynx Media" className="h-8 opacity-60 hover:opacity-100 transition-opacity" />
           
           <p className="text-sm text-muted-foreground mt-8">
             © {new Date().getFullYear()} Lynx Media. All rights reserved.
