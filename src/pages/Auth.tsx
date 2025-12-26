@@ -21,14 +21,14 @@ const Auth = () => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     });
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
-        navigate('/', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     });
 
@@ -81,7 +81,7 @@ const Auth = () => {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: `${window.location.origin}/dashboard`,
           },
         });
 
@@ -105,42 +105,42 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
       
       {/* Glow Effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-400/10 rounded-full blur-[150px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-400/5 rounded-full blur-[120px]" />
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[150px]" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-[120px]" />
 
       <div className="relative z-10 w-full max-w-md">
         {/* Logo */}
         <div className="flex items-center justify-center gap-4 mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-brand-400 flex items-center justify-center shadow-[0_0_40px_rgba(204,255,0,0.4)]">
-            <Shield className="w-8 h-8 text-black fill-current" strokeWidth={2.5} />
+          <div className="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-[0_0_40px_rgba(178,255,0,0.4)]">
+            <Shield className="w-8 h-8 text-primary-foreground fill-current" strokeWidth={2.5} />
           </div>
           <div className="flex flex-col items-start">
-            <span className="text-3xl font-heading font-black tracking-tight text-white">LYNX</span>
-            <span className="text-xl font-heading font-bold tracking-tight text-brand-400">MEDIA</span>
+            <span className="text-3xl font-black tracking-tight text-foreground">LYNX</span>
+            <span className="text-xl font-bold tracking-tight text-primary">MEDIA</span>
           </div>
         </div>
 
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-8 backdrop-blur-sm">
-          <h1 className="text-2xl font-heading font-bold text-white text-center mb-2">
+        <div className="bg-card/50 border border-border rounded-2xl p-8 backdrop-blur-sm">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-2">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
-          <p className="text-slate-400 text-center mb-6">
+          <p className="text-muted-foreground text-center mb-6">
             {isLogin ? 'Sign in to access your dashboards' : 'Sign up to get started'}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   id="email"
                   type="email"
@@ -150,23 +150,23 @@ const Auth = () => {
                     if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
                   }}
                   placeholder="you@example.com"
-                  className={`w-full pl-10 pr-4 py-3 bg-slate-800/50 border rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all ${
-                    errors.email ? 'border-rose-500' : 'border-slate-700'
+                  className={`w-full pl-10 pr-4 py-3 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                    errors.email ? 'border-destructive' : 'border-border'
                   }`}
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-sm text-rose-400">{errors.email}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.email}</p>
               )}
             </div>
 
             {/* Password Field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
@@ -176,20 +176,20 @@ const Auth = () => {
                     if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
                   }}
                   placeholder="••••••••"
-                  className={`w-full pl-10 pr-12 py-3 bg-slate-800/50 border rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-400 transition-all ${
-                    errors.password ? 'border-rose-500' : 'border-slate-700'
+                  className={`w-full pl-10 pr-12 py-3 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                    errors.password ? 'border-destructive' : 'border-border'
                   }`}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1 text-sm text-rose-400">{errors.password}</p>
+                <p className="mt-1 text-sm text-destructive">{errors.password}</p>
               )}
             </div>
 
@@ -197,7 +197,7 @@ const Auth = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 bg-brand-400 text-black font-bold rounded-xl hover:bg-brand-300 transition-all shadow-[0_0_20px_rgba(204,255,0,0.2)] hover:shadow-[0_0_30px_rgba(204,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
@@ -211,21 +211,21 @@ const Auth = () => {
           </form>
 
           {/* Toggle Login/Signup */}
-          <p className="mt-6 text-center text-slate-400">
+          <p className="mt-6 text-center text-muted-foreground">
             {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
             <button
               onClick={() => {
                 setIsLogin(!isLogin);
                 setErrors({});
               }}
-              className="text-brand-400 font-medium hover:text-brand-300 transition-colors"
+              className="text-primary font-medium hover:text-primary/80 transition-colors"
             >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
         </div>
 
-        <p className="text-xs text-slate-600 text-center mt-6">
+        <p className="text-xs text-muted-foreground text-center mt-6">
           Your data is secure and encrypted.
         </p>
       </div>
