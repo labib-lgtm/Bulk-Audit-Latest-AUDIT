@@ -103,11 +103,63 @@ const LandingPage = () => {
       </nav>
 
       {/* Hero Section - Full Screen Immersive */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6">
-        {/* Animated Background Glow */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/15 rounded-full blur-[200px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary/10 rounded-full blur-[150px] pointer-events-none" />
-        <div className="absolute top-1/4 right-0 w-[300px] h-[300px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
+        {/* Animated Gradient Background */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Main animated gradient orbs */}
+          <div 
+            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/20 rounded-full blur-[180px] pointer-events-none animate-pulse"
+            style={{ animation: 'pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
+          />
+          <div 
+            className="absolute bottom-0 left-[-10%] w-[500px] h-[500px] bg-primary/15 rounded-full blur-[150px] pointer-events-none"
+            style={{ animation: 'float-slow 12s ease-in-out infinite' }}
+          />
+          <div 
+            className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] bg-primary/12 rounded-full blur-[120px] pointer-events-none"
+            style={{ animation: 'float-slow 10s ease-in-out infinite reverse' }}
+          />
+          <div 
+            className="absolute top-[60%] left-[10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"
+            style={{ animation: 'float-slow 14s ease-in-out infinite 2s' }}
+          />
+          
+          {/* Floating particles */}
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-primary/40 rounded-full pointer-events-none"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `particle-float ${8 + Math.random() * 8}s ease-in-out infinite ${Math.random() * 5}s`,
+                opacity: 0.3 + Math.random() * 0.4
+              }}
+            />
+          ))}
+          
+          {/* Additional larger floating dots */}
+          {[...Array(8)].map((_, i) => (
+            <div
+              key={`large-${i}`}
+              className="absolute w-2 h-2 bg-primary/30 rounded-full pointer-events-none blur-[1px]"
+              style={{
+                left: `${10 + Math.random() * 80}%`,
+                top: `${10 + Math.random() * 80}%`,
+                animation: `particle-float ${10 + Math.random() * 6}s ease-in-out infinite ${Math.random() * 3}s`,
+              }}
+            />
+          ))}
+          
+          {/* Grid overlay for depth */}
+          <div 
+            className="absolute inset-0 opacity-[0.015]"
+            style={{
+              backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
+              backgroundSize: '60px 60px'
+            }}
+          />
+        </div>
         
         <div className="relative z-10 max-w-5xl mx-auto text-center pt-20">
           <div 
