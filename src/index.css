@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    /* LYNX MEDIA Brand - Dark Theme by Default */
-    --background: 240 16% 9%; /* #13131A Black */
-    --foreground: 0 0% 98%; /* #FBFBFB White */
+    /* LYNX MEDIA Brand - Light Theme by Default */
+    --background: 0 0% 100%; /* White */
+    --foreground: 240 10% 10%; /* Near black */
 
-    --card: 240 12% 12%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 99%;
+    --card-foreground: 240 10% 10%;
 
-    --popover: 240 12% 10%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
 
     /* Future Green as Primary */
-    --primary: 78 100% 50%; /* #B2FF00 Future Green */
-    --primary-foreground: 240 16% 9%; /* Dark text on green */
+    --primary: 78 100% 40%; /* Slightly darker for light bg */
+    --primary-foreground: 0 0% 100%; /* White text on green */
 
-    --secondary: 240 10% 15%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 5% 94%;
+    --secondary-foreground: 240 10% 10%;
 
-    --muted: 240 8% 18%;
-    --muted-foreground: 240 5% 60%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 5% 40%;
 
-    --accent: 78 100% 50%;
-    --accent-foreground: 240 16% 9%;
+    --accent: 78 100% 40%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 240 8% 20%;
-    --input: 240 8% 18%;
-    --ring: 78 100% 50%;
+    --border: 240 5% 87%;
+    --input: 240 5% 90%;
+    --ring: 78 100% 40%;
 
     --radius: 0.5rem;
 
@@ -52,17 +52,17 @@
     --brand-950: 78 100% 10%;
 
     /* Glow Effects */
-    --glow-primary: 0 0 60px hsl(78 100% 50% / 0.4);
-    --glow-strong: 0 0 100px hsl(78 100% 50% / 0.6);
+    --glow-primary: 0 0 60px hsl(78 100% 50% / 0.2);
+    --glow-strong: 0 0 100px hsl(78 100% 50% / 0.3);
 
-    --sidebar-background: 240 12% 8%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 78 100% 50%;
-    --sidebar-primary-foreground: 240 16% 9%;
-    --sidebar-accent: 240 8% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 240 8% 18%;
-    --sidebar-ring: 78 100% 50%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 10% 10%;
+    --sidebar-primary: 78 100% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 94%;
+    --sidebar-accent-foreground: 240 10% 10%;
+    --sidebar-border: 240 5% 87%;
+    --sidebar-ring: 78 100% 40%;
   }
 
   .dark {
