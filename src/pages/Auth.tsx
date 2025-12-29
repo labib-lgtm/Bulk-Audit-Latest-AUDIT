@@ -1,12 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { Shield, Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Shield, Mail, Lock, Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
 import { z } from 'zod';
 import { toast } from 'sonner';
 
 const emailSchema = z.string().email('Please enter a valid email address');
-const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
+
+// Stronger password requirements
+const passwordSchema = z.string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[a-z]/, 'Password must contain a lowercase letter')
+  .regex(/[A-Z]/, 'Password must contain an uppercase letter')
+  .regex(/[0-9]/, 'Password must contain a number')
+  .regex(/[^a-zA-Z0-9]/, 'Password must contain a special character');
+
+// Password requirements for display
+const passwordRequirements = [
+  { regex: /.{8,}/, label: 'At least 8 characters' },
+  { regex: /[a-z]/, label: 'One lowercase letter' },
+  { regex: /[A-Z]/, label: 'One uppercase letter' },
+  { regex: /[0-9]/, label: 'One number' },
+  { regex: /[^a-zA-Z0-9]/, label: 'One special character' },
+];
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -43,9 +59,16 @@ const Auth = () => {
       newErrors.email = emailResult.error.errors[0].message;
     }
 
-    const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error.errors[0].message;
+    // For signup, use strict validation; for login, just check minimum length
+    if (isLogin) {
+      if (password.length < 1) {
+        newErrors.password = 'Password is required';
+      }
+    } else {
+      const passwordResult = passwordSchema.safeParse(password);
+      if (!passwordResult.success) {
+        newErrors.password = 'Please meet all password requirements';
+      }
     }
 
     setErrors(newErrors);
@@ -190,6 +213,30 @@ const Auth = () => {
               </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-destructive">{errors.password}</p>
+              )}
+              
+              {/* Password Requirements - Only show during signup */}
+              {!isLogin && password.length > 0 && (
+                <div className="mt-3 p-3 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Password requirements:</p>
+                  <div className="grid grid-cols-1 gap-1">
+                    {passwordRequirements.map((req, index) => {
+                      const isMet = req.regex.test(password);
+                      return (
+                        <div key={index} className="flex items-center gap-2">
+                          {isMet ? (
+                            <Check className="w-3.5 h-3.5 text-primary" />
+                          ) : (
+                            <X className="w-3.5 h-3.5 text-muted-foreground" />
+                          )}
+                          <span className={`text-xs ${isMet ? 'text-foreground' : 'text-muted-foreground'}`}>
+                            {req.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
             </div>
 
