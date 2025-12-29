@@ -94,16 +94,16 @@ const LandingPage = () => {
   ];
 
   const tools = [
-    { icon: LayoutDashboard, label: "Executive Dashboard", active: true },
-    { icon: Target, label: "SP Campaigns" },
-    { icon: Video, label: "SB Campaigns" },
-    { icon: Monitor, label: "SD Campaigns" },
-    { icon: Search, label: "Search Terms" },
-    { icon: Package, label: "ASIN Audit" },
-    { icon: Layers, label: "Portfolios" },
-    { icon: Activity, label: "Diagnostics" },
-    { icon: BarChart3, label: "TACOS/ROAS" },
-    { icon: FileText, label: "Reports" },
+    { icon: LayoutDashboard, label: "Executive Dashboard", active: true, route: "/dashboard" },
+    { icon: Target, label: "SP Campaigns", route: "/dashboard/sp" },
+    { icon: Video, label: "SB Campaigns", route: "/dashboard/sb" },
+    { icon: Monitor, label: "SD Campaigns", route: "/dashboard/sd" },
+    { icon: Search, label: "Search Terms", route: "/dashboard/search-terms" },
+    { icon: Package, label: "ASIN Audit", route: "/dashboard/asin-audit" },
+    { icon: Layers, label: "Portfolios", route: "/dashboard/portfolios" },
+    { icon: Activity, label: "Diagnostics", route: "/dashboard/diagnostics" },
+    { icon: BarChart3, label: "TACOS/ROAS", route: "/dashboard" },
+    { icon: FileText, label: "Reports", route: "/dashboard" },
   ];
 
   const faqs = [
@@ -405,6 +405,7 @@ const LandingPage = () => {
                 variants={scaleIn}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate(tool.route)}
                 className={`flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl transition-colors cursor-pointer ${
                   tool.active 
                     ? 'bg-primary text-primary-foreground' 
@@ -433,6 +434,7 @@ const LandingPage = () => {
                 variants={scaleIn}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => navigate(tool.route)}
                 className="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl transition-colors cursor-pointer bg-card border border-border/30 hover:border-primary/30"
               >
                 <tool.icon className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
