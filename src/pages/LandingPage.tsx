@@ -130,13 +130,13 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden dark">
       {/* Navigation */}
       <motion.nav 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
-        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full border border-border/30 bg-[#0a0a0f]/80 backdrop-blur-xl"
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full border border-border/30 bg-background/80 backdrop-blur-xl"
       >
         <div className="flex items-center gap-8">
           <img src={lynxLogoDark} alt="Lynx Media" className="h-6" />
@@ -244,8 +244,8 @@ const LandingPage = () => {
               transition={{ duration: 0.3 }}
               className="relative w-full max-w-3xl"
             >
-              <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-t-xl p-2 border border-border/30">
-                <div className="rounded-lg overflow-hidden bg-[#13131a] aspect-[16/10]">
+              <div className="relative bg-gradient-to-b from-muted to-background rounded-t-xl p-2 border border-border/30">
+                <div className="rounded-lg overflow-hidden bg-card aspect-[16/10]">
                   <img 
                     src={dashboardLaptopMockup} 
                     alt="Lynx Media Dashboard" 
@@ -253,8 +253,8 @@ const LandingPage = () => {
                   />
                 </div>
               </div>
-              <div className="h-4 bg-gradient-to-b from-[#1a1a24] to-[#2a2a34] rounded-b-lg mx-4" />
-              <div className="h-1 bg-[#2a2a34] rounded-full mx-8" />
+              <div className="h-4 bg-gradient-to-b from-muted to-secondary rounded-b-lg mx-4" />
+              <div className="h-1 bg-secondary rounded-full mx-8" />
             </motion.div>
 
             {/* Phone Mockup */}
@@ -265,8 +265,8 @@ const LandingPage = () => {
               whileHover={{ scale: 1.05 }}
               className="absolute right-4 bottom-4 md:right-0 md:bottom-0 md:relative w-24 md:w-40 lg:w-48"
             >
-              <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-3xl p-1.5 border border-border/30">
-                <div className="rounded-2xl overflow-hidden bg-[#13131a] aspect-[9/19]">
+              <div className="relative bg-gradient-to-b from-muted to-background rounded-3xl p-1.5 border border-border/30">
+                <div className="rounded-2xl overflow-hidden bg-card aspect-[9/19]">
                   <img 
                     src={dashboardMobileMockup} 
                     alt="Lynx Media Mobile Dashboard" 
@@ -292,7 +292,7 @@ const LandingPage = () => {
               whileHover={{ scale: 1.1, y: -5 }}
               className="flex flex-col items-center gap-2 group cursor-pointer"
             >
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1a1a28] to-[#0f0f15] border border-border/30 flex items-center justify-center group-hover:border-primary/30 transition-colors">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-muted to-background border border-border/30 flex items-center justify-center group-hover:border-primary/30 transition-colors">
                 <persona.icon className="w-6 h-6 text-primary/60 group-hover:text-primary transition-colors" />
               </div>
               <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{persona.label}</span>
@@ -341,10 +341,10 @@ const LandingPage = () => {
                 variants={fadeInUp}
                 whileHover={{ y: -8, scale: 1.02 }}
                 transition={{ duration: 0.3 }}
-                className="p-8 rounded-2xl bg-gradient-to-b from-[#13131a] to-[#0d0d12] border border-border/30 hover:border-primary/20 transition-colors"
+                className="p-8 rounded-2xl bg-gradient-to-b from-card to-background border border-border/30 hover:border-primary/20 transition-colors"
               >
                 {pillar.image ? (
-                  <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-[#1a1a28] to-[#0f0f15] flex items-center justify-center mb-6">
+                  <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-muted to-background flex items-center justify-center mb-6">
                     <Monitor className="w-16 h-16 text-primary/40" />
                   </div>
                 ) : (
@@ -352,7 +352,7 @@ const LandingPage = () => {
                     {pillar.features?.map((feature, i) => (
                       <span 
                         key={i}
-                        className="px-3 py-1.5 rounded-full text-xs bg-[#1a1a28] border border-border/30 text-muted-foreground"
+                        className="px-3 py-1.5 rounded-full text-xs bg-muted border border-border/30 text-muted-foreground"
                       >
                         {feature}
                       </span>
@@ -407,7 +407,7 @@ const LandingPage = () => {
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-colors cursor-pointer ${
                   tool.active 
                     ? 'bg-primary text-primary-foreground' 
-                    : 'bg-[#13131a] border border-border/30 hover:border-primary/30'
+                    : 'bg-card border border-border/30 hover:border-primary/30'
                 }`}
               >
                 <tool.icon className={`w-6 h-6 ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
@@ -548,7 +548,7 @@ const LandingPage = () => {
                 <motion.button
                   whileHover={{ scale: 1.01 }}
                   onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full text-left p-6 rounded-2xl bg-[#13131a] border border-border/30 hover:border-primary/20 transition-all"
+                  className="w-full text-left p-6 rounded-2xl bg-card border border-border/30 hover:border-primary/20 transition-all"
                 >
                   <div className="flex items-center justify-between gap-4">
                     <h3 className="text-base font-medium text-foreground">{faq.question}</h3>
