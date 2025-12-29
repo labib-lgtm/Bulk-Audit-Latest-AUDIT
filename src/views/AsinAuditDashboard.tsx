@@ -369,12 +369,14 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                     <div className="h-80 w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={topProducts} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}>
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-                                <XAxis type="number" tickFormatter={(val) => `$${val/1000}k`} />
-                                <YAxis type="category" dataKey="asin" width={80} tick={{fontSize: 10, fontFamily: 'monospace'}} />
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                                <XAxis type="number" tickFormatter={(val) => `$${val/1000}k`} tick={{ fill: 'hsl(var(--foreground))' }} />
+                                <YAxis type="category" dataKey="asin" width={80} tick={{fontSize: 10, fontFamily: 'monospace', fill: 'hsl(var(--foreground))'}} />
                                 <RechartsTooltip 
                                     formatter={(value: number) => formatCurrency(value)}
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                    contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '12px', color: 'hsl(var(--foreground))' }}
+                                    itemStyle={{ color: 'hsl(var(--foreground))' }}
+                                    labelStyle={{ color: 'hsl(var(--foreground))' }}
                                 />
                                 <Legend iconType="circle" />
                                 <Bar dataKey="organicSales" name="Organic Sales" stackId="a" fill={COLORS.organic} radius={[0, 0, 0, 0]} barSize={20} />
@@ -384,23 +386,23 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                     </div>
                 </div>
 
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                    <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6">
+                <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col">
+                    <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6 text-foreground">
                         <Activity className="w-4 h-4 text-violet-500" /> Profitability Matrix ({groupByParent ? 'Parent Level' : 'Child Level'})
                     </h4>
                     <div className="h-80 w-full relative">
-                        <div className="absolute top-2 right-2 text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded">Problem Children</div>
-                        <div className="absolute bottom-2 right-2 text-[10px] font-bold text-slate-400 bg-slate-50 px-2 py-1 rounded">Stars / Cash Cows</div>
+                        <div className="absolute top-2 right-2 text-[10px] font-bold text-muted-foreground bg-muted px-2 py-1 rounded">Problem Children</div>
+                        <div className="absolute bottom-2 right-2 text-[10px] font-bold text-muted-foreground bg-muted px-2 py-1 rounded">Stars / Cash Cows</div>
                         
                         <ResponsiveContainer width="100%" height="100%">
                             <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                                 <XAxis 
                                     type="number" 
                                     dataKey="totalSales" 
                                     name="Total Sales" 
                                     unit="$" 
-                                    tick={{fontSize: 10}} 
+                                    tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} 
                                     tickFormatter={(val) => val >= 1000 ? `${val/1000}k` : val}
                                 />
                                 <YAxis 
@@ -408,7 +410,7 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                     dataKey="tacosPct" 
                                     name="TACOS" 
                                     unit="%" 
-                                    tick={{fontSize: 10}}
+                                    tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}}
                                 />
                                 <RechartsTooltip 
                                     cursor={{ strokeDasharray: '3 3' }} 
@@ -416,17 +418,17 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                         if (active && payload && payload.length) {
                                             const data = payload[0].payload;
                                             return (
-                                                <div className="bg-white p-3 border border-slate-100 shadow-xl rounded-xl text-xs">
-                                                    <p className="font-bold text-slate-900 mb-1">{data.asin}</p>
-                                                    <p className="text-slate-500 mb-2 max-w-[150px] truncate">{data.title}</p>
-                                                    <div className="flex justify-between gap-4">
+                                                <div className="bg-card p-3 border border-border shadow-xl rounded-xl text-xs">
+                                                    <p className="font-bold text-foreground mb-1">{data.asin}</p>
+                                                    <p className="text-muted-foreground mb-2 max-w-[150px] truncate">{data.title}</p>
+                                                    <div className="flex justify-between gap-4 text-foreground">
                                                         <span>Sales:</span> <span className="font-bold">{formatCurrency(data.totalSales)}</span>
                                                     </div>
-                                                    <div className="flex justify-between gap-4">
+                                                    <div className="flex justify-between gap-4 text-foreground">
                                                         <span>TACOS:</span> <span className={`font-bold ${data.tacos > 0.2 ? 'text-rose-500' : 'text-emerald-500'}`}>{formatPct(data.tacos)}</span>
                                                     </div>
                                                     {groupByParent && (
-                                                         <div className="mt-1 text-slate-400 italic">{data.variantCount} Variations</div>
+                                                         <div className="mt-1 text-muted-foreground italic">{data.variantCount} Variations</div>
                                                     )}
                                                 </div>
                                             );

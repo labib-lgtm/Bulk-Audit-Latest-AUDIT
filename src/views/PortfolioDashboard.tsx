@@ -150,7 +150,7 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                   ))}
                               </Pie>
-                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                           </PieChart>
                       </ResponsiveContainer>
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col">
@@ -171,7 +171,7 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                               <XAxis dataKey="name" tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} interval={0} tickFormatter={(val) => val.length > 15 ? val.substring(0,15)+'...' : val} />
                               <YAxis tickFormatter={(val) => `$${val}`} tick={{fontSize: 11, fill: 'hsl(var(--muted-foreground))'}} />
-                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                               <Legend iconType="circle" />
                               <Bar dataKey="spend" name="Spend" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={50} />
                               <Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={50} />

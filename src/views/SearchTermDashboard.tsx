@@ -504,7 +504,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
                                                 <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                                                 <Bar dataKey="spend" fill="#6366f1" radius={[4, 4, 0, 0]} name="Spend" />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -518,7 +518,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
                                                 <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                                                 <Bar dataKey="sales" fill="#10b981" radius={[4, 4, 0, 0]} name="Sales" />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -542,7 +542,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
                                                 <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                                                 <Bar dataKey="spend" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Spend" />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -556,7 +556,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
                                                 <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
                                                 <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
                                                 <Bar dataKey="sales" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Sales" />
                                             </BarChart>
                                         </ResponsiveContainer>
