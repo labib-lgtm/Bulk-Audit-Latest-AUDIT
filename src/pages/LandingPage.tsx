@@ -68,44 +68,42 @@ const LandingPage = () => {
     { icon: Users, label: "Agency" },
     { icon: Target, label: "PPC Manager" },
     { icon: Briefcase, label: "Consultant" },
-    { icon: TrendingUp, label: "Growth Team" },
-    { icon: Package, label: "Seller" },
+    { icon: Package, label: "Amazon Seller" },
     { icon: Layers, label: "Enterprise" },
-    { icon: Zap, label: "Startup" },
   ];
 
   const pillars = [
     {
-      tag: "Learn",
-      title: "Data Philosophy",
-      description: "Master the fundamentals of Amazon PPC analytics and understand what metrics actually matter for profitability.",
-      features: ["You", "Philosophy", "Principles", "Proven success methods"]
+      tag: "Upload",
+      title: "Bulk File Processing",
+      description: "Simply upload your Amazon Bulk Operations file. We parse SP, SB, and SD campaigns, keywords, targets, and placements instantly.",
+      features: ["Bulk Operations", "Business Reports", "Search Terms", "No API Required"]
     },
     {
-      tag: "Plan",
-      title: "Your Strategic Plan",
-      description: "Build and refine your optimization strategy to navigate your path to profitable advertising.",
-      features: ["Branding", "Team Building", "Tactics", "Optimization", "Sales", "Negotiation", "Analysis", "Advertising", "Business Growth"]
+      tag: "Analyze",
+      title: "Cross-Campaign Insights",
+      description: "See the full picture with unified metrics across all ad types. ACOS, ROAS, TACOS, CVR—all in one executive dashboard.",
+      features: ["ACOS/ROAS", "TACOS Analysis", "Branded vs Generic", "Wasted Spend", "Portfolio Breakdown", "Placement Analysis"]
     },
     {
-      tag: "Execute",
-      title: "Execute The Plan",
-      description: "Turn your insights into reality with ruthless precision and data-driven execution.",
+      tag: "Optimize",
+      title: "Actionable Diagnostics",
+      description: "Identify underperforming targets, wasted spend, and scaling opportunities with smart diagnostics and recommendations.",
       image: true
     }
   ];
 
   const tools = [
-    { icon: Video, label: "Live Dashboards" },
-    { icon: LayoutDashboard, label: "Analytics" },
-    { icon: Monitor, label: "Reports" },
-    { icon: Users, label: "Community", active: true },
-    { icon: MessageSquare, label: "ROAS" },
-    { icon: FileText, label: "Coaching" },
-    { icon: Layers, label: "Templates" },
-    { icon: Link, label: "Resources" },
-    { icon: BarChart3, label: "Job Board" },
-    { icon: Activity, label: "And More" },
+    { icon: LayoutDashboard, label: "Executive Dashboard", active: true },
+    { icon: Target, label: "SP Campaigns" },
+    { icon: Video, label: "SB Campaigns" },
+    { icon: Monitor, label: "SD Campaigns" },
+    { icon: Search, label: "Search Terms" },
+    { icon: Package, label: "ASIN Audit" },
+    { icon: Layers, label: "Portfolios" },
+    { icon: Activity, label: "Diagnostics" },
+    { icon: BarChart3, label: "TACOS/ROAS" },
+    { icon: FileText, label: "Reports" },
   ];
 
   const faqs = [
@@ -181,7 +179,7 @@ const LandingPage = () => {
             transition={{ duration: 0.5, delay: 0.3 }}
             className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6"
           >
-            LYNX PLATFORM IS COMING
+            AMAZON PPC ANALYTICS PLATFORM
           </motion.p>
           
           <motion.h1 
@@ -190,13 +188,13 @@ const LandingPage = () => {
             transition={{ duration: 0.7, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
             className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
           >
-            <span className="text-foreground/80">A one of a kind</span>
+            <span className="text-foreground/80">Turn Amazon Ad Data Into</span>
             <br />
             <span className="bg-gradient-to-r from-primary via-brand-400 to-primary bg-clip-text text-transparent">
-              hyper-growth platform
+              Profitable Insights
             </span>
             <br />
-            <span className="text-foreground">where <span className="font-black">Nothing Is Held Back</span></span>
+            <span className="text-foreground">in <span className="font-black">Minutes, Not Hours</span></span>
           </motion.h1>
           
           <motion.p 
@@ -205,22 +203,29 @@ const LandingPage = () => {
             transition={{ duration: 0.5, delay: 0.6 }}
             className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10"
           >
-            Learn to grow any business, get ahead of the competition
+            Upload your bulk files. Get cross-campaign analytics, TACOS insights, and optimization recommendations—no API setup required.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.7 }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
           >
             <Button 
               onClick={() => navigate("/auth")}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-base group transition-all"
+            >
+              Start Free Analysis
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
+            <Button 
+              onClick={() => navigate("/dashboard")}
               variant="outline"
               className="border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/50 rounded-full px-8 py-6 text-base group transition-all"
             >
-              <Search className="w-5 h-5 mr-2 text-muted-foreground/60" />
-              Training started
-              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Try Demo Data
+              <Zap className="ml-2 w-4 h-4" />
             </Button>
           </motion.div>
         </div>
@@ -309,13 +314,13 @@ const LandingPage = () => {
             variants={fadeIn}
             className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6"
           >
-            MORE THAN A TOOL
+            WHY LYNX MEDIA
           </motion.p>
           <motion.h2 
             variants={fadeInUp}
             className="text-3xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground/80"
           >
-            We are a community of <span className="text-primary">Amazon sellers</span> dedicated to helping each other <span className="text-primary">grow, scale</span> and reach new heights through <span className="text-primary">data-driven optimization</span>
+            Stop drowning in spreadsheets. Get <span className="text-primary">unified analytics</span> across SP, SB & SD campaigns with <span className="text-primary">TACOS visibility</span> and <span className="text-primary">actionable diagnostics</span> that actually move the needle.
           </motion.h2>
         </motion.div>
       </section>
@@ -379,11 +384,11 @@ const LandingPage = () => {
             variants={fadeInUp}
             className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6"
           >
-            We'll help you become best of the best in
+            Everything you need to optimize
             <br />
-            the game by giving you everything you'll
+            your Amazon PPC in one
             <br />
-            ever need to win
+            powerful platform
           </motion.h2>
 
           <motion.div 
@@ -436,7 +441,7 @@ const LandingPage = () => {
               transition={{ delay: 0.3, type: "spring" }}
               className="absolute top-6 left-6 w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center"
             >
-              <Users className="w-6 h-6 text-primary" />
+              <BarChart3 className="w-6 h-6 text-primary" />
             </motion.div>
             
             <motion.div 
@@ -444,20 +449,20 @@ const LandingPage = () => {
               className="max-w-lg"
             >
               <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                A Thriving
+                Data Processed
                 <br />
-                Community
+                Locally & Securely
               </h3>
               <p className="text-lg text-muted-foreground font-medium mb-6">
-                Connect With A Thriving Community Of Amazon Sellers.
+                Your Competitive Intelligence Stays Private.
               </p>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Join an energetic community where collaboration and support thrive. Engage with fellow sellers, share experiences, and build lasting connections. The journey is more rewarding when you have a community to lean on.
+                Your bulk files are processed entirely in your browser. No data is uploaded to external servers. Get the insights you need while keeping your advertising strategy confidential.
               </p>
             </motion.div>
 
             <div className="absolute top-10 right-10 text-muted-foreground/30 text-sm hidden md:block">
-              Meet People Like You
+              Enterprise-Grade Privacy
             </div>
 
             <div className="absolute bottom-8 right-8 flex gap-2">
@@ -492,20 +497,27 @@ const LandingPage = () => {
             variants={fadeIn}
             className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4"
           >
-            Join The Waitlist
+            GET STARTED
           </motion.p>
           <motion.h2 
             variants={fadeInUp}
             className="text-4xl md:text-5xl font-bold text-foreground mb-8"
           >
-            Be The First To Get Access
+            Ready to Optimize Your Amazon PPC?
           </motion.h2>
-          <motion.div variants={scaleIn}>
+          <motion.div variants={scaleIn} className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               onClick={() => navigate("/auth")}
               className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-base font-bold"
             >
-              Sign Up To The Waitlist
+              Start Free Analysis
+            </Button>
+            <Button 
+              onClick={() => navigate("/dashboard")}
+              variant="outline"
+              className="border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/50 rounded-full px-8 py-6 text-base"
+            >
+              Try Demo Data
             </Button>
           </motion.div>
         </motion.div>
