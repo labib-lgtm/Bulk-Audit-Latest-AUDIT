@@ -160,7 +160,9 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                         border: '1px solid hsl(217.2, 32.6%, 17.5%)', 
                                         borderRadius: '8px', 
                                         padding: '8px 12px',
-                                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)'
+                                        boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
+                                        zIndex: 50,
+                                        position: 'relative'
                                       }}>
                                         <p style={{ color: '#ffffff', fontWeight: 600, fontSize: '14px', margin: 0 }}>{data.name}</p>
                                         <p style={{ color: '#e2e8f0', fontSize: '13px', margin: '4px 0 0 0' }}>{formatCurrency(data.spend)}</p>
