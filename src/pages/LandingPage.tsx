@@ -391,27 +391,52 @@ const LandingPage = () => {
             powerful platform
           </motion.h2>
 
+          {/* First row - 7 items */}
           <motion.div 
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="mt-12 flex flex-wrap justify-center gap-4"
+            className="mt-12 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3 md:gap-4 w-full max-w-4xl"
           >
-            {tools.map((tool, i) => (
+            {tools.slice(0, 7).map((tool, i) => (
               <motion.div 
                 key={i}
                 variants={scaleIn}
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-colors cursor-pointer ${
+                className={`flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl transition-colors cursor-pointer ${
                   tool.active 
                     ? 'bg-primary text-primary-foreground' 
                     : 'bg-card border border-border/30 hover:border-primary/30'
                 }`}
               >
-                <tool.icon className={`w-6 h-6 ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
-                <span className={`text-xs font-medium ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
+                <tool.icon className={`w-5 h-5 md:w-6 md:h-6 ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+                <span className={`text-[10px] md:text-xs font-medium text-center leading-tight ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
+                  {tool.label}
+                </span>
+              </motion.div>
+            ))}
+          </motion.div>
+          
+          {/* Second row - 3 items centered */}
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="mt-3 md:mt-4 grid grid-cols-3 gap-3 md:gap-4 w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto"
+          >
+            {tools.slice(7).map((tool, i) => (
+              <motion.div 
+                key={i + 7}
+                variants={scaleIn}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex flex-col items-center gap-2 p-3 md:p-4 rounded-xl transition-colors cursor-pointer bg-card border border-border/30 hover:border-primary/30"
+              >
+                <tool.icon className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
+                <span className="text-[10px] md:text-xs font-medium text-center leading-tight text-muted-foreground">
                   {tool.label}
                 </span>
               </motion.div>
