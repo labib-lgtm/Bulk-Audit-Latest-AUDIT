@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/hooks/useAuth';
-import { Shield, Users, Crown, User, Trash2, Mail } from 'lucide-react';
+import { Shield, Users, Crown, User, Trash2, Mail, Clock, X, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { InviteUserDialog } from '@/components/InviteUserDialog';
+
 interface TeamMember {
   id: string;
   user_id: string;
@@ -18,10 +19,20 @@ interface TeamMember {
   email?: string;
 }
 
+interface Invitation {
+  id: string;
+  email: string;
+  role: AppRole;
+  status: string;
+  created_at: string;
+  expires_at: string;
+}
+
 export const TeamManagement: React.FC = () => {
   const { isAdmin, isLoading: roleLoading } = useUserRole();
   const { user } = useAuth();
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchTeamMembers = async () => {
@@ -36,14 +47,34 @@ export const TeamManagement: React.FC = () => {
     } catch (err) {
       console.error('Error fetching team members:', err);
       toast.error('Failed to load team members');
-    } finally {
-      setIsLoading(false);
     }
+  };
+
+  const fetchInvitations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('invitations')
+        .select('*')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setInvitations(data || []);
+    } catch (err) {
+      console.error('Error fetching invitations:', err);
+      toast.error('Failed to load invitations');
+    }
+  };
+
+  const fetchAll = async () => {
+    setIsLoading(true);
+    await Promise.all([fetchTeamMembers(), fetchInvitations()]);
+    setIsLoading(false);
   };
 
   useEffect(() => {
     if (isAdmin) {
-      fetchTeamMembers();
+      fetchAll();
     } else {
       setIsLoading(false);
     }
@@ -88,6 +119,45 @@ export const TeamManagement: React.FC = () => {
     }
   };
 
+  const cancelInvitation = async (invitationId: string) => {
+    try {
+      const { error } = await supabase
+        .from('invitations')
+        .delete()
+        .eq('id', invitationId);
+
+      if (error) throw error;
+      
+      toast.success('Invitation cancelled');
+      fetchInvitations();
+    } catch (err) {
+      console.error('Error cancelling invitation:', err);
+      toast.error('Failed to cancel invitation');
+    }
+  };
+
+  const resendInvitation = async (invitation: Invitation) => {
+    try {
+      // Update expiration date
+      const { error } = await supabase
+        .from('invitations')
+        .update({ 
+          expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() 
+        })
+        .eq('id', invitation.id);
+
+      if (error) throw error;
+      
+      toast.success(`Invitation resent to ${invitation.email}`);
+      fetchInvitations();
+    } catch (err) {
+      console.error('Error resending invitation:', err);
+      toast.error('Failed to resend invitation');
+    }
+  };
+
+  const isExpired = (expiresAt: string) => new Date(expiresAt) < new Date();
+
   if (roleLoading || isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -117,11 +187,11 @@ export const TeamManagement: React.FC = () => {
           </h1>
           <p className="text-muted-foreground mt-1">Manage user roles and permissions</p>
         </div>
-        <InviteUserDialog onInviteSent={fetchTeamMembers} />
+        <InviteUserDialog onInviteSent={fetchInvitations} />
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
         <Card className="bg-card border-border">
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -165,7 +235,105 @@ export const TeamManagement: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-orange-500/10">
+                <Mail className="w-6 h-6 text-orange-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{invitations.length}</p>
+                <p className="text-sm text-muted-foreground">Pending Invites</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      {/* Pending Invitations */}
+      {invitations.length > 0 && (
+        <Card className="bg-card border-border">
+          <CardHeader>
+            <CardTitle className="text-foreground flex items-center gap-2">
+              <Clock className="w-5 h-5 text-orange-500" />
+              Pending Invitations
+            </CardTitle>
+            <CardDescription>Invitations waiting to be accepted</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border hover:bg-muted/50">
+                  <TableHead className="text-muted-foreground">Email</TableHead>
+                  <TableHead className="text-muted-foreground">Role</TableHead>
+                  <TableHead className="text-muted-foreground">Sent</TableHead>
+                  <TableHead className="text-muted-foreground">Expires</TableHead>
+                  <TableHead className="text-muted-foreground text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {invitations.map((invitation) => (
+                  <TableRow key={invitation.id} className="border-border hover:bg-muted/50">
+                    <TableCell className="text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        {invitation.email}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant="outline" 
+                        className={invitation.role === 'admin' 
+                          ? 'border-amber-500/50 text-amber-500 bg-amber-500/10' 
+                          : 'border-blue-500/50 text-blue-500 bg-blue-500/10'
+                        }
+                      >
+                        {invitation.role === 'admin' && <Crown className="w-3 h-3 mr-1" />}
+                        {invitation.role === 'user' && <User className="w-3 h-3 mr-1" />}
+                        {invitation.role}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(invitation.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {isExpired(invitation.expires_at) ? (
+                        <Badge variant="destructive" className="text-xs">Expired</Badge>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {new Date(invitation.expires_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => resendInvitation(invitation)}
+                          className="text-muted-foreground hover:text-primary"
+                          title="Resend invitation"
+                        >
+                          <RefreshCw className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => cancelInvitation(invitation.id)}
+                          className="text-muted-foreground hover:text-destructive"
+                          title="Cancel invitation"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Team Members Table */}
       <Card className="bg-card border-border">
