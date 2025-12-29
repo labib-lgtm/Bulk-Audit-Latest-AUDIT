@@ -12,6 +12,7 @@ import {
   DiagnosticsDashboard, 
   SettingsDashboard 
 } from '../views/Dashboards';
+import { TeamManagement } from '../views/TeamManagement';
 import { processBulkFile, processBusinessReport } from '../services/dataProcessor';
 import { generateMockData } from '../services/mockData';
 import { DashboardData, AppSettings, ProductGoal } from '../types';
@@ -78,6 +79,11 @@ const Index = () => {
   }, []);
 
   const renderView = () => {
+    // Team management can be accessed without dashboard data
+    if (currentView === 'team') {
+      return <TeamManagement />;
+    }
+    
     if (!dashboardData) return null;
 
     switch (currentView) {

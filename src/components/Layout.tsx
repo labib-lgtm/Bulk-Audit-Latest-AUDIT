@@ -15,9 +15,13 @@ import {
   ScanSearch,
   Shield,
   Package,
-  LogOut
+  LogOut,
+  Users,
+  Crown
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
+import { Badge } from '@/components/ui/badge';
 
 interface LayoutProps {
   currentView: string;
@@ -38,9 +42,14 @@ const NAV_ITEMS = [
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
 
+const ADMIN_NAV_ITEMS = [
+  { id: 'team', label: 'Team Management', icon: Users },
+];
+
 export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin, role } = useUserRole();
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground font-sans">
       {/* Mobile Backdrop Overlay */}
@@ -98,6 +107,34 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
               </button>
             );
           })}
+
+          {/* Admin Section */}
+          {isAdmin && (
+            <>
+              <div className="px-4 mb-3 mt-6 text-[11px] font-bold text-muted-foreground uppercase tracking-widest font-heading">Admin</div>
+              {ADMIN_NAV_ITEMS.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentView === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setCurrentView(item.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`flex items-center w-full px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200 group ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.25)] scale-[1.02]'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    }`}
+                  >
+                    <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
+                    {item.label}
+                  </button>
+                );
+              })}
+            </>
+          )}
         </nav>
         
         {/* User / Footer */}
@@ -108,7 +145,18 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-foreground truncate">{user?.email || 'User'}</p>
-              <p className="text-xs text-primary font-medium">Expert Mode</p>
+              <div className="flex items-center gap-1.5">
+                {isAdmin ? (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500/50 text-amber-500 bg-amber-500/10">
+                    <Crown className="w-2.5 h-2.5 mr-1" />
+                    Admin
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-primary/50 text-primary bg-primary/10">
+                    {role || 'User'}
+                  </Badge>
+                )}
+              </div>
             </div>
             <button
               onClick={signOut}
