@@ -156,7 +156,7 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                 <SectionHeader title="Strategy Configuration" description="Configure global profitability thresholds and individual product goals." />
                 <button 
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-black text-white hover:bg-brand-500 hover:text-black transition-all shadow-lg shadow-slate-300"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-brand-500 hover:text-black transition-all shadow-lg"
                 >
                     {saved ? <span className="flex items-center gap-2">Settings Saved!</span> : <><Save size={16} /> Save Changes</>}
                 </button>
@@ -164,14 +164,14 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* 1. Global Goals */}
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm h-full">
-                    <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                        <h3 className="font-bold text-slate-800 flex items-center gap-2"><Target size={18} className="text-brand-600"/> Global Account Goals</h3>
+                <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm h-full">
+                    <div className="px-6 py-4 bg-muted border-b border-border flex items-center justify-between">
+                        <h3 className="font-bold text-foreground flex items-center gap-2"><Target size={18} className="text-brand-600"/> Global Account Goals</h3>
                     </div>
                     <div className="p-6 space-y-6">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Default Target ACOS (%)</label>
-                            <p className="text-xs text-slate-500 mb-3">Fallback target for products without specific overrides.</p>
+                            <label className="block text-sm font-bold text-foreground mb-2">Default Target ACOS (%)</label>
+                            <p className="text-xs text-muted-foreground mb-3">Fallback target for products without specific overrides.</p>
                             <div className="relative max-w-xs">
                                 <input 
                                     type="number" 
@@ -180,52 +180,52 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                                     max="1.00"
                                     value={localSettings.targetAcos}
                                     onChange={(e) => handleChange('targetAcos', parseFloat(e.target.value))}
-                                    className="w-full pl-4 pr-12 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900"
+                                    className="w-full pl-4 pr-12 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">%</span>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Break-Even ACOS (%)</label>
+                            <label className="block text-sm font-bold text-foreground mb-2">Break-Even ACOS (%)</label>
                             <div className="relative max-w-xs">
                                 <input 
                                     type="number" step="0.01" min="0.01" max="1.00"
                                     value={localSettings.breakEvenAcos}
                                     onChange={(e) => handleChange('breakEvenAcos', parseFloat(e.target.value))}
-                                    className="w-full pl-4 pr-12 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900"
+                                    className="w-full pl-4 pr-12 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
                                 />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">%</span>
+                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">%</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* 2. Audit Thresholds */}
-                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm h-full">
-                    <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                        <h3 className="font-bold text-slate-800 flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500"/> Audit Thresholds</h3>
+                <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm h-full">
+                    <div className="px-6 py-4 bg-muted border-b border-border flex items-center justify-between">
+                        <h3 className="font-bold text-foreground flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500"/> Audit Thresholds</h3>
                     </div>
                     <div className="p-6 space-y-6">
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Wasted Spend Threshold</label>
+                            <label className="block text-sm font-bold text-foreground mb-2">Wasted Spend Threshold</label>
                             <div className="relative max-w-xs">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">{localSettings.currencySymbol}</span>
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">{localSettings.currencySymbol}</span>
                                 <input 
                                     type="number" step="1"
                                     value={localSettings.minSpendThreshold}
                                     onChange={(e) => handleChange('minSpendThreshold', parseInt(e.target.value))}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900"
+                                    className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
                                 />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-bold text-slate-700 mb-2">Click Threshold (No Sales)</label>
+                            <label className="block text-sm font-bold text-foreground mb-2">Click Threshold (No Sales)</label>
                             <div className="relative max-w-xs">
                                 <input 
                                     type="number" step="1"
                                     value={localSettings.minClickThreshold}
                                     onChange={(e) => handleChange('minClickThreshold', parseInt(e.target.value))}
-                                    className="w-full pl-4 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900"
+                                    className="w-full pl-4 pr-4 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
                                 />
                             </div>
                         </div>
@@ -234,22 +234,22 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
             </div>
 
             {/* 3. Product Strategy Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                <div className="px-6 py-4 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
+                <div className="px-6 py-4 bg-muted border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                        <h3 className="font-bold text-slate-800 flex items-center gap-2">
+                        <h3 className="font-bold text-foreground flex items-center gap-2">
                             <Layers size={18} className="text-indigo-500"/> Product-Level Strategy Overrides
                         </h3>
-                        <p className="text-xs text-slate-500 mt-1">Set aggressive targets for launches or conservative targets for profit cows.</p>
+                        <p className="text-xs text-muted-foreground mt-1">Set aggressive targets for launches or conservative targets for profit cows.</p>
                     </div>
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
                         <input 
                             type="text" 
                             placeholder="Search ASIN or Title..." 
                             value={productSearch}
                             onChange={(e) => setProductSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 rounded-lg focus:ring-brand-500 focus:border-brand-500"
+                            className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-lg bg-card text-foreground focus:ring-brand-500 focus:border-brand-500"
                         />
                     </div>
                 </div>
@@ -259,8 +259,8 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                         columns={[
                             { key: 'title', header: 'Product', sortable: true, render: (r: any) => (
                                 <div>
-                                    <div className="font-bold text-slate-800 text-xs truncate max-w-[250px]">{r.title}</div>
-                                    <div className="text-[10px] text-slate-400 font-mono">{r.asin}</div>
+                                    <div className="font-bold text-foreground text-xs truncate max-w-[250px]">{r.title}</div>
+                                    <div className="text-[10px] text-muted-foreground font-mono">{r.asin}</div>
                                 </div>
                             )},
                             { key: 'sales', header: 'Total Sales', align: 'right', sortable: true, render: (r: any) => `$${r.sales.toLocaleString()}` },
@@ -277,8 +277,8 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                                             title={s}
                                             className={`p-1.5 rounded-md border text-[10px] font-bold uppercase transition-all ${
                                                 r.currentGoal && r.strategy === s 
-                                                ? (s === 'Launch' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : s === 'Profit' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-rose-100 text-rose-700 border-rose-200')
-                                                : 'bg-white text-slate-400 border-slate-200 hover:border-slate-300'
+                                                ? (s === 'Launch' ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30' : s === 'Profit' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border-rose-500/30')
+                                                : 'bg-muted text-muted-foreground border-border hover:border-foreground/30'
                                             }`}
                                         >
                                             {s === 'Launch' && <Rocket size={12}/>}
@@ -295,9 +295,9 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                                             value={r.currentGoal ? (r.currentGoal * 100) : ''}
                                             placeholder={(localSettings.targetAcos * 100).toFixed(0)}
                                             onCommit={(val) => handleProductGoalChange(r.asin, val, 'targetAcos')}
-                                            className={`w-full text-right pr-6 pl-2 py-1.5 text-xs font-bold border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${r.currentGoal ? 'border-brand-500 bg-brand-50 text-brand-900' : 'border-slate-200 bg-slate-50 text-slate-500'}`}
+                                            className={`w-full text-right pr-6 pl-2 py-1.5 text-xs font-bold border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${r.currentGoal ? 'border-brand-500 bg-brand-500/10 text-foreground' : 'border-border bg-muted text-muted-foreground'}`}
                                         />
-                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] font-bold">%</span>
+                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px] font-bold">%</span>
                                     </div>
                                 </div>
                             )}
