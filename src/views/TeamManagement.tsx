@@ -1,0 +1,247 @@
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useUserRole, AppRole } from '@/hooks/useUserRole';
+import { useAuth } from '@/hooks/useAuth';
+import { Shield, Users, Crown, User, Trash2, UserPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
+
+interface TeamMember {
+  id: string;
+  user_id: string;
+  role: AppRole;
+  created_at: string;
+  email?: string;
+}
+
+export const TeamManagement: React.FC = () => {
+  const { isAdmin, isLoading: roleLoading } = useUserRole();
+  const { user } = useAuth();
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchTeamMembers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setTeamMembers(data || []);
+    } catch (err) {
+      console.error('Error fetching team members:', err);
+      toast.error('Failed to load team members');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAdmin) {
+      fetchTeamMembers();
+    } else {
+      setIsLoading(false);
+    }
+  }, [isAdmin]);
+
+  const updateRole = async (userId: string, newRole: AppRole) => {
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ role: newRole })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      
+      toast.success('Role updated successfully');
+      fetchTeamMembers();
+    } catch (err) {
+      console.error('Error updating role:', err);
+      toast.error('Failed to update role');
+    }
+  };
+
+  const removeUser = async (userId: string) => {
+    if (userId === user?.id) {
+      toast.error("You can't remove yourself");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+      
+      toast.success('User removed successfully');
+      fetchTeamMembers();
+    } catch (err) {
+      console.error('Error removing user:', err);
+      toast.error('Failed to remove user');
+    }
+  };
+
+  if (roleLoading || isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <Shield className="w-16 h-16 text-muted-foreground mb-4" />
+        <h2 className="text-xl font-bold text-foreground mb-2">Access Denied</h2>
+        <p className="text-muted-foreground">You need admin privileges to access this page.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Users className="w-7 h-7 text-primary" />
+            Team Management
+          </h1>
+          <p className="text-muted-foreground mt-1">Manage user roles and permissions</p>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="bg-card border-border">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-primary/10">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{teamMembers.length}</p>
+                <p className="text-sm text-muted-foreground">Total Members</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-amber-500/10">
+                <Crown className="w-6 h-6 text-amber-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">
+                  {teamMembers.filter(m => m.role === 'admin').length}
+                </p>
+                <p className="text-sm text-muted-foreground">Admins</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="bg-card border-border">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-blue-500/10">
+                <User className="w-6 h-6 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">
+                  {teamMembers.filter(m => m.role === 'user').length}
+                </p>
+                <p className="text-sm text-muted-foreground">Users</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Team Members Table */}
+      <Card className="bg-card border-border">
+        <CardHeader>
+          <CardTitle className="text-foreground">Team Members</CardTitle>
+          <CardDescription>View and manage team member roles</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-muted/50">
+                <TableHead className="text-muted-foreground">User ID</TableHead>
+                <TableHead className="text-muted-foreground">Role</TableHead>
+                <TableHead className="text-muted-foreground">Joined</TableHead>
+                <TableHead className="text-muted-foreground text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teamMembers.map((member) => (
+                <TableRow key={member.id} className="border-border hover:bg-muted/50">
+                  <TableCell className="font-mono text-sm text-foreground">
+                    {member.user_id.slice(0, 8)}...
+                    {member.user_id === user?.id && (
+                      <Badge variant="outline" className="ml-2 text-xs">You</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Select
+                      value={member.role}
+                      onValueChange={(value: AppRole) => updateRole(member.user_id, value)}
+                      disabled={member.user_id === user?.id}
+                    >
+                      <SelectTrigger className="w-32 bg-muted border-border">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">
+                          <div className="flex items-center gap-2">
+                            <Crown className="w-4 h-4 text-amber-500" />
+                            Admin
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="user">
+                          <div className="flex items-center gap-2">
+                            <User className="w-4 h-4 text-blue-500" />
+                            User
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(member.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeUser(member.user_id)}
+                      disabled={member.user_id === user?.id}
+                      className="text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          
+          {teamMembers.length === 0 && (
+            <div className="text-center py-8 text-muted-foreground">
+              No team members found
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
