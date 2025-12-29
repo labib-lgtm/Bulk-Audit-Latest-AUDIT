@@ -464,14 +464,14 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                           onClick={() => setHitListFilter(item.id as any)} 
                           className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all flex-1 sm:flex-none ${
                              hitListFilter === item.id 
-                                ? (item.id === 'gems' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' : 
-                                   item.id === 'drainers' ? 'bg-rose-500 text-white shadow-lg shadow-rose-200' : 
-                                   item.id === 'ghosts' ? 'bg-amber-500 text-white shadow-lg shadow-amber-200' :
-                                   'bg-slate-900 text-white shadow-lg shadow-slate-200')
-                                : (item.id === 'gems' ? 'bg-white border border-slate-200 text-slate-600 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200' :
-                                   item.id === 'drainers' ? 'bg-white border border-slate-200 text-slate-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200' :
-                                   item.id === 'ghosts' ? 'bg-white border border-slate-200 text-slate-600 hover:bg-amber-50 hover:text-amber-600 hover:border-amber-200' :
-                                   'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50')
+                                ? (item.id === 'gems' ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' : 
+                                   item.id === 'drainers' ? 'bg-rose-500 text-white shadow-lg shadow-rose-500/30' : 
+                                   item.id === 'ghosts' ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/30' :
+                                   'bg-foreground text-background shadow-lg')
+                                : (item.id === 'gems' ? 'bg-card border border-border text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-400 hover:border-emerald-500/30' :
+                                   item.id === 'drainers' ? 'bg-card border border-border text-muted-foreground hover:bg-rose-500/10 hover:text-rose-400 hover:border-rose-500/30' :
+                                   item.id === 'ghosts' ? 'bg-card border border-border text-muted-foreground hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30' :
+                                   'bg-card border border-border text-muted-foreground hover:bg-muted')
                           }`}
                       >
                           <item.icon size={16} /> <span className="whitespace-nowrap">{item.label}</span>
@@ -512,10 +512,10 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             </div>
             
             {rawAsinData.every(r => r.totalSales === 0) && (
-                <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-sm flex items-start gap-3">
+                <div className="mt-4 p-4 bg-muted border border-border rounded-xl text-muted-foreground text-sm flex items-start gap-3">
                     <Activity className="w-5 h-5 flex-shrink-0 mt-0.5" />
                     <div>
-                        <strong>Business Report Missing or Empty:</strong> It looks like we only have Advertising data. 
+                        <strong className="text-foreground">Business Report Missing or Empty:</strong> It looks like we only have Advertising data. 
                         To see "Total Sales", "Organic Sales", and "Sessions", please upload a Business Report (Child ASIN) in the main menu.
                     </div>
                 </div>

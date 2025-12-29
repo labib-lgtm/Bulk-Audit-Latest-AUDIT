@@ -647,8 +647,8 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
       {/* 3. DETAILED MATCH TYPE BREAKDOWN (Replaced with DataTable for Export) */}
       <div className="space-y-2">
           <div className="flex items-center gap-2 pl-1">
-               <Layers className="w-4 h-4 text-slate-500" />
-               <h3 className="text-sm font-bold font-heading uppercase tracking-wide text-slate-500">Detailed Performance Breakdown</h3>
+               <Layers className="w-4 h-4 text-muted-foreground" />
+               <h3 className="text-sm font-bold font-heading uppercase tracking-wide text-muted-foreground">Detailed Performance Breakdown</h3>
           </div>
           <DataTable 
             data={breakdownData}
@@ -656,7 +656,7 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             fileName="Lynx_Executive_Breakdown"
             columns={[
                 { key: 'label', header: 'Match / Segment', render: (r: any) => (
-                    <span className={`font-bold ${r.isTotal ? 'text-black text-sm' : r.isSummary ? 'text-slate-900' : 'text-slate-600'}`}>
+                    <span className={`font-bold ${r.isTotal ? 'text-foreground text-sm' : r.isSummary ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {r.label}
                     </span>
                 )},
@@ -677,24 +677,24 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
       </div>
 
       {/* 4. BRANDED vs NON-BRANDED */}
-      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
-          <div className="px-6 py-4 bg-slate-50 border-b border-slate-100">
+      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+          <div className="px-6 py-4 bg-muted border-b border-border">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                  <div>
-                     <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2">
-                       <Tags className="w-4 h-4 text-slate-900" /> Branded vs Non-Branded Analysis
+                     <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-foreground">
+                       <Tags className="w-4 h-4 text-foreground" /> Branded vs Non-Branded Analysis
                      </h3>
-                     <p className="text-xs text-slate-500 mt-1">Based on search term report data. Define your brand terms below.</p>
+                     <p className="text-xs text-muted-foreground mt-1">Based on search term report data. Define your brand terms below.</p>
                  </div>
                  
                  <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
                     <input 
                         type="text" 
                         placeholder="e.g. nike, adidas (comma separated)" 
                         value={brandInput}
                         onChange={(e) => setBrandInput(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 rounded-lg focus:ring-brand-500 focus:border-brand-500 bg-white text-black placeholder:text-slate-400"
+                        className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-lg focus:ring-primary focus:border-primary bg-background text-foreground placeholder:text-muted-foreground"
                     />
                  </div>
              </div>
@@ -731,30 +731,30 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                       <div className="overflow-x-auto">
                           <table className="w-full text-xs">
                               <thead>
-                                  <tr className="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-200">
+                                  <tr className="bg-muted text-muted-foreground uppercase tracking-wider font-bold border-b border-border">
                                       <th className="py-3 px-4 text-left">Metric</th>
-                                      <th className="py-3 px-4 text-right text-indigo-700">Branded</th>
-                                      <th className="py-3 px-4 text-right text-emerald-700">Non-Branded</th>
-                                      <th className="py-3 px-4 text-right text-slate-700">Total (Search Terms)</th>
+                                      <th className="py-3 px-4 text-right text-indigo-400">Branded</th>
+                                      <th className="py-3 px-4 text-right text-emerald-400">Non-Branded</th>
+                                      <th className="py-3 px-4 text-right text-foreground">Total (Search Terms)</th>
                                   </tr>
                               </thead>
-                              <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                              <tbody className="divide-y divide-border text-foreground font-medium">
                                   <tr>
                                       <td className="py-3 px-4 font-bold">Spend</td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.spend)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.branded.spendShare)})</span></td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.spend)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.nonBranded.spendShare)})</span></td>
+                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.spend)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.branded.spendShare)})</span></td>
+                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.spend)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.nonBranded.spendShare)})</span></td>
                                       <td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSpend)}</td>
                                   </tr>
                                   <tr>
                                       <td className="py-3 px-4 font-bold">Sales</td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.sales)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.branded.salesShare)})</span></td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.sales)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.nonBranded.salesShare)})</span></td>
+                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.sales)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.branded.salesShare)})</span></td>
+                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.sales)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.nonBranded.salesShare)})</span></td>
                                       <td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSales)}</td>
                                   </tr>
                                   <tr>
                                       <td className="py-3 px-4 font-bold">ACOS</td>
-                                      <td className="py-3 px-4 text-right font-bold text-indigo-600">{formatPct(brandStats.branded.acos)}</td>
-                                      <td className="py-3 px-4 text-right font-bold text-emerald-600">{formatPct(brandStats.nonBranded.acos)}</td>
+                                      <td className="py-3 px-4 text-right font-bold text-indigo-400">{formatPct(brandStats.branded.acos)}</td>
+                                      <td className="py-3 px-4 text-right font-bold text-emerald-400">{formatPct(brandStats.nonBranded.acos)}</td>
                                       <td className="py-3 px-4 text-right">{formatPct(safeDiv(brandStats.totalSpend, brandStats.totalSales))}</td>
                                   </tr>
                                   <tr>
@@ -774,7 +774,7 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                       </div>
                   </div>
               ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-slate-400 bg-slate-50/50 rounded-xl border border-dashed border-slate-200">
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/50 rounded-xl border border-dashed border-border">
                       <Tags className="w-10 h-10 mb-3 opacity-20" />
                       <p className="font-bold text-sm">Enter brand terms above to see the breakdown.</p>
                       <p className="text-xs mt-1">We'll analyze your search term data instantly.</p>

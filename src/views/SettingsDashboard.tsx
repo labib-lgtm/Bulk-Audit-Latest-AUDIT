@@ -156,7 +156,7 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                 <SectionHeader title="Strategy Configuration" description="Configure global profitability thresholds and individual product goals." />
                 <button 
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-brand-500 hover:text-black transition-all shadow-lg"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-brand-500 transition-all shadow-lg"
                 >
                     {saved ? <span className="flex items-center gap-2">Settings Saved!</span> : <><Save size={16} /> Save Changes</>}
                 </button>

@@ -225,7 +225,7 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
           {view === 'campaigns' && (
             <DataTable data={campaignTableData} columns={[
               { key: 'name', header: 'Campaign Name', sortable: true },
-              { key: 'state', header: 'State', render: r => <span className={`uppercase text-[10px] font-bold px-2 py-1 rounded-full ${r.state === 'enabled' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{r.state}</span> },
+              { key: 'state', header: 'State', render: r => <span className={`uppercase text-[10px] font-bold px-2 py-1 rounded-full ${r.state === 'enabled' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-muted text-muted-foreground'}`}>{r.state}</span> },
               { key: 'adFormat', header: 'Format', sortable: true },
               { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatInt(r.impressions) },
               { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
@@ -282,17 +282,17 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
           {view === 'placements' && (
             <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Placement Efficiency</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} /><XAxis type="number" hide /><YAxis type="category" dataKey="placement" width={100} tick={{fontSize: 10}} /><RechartsTooltip formatter={(value: number, name: string) => name === 'CPC' ? formatCurrency(value) : formatPct(value)} cursor={{fill: '#f8fafc'}} /><Legend /><Bar dataKey="cpc" name="CPC" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} /><Bar dataKey="ctr" name="CTR" fill="#34d399" radius={[0, 4, 4, 0]} barSize={20} /></BarChart></ResponsiveContainer></div>
+                    <div className="bg-card rounded-2xl border border-border p-6">
+                        <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Placement Efficiency</h4>
+                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" /><XAxis type="number" hide /><YAxis type="category" dataKey="placement" width={100} tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} /><RechartsTooltip formatter={(value: number, name: string) => name === 'CPC' ? formatCurrency(value) : formatPct(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} cursor={{fill: 'hsl(var(--muted))'}} /><Legend /><Bar dataKey="cpc" name="CPC" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} /><Bar dataKey="ctr" name="CTR" fill="#34d399" radius={[0, 4, 4, 0]} barSize={20} /></BarChart></ResponsiveContainer></div>
                     </div>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Spend vs Sales</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="placement" tick={{fontSize: 10}} interval={0} /><YAxis /><RechartsTooltip formatter={(value: number) => formatCurrency(value)} /><Legend /><Bar dataKey="spend" name="Spend" fill="#f43f5e" radius={[4, 4, 0, 0]} /><Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
+                    <div className="bg-card rounded-2xl border border-border p-6">
+                        <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Spend vs Sales</h4>
+                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" /><XAxis dataKey="placement" tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} interval={0} /><YAxis tick={{fill: 'hsl(var(--muted-foreground))'}} /><RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} /><Legend /><Bar dataKey="spend" name="Spend" fill="#f43f5e" radius={[4, 4, 0, 0]} /><Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
                     </div>
                 </div>
                 <DataTable data={placementData} columns={[
-                    { key: 'placement', header: 'Placement', render: r => <span className="font-bold text-slate-900">{r.placement}</span>, sortable: true },
+                    { key: 'placement', header: 'Placement', render: r => <span className="font-bold text-foreground">{r.placement}</span>, sortable: true },
                     { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                     { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
                     { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },

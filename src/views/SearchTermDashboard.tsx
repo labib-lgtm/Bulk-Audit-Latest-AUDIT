@@ -400,7 +400,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             <span className="text-sm font-bold text-muted-foreground">N-Gram Size:</span>
                             <div className="flex bg-card rounded-lg border border-border p-1">
                                 {[1, 2, 3].map(n => (
-                                    <button key={n} onClick={() => setNgramSize(n as 1|2|3)} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${ngramSize === n ? 'bg-brand-400 text-black shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}>{n}-Word</button>
+                                    <button key={n} onClick={() => setNgramSize(n as 1|2|3)} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${ngramSize === n ? 'bg-brand-400 text-background shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}>{n}-Word</button>
                                 ))}
                             </div>
                         </div>
@@ -460,18 +460,18 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
 
                                  {/* Detailed Tables */}
                                  <div className="space-y-6">
-                                    <div className="bg-white rounded-2xl border border-indigo-100 overflow-hidden">
-                                        <div className="px-6 py-4 bg-indigo-50/50 border-b border-indigo-100">
-                                            <h3 className="font-bold text-indigo-900 flex items-center gap-2"><Tags className="w-4 h-4" /> Branded Search Terms</h3>
+                                    <div className="bg-card rounded-2xl border border-indigo-500/30 overflow-hidden">
+                                        <div className="px-6 py-4 bg-indigo-500/10 border-b border-indigo-500/20">
+                                            <h3 className="font-bold text-indigo-400 flex items-center gap-2"><Tags className="w-4 h-4" /> Branded Search Terms</h3>
                                         </div>
                                         <div className="p-4">
                                             <DataTable data={brandData.branded.list} columns={summaryColumns} initialSortKey="spend" fileName="Lynx_Branded_Terms" />
                                         </div>
                                     </div>
 
-                                    <div className="bg-white rounded-2xl border border-emerald-100 overflow-hidden">
-                                        <div className="px-6 py-4 bg-emerald-50/50 border-b border-emerald-100">
-                                            <h3 className="font-bold text-emerald-900 flex items-center gap-2"><Globe className="w-4 h-4" /> Non-Branded Search Terms</h3>
+                                    <div className="bg-card rounded-2xl border border-emerald-500/30 overflow-hidden">
+                                        <div className="px-6 py-4 bg-emerald-500/10 border-b border-emerald-500/20">
+                                            <h3 className="font-bold text-emerald-400 flex items-center gap-2"><Globe className="w-4 h-4" /> Non-Branded Search Terms</h3>
                                         </div>
                                         <div className="p-4">
                                             <DataTable data={brandData.nonBranded.list} columns={summaryColumns} initialSortKey="spend" fileName="Lynx_NonBranded_Terms" />
