@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
-  ArrowRight, ArrowDown, BarChart3, Target, TrendingUp, Zap, 
-  Search, Package, Layers, Activity, FileDown, CheckCircle, Upload,
-  PieChart, Video, Monitor, ChevronRight, Plus, Minus
+  ArrowRight, BarChart3, Target, TrendingUp, Zap, 
+  Search, Package, Layers, Activity, Video, Monitor,
+  Users, Link, LayoutDashboard, FileText, MessageSquare,
+  Briefcase, ChevronLeft, ChevronRight, Plus, Minus
 } from "lucide-react";
-import { AnimatedSection, AnimatedCounter, StaggeredContainer } from "@/hooks/useScrollAnimation";
 import lynxLogoDark from "@/assets/lynx-logo-dark.png";
 import { useState } from "react";
 
@@ -13,457 +13,364 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const features = [
+  const personas = [
+    { icon: BarChart3, label: "Brand Owner" },
+    { icon: Users, label: "Agency" },
+    { icon: Target, label: "PPC Manager" },
+    { icon: Briefcase, label: "Consultant" },
+    { icon: TrendingUp, label: "Growth Team" },
+    { icon: Package, label: "Seller" },
+    { icon: Layers, label: "Enterprise" },
+    { icon: Zap, label: "Startup" },
+  ];
+
+  const pillars = [
     {
-      icon: BarChart3,
-      title: "Executive Dashboard",
-      description: "Total spend, revenue, ACOS, ROAS—unified across SP, SB, and SD campaigns. Channel breakdown, branded vs non-branded analysis, target distribution."
+      tag: "Learn",
+      title: "Data Philosophy",
+      description: "Master the fundamentals of Amazon PPC analytics and understand what metrics actually matter for profitability.",
+      features: ["You", "Philosophy", "Principles", "Proven success methods"]
     },
     {
-      icon: Target,
-      title: "Sponsored Products",
-      description: "Campaign summaries, keyword analysis, match type performance, placement insights. Everything at the target level."
+      tag: "Plan",
+      title: "Your Strategic Plan",
+      description: "Build and refine your optimization strategy to navigate your path to profitable advertising.",
+      features: ["Branding", "Team Building", "Tactics", "Optimization", "Sales", "Negotiation", "Analysis", "Advertising", "Business Growth"]
     },
     {
-      icon: Video,
-      title: "Sponsored Brands",
-      description: "HSA, Video, and Store Spotlight performance. Compare formats, track keywords, optimize brand awareness."
-    },
-    {
-      icon: Monitor,
-      title: "Sponsored Display",
-      description: "Retargeting and audience campaigns. Product contextual vs audience targeting, viewable impressions, tactic breakdown."
-    },
-    {
-      icon: Search,
-      title: "Search Term Intelligence",
-      description: "N-Gram analysis, harvesting candidates, wasted spend finder, ACOS distribution, branded segmentation."
-    },
-    {
-      icon: Package,
-      title: "ASIN-Level Audit",
-      description: "Product profitability analysis. TACOS, ad dependency, organic win rate. Group by parent ASIN."
-    },
-    {
-      icon: Layers,
-      title: "Portfolio Performance",
-      description: "Budget allocation, utilization rates, cross-portfolio comparison. Perfect for multi-brand sellers."
-    },
-    {
-      icon: Activity,
-      title: "Diagnostics & Optimization",
-      description: "Auto-detect bleeders, bid recommendations, bulk export files. Custom ACOS targets per product."
+      tag: "Execute",
+      title: "Execute The Plan",
+      description: "Turn your insights into reality with ruthless precision and data-driven execution.",
+      image: true
     }
   ];
 
-  const stats = [
-    { value: "$2.4M+", label: "Ad Spend Analyzed" },
-    { value: "32%", label: "Avg. ACOS Reduction" },
-    { value: "500+", label: "Active Sellers" },
-    { value: "<60s", label: "Time to Insights" }
+  const tools = [
+    { icon: Video, label: "Live Dashboards" },
+    { icon: LayoutDashboard, label: "Analytics" },
+    { icon: Monitor, label: "Reports" },
+    { icon: Users, label: "Community", active: true },
+    { icon: MessageSquare, label: "ROAS" },
+    { icon: FileText, label: "Coaching" },
+    { icon: Layers, label: "Templates" },
+    { icon: Link, label: "Resources" },
+    { icon: BarChart3, label: "Job Board" },
+    { icon: Activity, label: "And More" },
   ];
 
   const faqs = [
     {
       question: "What reports do I need to upload?",
-      answer: "You'll need your Sponsored Products, Sponsored Brands, and Sponsored Display bulk reports from Amazon Advertising Console. Optionally, upload your Business Report for ASIN-level profitability analysis. All reports can be exported directly from Seller Central."
+      answer: "You'll need your Sponsored Products, Sponsored Brands, and Sponsored Display bulk reports from Amazon Advertising Console. Optionally, upload your Business Report for ASIN-level profitability analysis."
     },
     {
       question: "Do I need API access or technical setup?",
-      answer: "No. Lynx Media works entirely with bulk file uploads. No API connections, no developer needed, no complex integrations. Just download your reports from Amazon and upload them here."
+      answer: "No. Lynx Media works entirely with bulk file uploads. No API connections, no developer needed, no complex integrations."
     },
     {
       question: "How is this different from Amazon's built-in analytics?",
-      answer: "Amazon shows you data. We show you insights. Cross-campaign analysis, N-gram search term breakdowns, ASIN profitability with TACOS, wasted spend detection, harvesting candidates—insights that would take hours to compile manually."
+      answer: "Amazon shows you data. We show you insights. Cross-campaign analysis, N-gram breakdowns, ASIN profitability with TACOS, wasted spend detection—insights that would take hours to compile manually."
     },
     {
-      question: "Can I export data for bulk uploads?",
-      answer: "Yes. The Diagnostics dashboard generates ready-to-upload bulk files for bid changes, pauses, and negative keywords. The Search Term dashboard exports negative keyword files. Just download and upload to Amazon."
+      question: "Can I use this for multiple brands or clients?",
+      answer: "Yes! Our platform supports multi-tenant architecture, making it perfect for agencies and brands managing multiple accounts."
     },
     {
       question: "Is my data secure?",
-      answer: "Your data is processed in your browser session. We don't store your Amazon data on our servers. Upload, analyze, and close—your competitive intelligence stays private."
+      answer: "Your data is processed securely with enterprise-grade encryption. We prioritize your competitive intelligence and privacy."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
-      {/* Navigation - Minimal */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-2xl border-b border-border/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <img src={lynxLogoDark} alt="Lynx Media" className="h-8" />
-          <Button 
-            onClick={() => navigate("/auth")}
-            variant="outline"
-            className="border-primary/50 text-primary hover:bg-primary hover:text-primary-foreground font-medium transition-all"
-          >
-            Get Started
-          </Button>
-        </div>
-      </nav>
-
-      {/* Hero Section - Full Screen Immersive */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
-        {/* Animated Gradient Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Main animated gradient orbs */}
-          <div 
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-primary/20 rounded-full blur-[180px] pointer-events-none animate-pulse"
-            style={{ animation: 'pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite' }}
-          />
-          <div 
-            className="absolute bottom-0 left-[-10%] w-[500px] h-[500px] bg-primary/15 rounded-full blur-[150px] pointer-events-none"
-            style={{ animation: 'float-slow 12s ease-in-out infinite' }}
-          />
-          <div 
-            className="absolute top-[20%] right-[-5%] w-[400px] h-[400px] bg-primary/12 rounded-full blur-[120px] pointer-events-none"
-            style={{ animation: 'float-slow 10s ease-in-out infinite reverse' }}
-          />
-          <div 
-            className="absolute top-[60%] left-[10%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] pointer-events-none"
-            style={{ animation: 'float-slow 14s ease-in-out infinite 2s' }}
-          />
-          
-          {/* Floating particles */}
-          {[...Array(20)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-1 h-1 bg-primary/40 rounded-full pointer-events-none"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animation: `particle-float ${8 + Math.random() * 8}s ease-in-out infinite ${Math.random() * 5}s`,
-                opacity: 0.3 + Math.random() * 0.4
-              }}
-            />
-          ))}
-          
-          {/* Additional larger floating dots */}
-          {[...Array(8)].map((_, i) => (
-            <div
-              key={`large-${i}`}
-              className="absolute w-2 h-2 bg-primary/30 rounded-full pointer-events-none blur-[1px]"
-              style={{
-                left: `${10 + Math.random() * 80}%`,
-                top: `${10 + Math.random() * 80}%`,
-                animation: `particle-float ${10 + Math.random() * 6}s ease-in-out infinite ${Math.random() * 3}s`,
-              }}
-            />
-          ))}
-          
-          {/* Grid overlay for depth */}
-          <div 
-            className="absolute inset-0 opacity-[0.015]"
-            style={{
-              backgroundImage: `linear-gradient(hsl(var(--primary)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)) 1px, transparent 1px)`,
-              backgroundSize: '60px 60px'
-            }}
-          />
-        </div>
-        
-        <div className="relative z-10 max-w-5xl mx-auto text-center pt-20">
-          <div 
-            className="opacity-0 animate-fade-in"
-            style={{ animationDelay: '0.2s', animationFillMode: 'forwards' }}
-          >
-            <span className="inline-block px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-primary text-sm font-medium mb-8">
-              Amazon PPC Analytics
-            </span>
+    <div className="min-h-screen bg-[#0a0a0f] text-foreground overflow-x-hidden">
+      {/* Navigation */}
+      <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-full border border-border/30 bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="flex items-center gap-8">
+          <img src={lynxLogoDark} alt="Lynx Media" className="h-6" />
+          <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+            <a href="#features" className="hover:text-foreground transition-colors">NEWSLETTERS</a>
           </div>
-          
-          <h1 
-            className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tight mb-8 leading-[1.05] opacity-0 animate-fade-in-up"
-            style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
-          >
-            The smartest way to
-            <br />
-            <span className="text-primary">stop wasting ad spend.</span>
-          </h1>
-          
-          <p 
-            className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed opacity-0 animate-fade-in-up"
-            style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}
-          >
-            Upload your Amazon bulk reports. Get instant insights across 8 specialized dashboards. Take action in minutes.
-          </p>
-
-          <div 
-            className="opacity-0 animate-fade-in-up"
-            style={{ animationDelay: '0.7s', animationFillMode: 'forwards' }}
-          >
+          <div className="flex items-center gap-3">
             <Button 
               onClick={() => navigate("/auth")}
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-lg px-10 py-7 rounded-full group transition-all hover:scale-105 hover:shadow-[0_0_60px_rgba(178,255,0,0.3)]"
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground"
             >
-              Start Analyzing Free
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              LOGIN
+            </Button>
+            <Button 
+              onClick={() => navigate("/auth")}
+              className="bg-foreground text-background hover:bg-foreground/90 rounded-full px-5"
+            >
+              JOIN WAITLIST
             </Button>
           </div>
         </div>
+      </nav>
 
-        {/* Scroll Indicator */}
-        <div 
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted-foreground opacity-0 animate-fade-in"
-          style={{ animationDelay: '1.2s', animationFillMode: 'forwards' }}
-        >
-          <span className="text-xs uppercase tracking-widest">Scroll</span>
-          <ArrowDown className="w-4 h-4 animate-bounce" />
-        </div>
-      </section>
-
-      {/* Problem Statement - Large Typography */}
-      <section className="py-32 px-6">
-        <div className="max-w-5xl mx-auto">
-          <AnimatedSection animation="blur">
-            <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground">
-              After years of managing Amazon PPC, one thing hasn't changed: 
-              <span className="text-foreground"> sellers are drowning in spreadsheets </span>
-              while money slips through the cracks.
-            </p>
-          </AnimatedSection>
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20">
+        {/* Gradient orbs */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-blue-600/20 via-purple-600/10 to-transparent rounded-full blur-[120px] pointer-events-none" />
+        
+        <div className="relative z-10 max-w-5xl mx-auto text-center">
+          <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6 animate-fade-in">
+            LYNX PLATFORM IS COMING
+          </p>
           
-          <AnimatedSection delay={300} animation="blur" className="mt-12">
-            <p className="text-2xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-primary">
-              It's time for a new approach.
-            </p>
-          </AnimatedSection>
-        </div>
-      </section>
+          <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            <span className="text-foreground/80">A one of a kind</span>
+            <br />
+            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+              hyper-growth platform
+            </span>
+            <br />
+            <span className="text-foreground">where <span className="font-black">Nothing Is Held Back</span></span>
+          </h1>
+          
+          <p className="text-muted-foreground text-lg md:text-xl max-w-2xl mx-auto mb-10">
+            Learn to grow any business, get ahead of the competition
+          </p>
 
-      {/* Stats Section - Dark Card */}
-      <section className="py-24 px-6">
-        <AnimatedSection animation="scale">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 p-10 md:p-16 rounded-3xl bg-card/80 border border-border backdrop-blur-sm">
-              {stats.map((stat, i) => (
-                <div key={i} className="text-center">
-                  <AnimatedCounter 
-                    value={stat.value} 
-                    className="text-4xl md:text-5xl lg:text-6xl font-black text-primary mb-2 block"
-                  />
-                  <p className="text-sm md:text-base text-muted-foreground">{stat.label}</p>
+          <Button 
+            onClick={() => navigate("/auth")}
+            variant="outline"
+            className="border-border/50 text-muted-foreground hover:text-foreground hover:border-foreground/50 rounded-full px-8 py-6 text-base group transition-all"
+          >
+            <Search className="w-5 h-5 mr-2 text-muted-foreground/60" />
+            Training started
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </div>
+
+        {/* Device Mockups */}
+        <div className="relative mt-12 w-full max-w-6xl mx-auto">
+          <div className="relative flex items-end justify-center gap-8">
+            {/* Laptop Mockup */}
+            <div className="relative w-full max-w-3xl">
+              <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-t-xl p-2 border border-border/30">
+                <div className="rounded-lg overflow-hidden bg-[#13131a] aspect-[16/10]">
+                  <div className="w-full h-full bg-gradient-to-br from-[#1a1a28] via-[#15151f] to-[#0f0f15] flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <BarChart3 className="w-16 h-16 text-primary/40 mx-auto mb-4" />
+                      <p className="text-muted-foreground text-sm">Dashboard Preview</p>
+                    </div>
+                  </div>
                 </div>
-              ))}
+              </div>
+              <div className="h-4 bg-gradient-to-b from-[#1a1a24] to-[#2a2a34] rounded-b-lg mx-4" />
+              <div className="h-1 bg-[#2a2a34] rounded-full mx-8" />
+            </div>
+
+            {/* Phone Mockup */}
+            <div className="absolute right-4 bottom-4 md:right-0 md:bottom-0 md:relative w-24 md:w-40 lg:w-48">
+              <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-3xl p-1.5 border border-border/30">
+                <div className="rounded-2xl overflow-hidden bg-[#13131a] aspect-[9/19]">
+                  <div className="w-full h-full bg-gradient-to-br from-[#1a1a28] via-[#15151f] to-[#0f0f15] flex items-center justify-center">
+                    <TrendingUp className="w-8 h-8 text-primary/40" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-        </AnimatedSection>
-      </section>
+        </div>
 
-      {/* Features Grid - Clean Cards */}
-      <section className="py-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          <AnimatedSection animation="blur" className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl lg:text-6xl font-black mb-6">
-              8 Dashboards.<br />
-              <span className="text-primary">One Platform.</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Every tool you need to analyze, optimize, and scale your Amazon advertising.
-            </p>
-          </AnimatedSection>
-
-          <StaggeredContainer className="grid md:grid-cols-2 lg:grid-cols-4 gap-4" staggerDelay={80}>
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="group p-6 rounded-2xl bg-card/50 border border-border hover:border-primary/50 hover:bg-card transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-primary/5"
-              >
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                  <feature.icon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-lg font-bold mb-2 text-foreground">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+        {/* Persona Avatars */}
+        <div className="mt-16 flex flex-wrap justify-center gap-6 md:gap-10 max-w-4xl mx-auto">
+          {personas.map((persona, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 group cursor-pointer">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#1a1a28] to-[#0f0f15] border border-border/30 flex items-center justify-center group-hover:border-primary/30 transition-colors">
+                <persona.icon className="w-6 h-6 text-primary/60 group-hover:text-primary transition-colors" />
               </div>
-            ))}
-          </StaggeredContainer>
+              <span className="text-xs text-muted-foreground group-hover:text-foreground transition-colors">{persona.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* How It Works - Numbered Steps */}
-      <section className="py-24 px-6 bg-card/30">
-        <div className="max-w-5xl mx-auto">
-          <AnimatedSection className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">
-              3 minutes to your first insights.
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              No setup friction. No integration delays.
-            </p>
-          </AnimatedSection>
-
-          <div className="space-y-0">
-            {[
-              {
-                step: "01",
-                title: "Download your reports",
-                description: "Export bulk reports from Amazon Seller Central. SP, SB, SD campaigns, plus your Business Report for ASIN analysis."
-              },
-              {
-                step: "02",
-                title: "Upload & analyze",
-                description: "Drop your files into Lynx Media. Our engine processes everything instantly—campaigns, keywords, targets, search terms, ASINs."
-              },
-              {
-                step: "03",
-                title: "Take action",
-                description: "Use insights to optimize bids, find wasted spend, harvest keywords, and export bulk files for immediate implementation."
-              }
-            ].map((item, index) => (
-              <AnimatedSection 
-                key={index}
-                delay={index * 150}
-                className="flex gap-8 items-start py-10 border-b border-border last:border-0"
-              >
-                <span className="text-5xl md:text-7xl font-black text-primary/30">{item.step}</span>
-                <div className="flex-1 pt-2">
-                  <h3 className="text-2xl md:text-3xl font-bold mb-3 text-foreground">{item.title}</h3>
-                  <p className="text-lg text-muted-foreground max-w-xl">{item.description}</p>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial - Large Quote */}
+      {/* Value Proposition */}
       <section className="py-32 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <AnimatedSection>
-            <blockquote className="text-2xl md:text-3xl lg:text-4xl font-medium leading-relaxed text-foreground mb-10">
-              "I found $3,200 in wasted spend within the first 10 minutes. The Search Term dashboard alone is worth 10x what I was paying for other tools."
-            </blockquote>
-            <div>
-              <p className="text-lg font-bold text-foreground">Marcus Chen</p>
-              <p className="text-muted-foreground">7-Figure Private Label Seller</p>
-              <p className="text-primary mt-2 font-medium">Reduced ACOS from 42% to 24%</p>
-            </div>
-          </AnimatedSection>
+          <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6">
+            MORE THAN A TOOL
+          </p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground">
+            We are a community of <span className="text-foreground">Amazon sellers</span> dedicated to helping each other <span className="text-foreground">grow, scale</span> and reach new heights through <span className="text-foreground">data-driven optimization</span>
+          </h2>
         </div>
       </section>
 
-      {/* More Social Proof */}
+      {/* Three Pillars */}
       <section className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                quote: "The ASIN Audit feature changed everything. I finally understand which products are actually profitable after ad spend.",
-                name: "Sarah Mitchell",
-                role: "Brand Owner, Home & Kitchen",
-                metric: "2.8x ROAS increase"
-              },
-              {
-                quote: "No API setup, no developer needed. I upload my reports and have actionable insights in seconds.",
-                name: "David Park",
-                role: "Agency Owner, 15+ Clients",
-                metric: "Saves 12+ hours/week"
-              },
-              {
-                quote: "The Diagnostics feature identified bid optimization opportunities I completely missed. Results in days.",
-                name: "Alex Rivera",
-                role: "Electronics Seller",
-                metric: "41% more orders, same spend"
-              }
-            ].map((testimonial, index) => (
-              <AnimatedSection 
+            {pillars.map((pillar, index) => (
+              <div 
                 key={index}
-                delay={index * 100}
-                className="p-8 rounded-2xl bg-card border border-border"
+                className="p-8 rounded-2xl bg-gradient-to-b from-[#13131a] to-[#0d0d12] border border-border/30 hover:border-primary/20 transition-all"
               >
-                <div className="flex gap-1 mb-6">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-primary fill-primary" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-                <p className="text-foreground mb-6 leading-relaxed">"{testimonial.quote}"</p>
-                <div className="border-t border-border pt-6">
-                  <p className="font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-sm text-muted-foreground mb-2">{testimonial.role}</p>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium">
-                    <TrendingUp className="w-3 h-3" />
-                    {testimonial.metric}
-                  </span>
-                </div>
-              </AnimatedSection>
+                {pillar.image ? (
+                  <div className="aspect-[4/3] rounded-xl bg-gradient-to-br from-[#1a1a28] to-[#0f0f15] flex items-center justify-center mb-6">
+                    <Monitor className="w-16 h-16 text-primary/40" />
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {pillar.features?.map((feature, i) => (
+                      <span 
+                        key={i}
+                        className="px-3 py-1.5 rounded-full text-xs bg-[#1a1a28] border border-border/30 text-muted-foreground"
+                      >
+                        {feature}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-medium mb-4">
+                  {pillar.tag}
+                </span>
+                
+                <h3 className="text-xl font-bold text-foreground mb-3">{pillar.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{pillar.description}</p>
+              </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Tools Section */}
+      <section className="py-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            We'll help you become best of the best in
+            <br />
+            the game by giving you everything you'll
+            <br />
+            ever need to win
+          </h2>
+
+          <div className="mt-12 flex flex-wrap justify-center gap-4">
+            {tools.map((tool, i) => (
+              <div 
+                key={i}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl transition-all cursor-pointer ${
+                  tool.active 
+                    ? 'bg-primary text-primary-foreground' 
+                    : 'bg-[#13131a] border border-border/30 hover:border-primary/30'
+                }`}
+              >
+                <tool.icon className={`w-6 h-6 ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`} />
+                <span className={`text-xs font-medium ${tool.active ? 'text-primary-foreground' : 'text-muted-foreground'}`}>
+                  {tool.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Community Card */}
+      <section className="py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="rounded-3xl bg-gradient-to-br from-primary/20 via-[#13131a] to-[#0d0d12] border border-primary/20 p-10 md:p-14 relative overflow-hidden">
+            <div className="absolute top-6 left-6 w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Users className="w-6 h-6 text-primary" />
+            </div>
+            
+            <div className="max-w-lg">
+              <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                A Thriving
+                <br />
+                Community
+              </h3>
+              <p className="text-lg text-muted-foreground font-medium mb-6">
+                Connect With A Thriving Community Of Amazon Sellers.
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Join an energetic community where collaboration and support thrive. Engage with fellow sellers, share experiences, and build lasting connections. The journey is more rewarding when you have a community to lean on.
+              </p>
+            </div>
+
+            <div className="absolute top-10 right-10 text-muted-foreground/30 text-sm hidden md:block">
+              Meet People Like You
+            </div>
+
+            <div className="absolute bottom-8 right-8 flex gap-2">
+              <button className="w-10 h-10 rounded-full border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/50 transition-colors">
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button className="w-10 h-10 rounded-full border border-border/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-foreground/50 transition-colors">
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-32 px-6">
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-4">
+            Join The Waitlist
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8">
+            Be The First To Get Access
+          </h2>
+          <Button 
+            onClick={() => navigate("/auth")}
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-8 py-6 text-base font-bold"
+          >
+            Sign Up To The Waitlist
+          </Button>
         </div>
       </section>
 
       {/* FAQ Section */}
-      <section className="py-24 px-6 bg-card/30">
+      <section className="py-24 px-6">
         <div className="max-w-3xl mx-auto">
-          <AnimatedSection className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">
-              Still have questions?
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Here's what sellers ask most.
-            </p>
-          </AnimatedSection>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground text-center mb-16">
+            Frequently Asked Questions
+          </h2>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {faqs.map((faq, index) => (
-              <AnimatedSection key={index} delay={index * 50}>
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full text-left p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <h3 className="text-lg font-bold text-foreground">{faq.question}</h3>
-                    {openFaq === index ? (
-                      <Minus className="w-5 h-5 text-primary flex-shrink-0" />
-                    ) : (
-                      <Plus className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                    )}
-                  </div>
-                  {openFaq === index && (
-                    <p className="text-muted-foreground mt-4 leading-relaxed">
-                      {faq.answer}
-                    </p>
+              <button
+                key={index}
+                onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                className="w-full text-left p-6 rounded-2xl bg-[#13131a] border border-border/30 hover:border-primary/20 transition-all"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <h3 className="text-base font-medium text-foreground">{faq.question}</h3>
+                  {openFaq === index ? (
+                    <Minus className="w-5 h-5 text-primary flex-shrink-0" />
+                  ) : (
+                    <Plus className="w-5 h-5 text-muted-foreground flex-shrink-0" />
                   )}
-                </button>
-              </AnimatedSection>
+                </div>
+                {openFaq === index && (
+                  <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
+                    {faq.answer}
+                  </p>
+                )}
+              </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Final CTA - Big Impact */}
-      <section className="py-32 px-6 relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/10 via-transparent to-transparent pointer-events-none" />
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[200px] pointer-events-none" />
-        
-        <AnimatedSection className="relative z-10 max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-black mb-8">
-            Ready to see
-            <br />
-            <span className="text-primary">the truth?</span>
-          </h2>
-          <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto">
-            Upload your Amazon reports. Get insights in seconds. No credit card required.
-          </p>
-          <Button 
-            onClick={() => navigate("/auth")}
-            size="lg"
-            className="bg-primary text-primary-foreground hover:bg-primary/90 font-bold text-xl px-12 py-8 rounded-full group transition-all hover:scale-105 hover:shadow-[0_0_80px_rgba(178,255,0,0.4)]"
-          >
-            Get Started Free
-            <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-1 transition-transform" />
-          </Button>
-        </AnimatedSection>
-      </section>
-
-      {/* Footer - Minimal */}
-      <footer className="py-16 px-6 border-t border-border">
+      {/* Footer */}
+      <footer className="py-12 px-6 border-t border-border/20">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-          <img src={lynxLogoDark} alt="Lynx Media" className="h-6 opacity-60" />
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} Lynx Media. All rights reserved.
+          <p className="text-xs text-muted-foreground">
+            © Lynx Media {new Date().getFullYear()}. All rights reserved.
           </p>
+          <img src={lynxLogoDark} alt="Lynx Media" className="h-5 opacity-60" />
+          <div className="flex gap-6 text-xs text-muted-foreground">
+            <a href="#" className="hover:text-foreground transition-colors">Terms</a>
+            <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
+            <a href="#" className="hover:text-foreground transition-colors">Acceptable use</a>
+            <a href="#" className="hover:text-foreground transition-colors">Accessibility</a>
+          </div>
         </div>
       </footer>
     </div>
