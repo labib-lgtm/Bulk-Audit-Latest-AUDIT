@@ -33,54 +33,59 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <div 
       onClick={onClick}
-      className={`relative rounded-xl p-4 sm:p-5 border transition-all duration-200 h-full flex flex-col justify-between group
+      className={`relative rounded-2xl p-5 sm:p-6 border transition-all duration-300 h-full flex flex-col justify-between group overflow-hidden
         ${onClick ? 'cursor-pointer' : ''}
         ${isSelected 
-          ? 'bg-primary/10 border-primary shadow-lg shadow-primary/20 ring-1 ring-primary' 
-          : 'bg-card border-border hover:border-primary/50 hover:shadow-md'
+          ? 'bg-primary/5 border-primary/50 shadow-[0_0_40px_-10px_hsl(var(--primary)/0.4)] ring-1 ring-primary/30' 
+          : 'bg-card border-border hover:border-primary/30 hover:shadow-[0_0_30px_-10px_hsl(var(--primary)/0.2)] card-hover'
         }`}
     >
-      <div className="flex items-center gap-1.5 mb-2 sm:mb-3">
-        <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider leading-tight ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
-          {title}
-        </span>
-        <Info size={14} className={`${isSelected ? 'text-primary' : 'text-muted-foreground/50'} cursor-help opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block`} />
-      </div>
+      {/* Subtle gradient overlay on hover/selected */}
+      <div className={`absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 transition-opacity duration-300 ${isSelected ? 'opacity-100' : 'group-hover:opacity-50'}`} />
       
-      <div className="flex items-baseline gap-1.5 flex-wrap">
-        <span className={`text-xl sm:text-[26px] font-heading font-bold tracking-tight text-foreground`}>
-          {value || '—'}
-        </span>
-        {typeLabel && value !== '—' && (
-          <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
-            {typeLabel}
+      <div className="relative z-10">
+        <div className="flex items-center gap-2 mb-3">
+          <span className={`text-[11px] font-bold uppercase tracking-wider ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+            {title}
           </span>
+          <Info size={14} className={`${isSelected ? 'text-primary/60' : 'text-muted-foreground/30'} cursor-help opacity-0 group-hover:opacity-100 transition-opacity`} />
+        </div>
+        
+        <div className="flex items-baseline gap-2 flex-wrap">
+          <span className={`text-2xl sm:text-3xl font-heading font-bold tracking-tight text-foreground`}>
+            {value || '—'}
+          </span>
+          {typeLabel && value !== '—' && (
+            <span className={`text-[10px] font-bold uppercase tracking-widest ${isSelected ? 'text-primary' : 'text-muted-foreground/60'}`}>
+              {typeLabel}
+            </span>
+          )}
+        </div>
+        
+        {subValue && (
+          <div className={`mt-3 text-xs font-medium ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
+            {subValue}
+          </div>
         )}
       </div>
       
-      {subValue && (
-        <div className={`mt-2 text-[10px] sm:text-[11px] font-semibold ${isSelected ? 'text-primary' : 'text-muted-foreground'}`}>
-          {subValue}
-        </div>
-      )}
-      
-      {/* Visual selection indicator */}
+      {/* Selection indicator */}
       {isSelected && (
-        <div className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-b-xl"></div>
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-brand-400" />
       )}
       
       {alert && (
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 w-2 h-2 bg-destructive rounded-full animate-pulse"></div>
+        <div className="absolute top-4 right-4 w-2.5 h-2.5 bg-destructive rounded-full animate-pulse shadow-[0_0_10px_hsl(var(--destructive)/0.5)]" />
       )}
     </div>
   );
 };
 
 export const SectionHeader: React.FC<{ title: string; description: string; rightElement?: React.ReactNode }> = ({ title, description, rightElement }) => (
-  <div className="mb-6 sm:mb-8 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+  <div className="mb-8 sm:mb-10 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
     <div>
-      <h2 className="text-2xl sm:text-3xl font-bold font-heading text-foreground tracking-tight">{title}</h2>
-      <p className="mt-1 text-sm sm:text-base text-muted-foreground max-w-2xl">{description}</p>
+      <h2 className="text-2xl sm:text-3xl font-heading font-bold text-foreground tracking-tight">{title}</h2>
+      <p className="mt-2 text-sm sm:text-base text-muted-foreground max-w-2xl leading-relaxed">{description}</p>
     </div>
     {rightElement && <div className="w-full lg:w-auto">{rightElement}</div>}
   </div>
@@ -340,20 +345,20 @@ export const DataTable = <T extends Record<string, any>>({
   const visibleColumns = columns.filter(col => !hiddenColumns.has(String(col.key)));
 
   return (
-    <div className="bg-card rounded-xl sm:rounded-2xl border border-border shadow-sm flex flex-col relative min-h-[400px]">
+    <div className="bg-card rounded-2xl border border-border shadow-sm flex flex-col relative min-h-[400px] overflow-hidden">
       
       {/* Top Controls Bar */}
-      <div className={`px-4 py-3 sm:px-6 sm:py-4 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center bg-card gap-3 rounded-t-xl sm:rounded-t-2xl z-20`}>
+      <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center bg-card/50 backdrop-blur-sm gap-3 rounded-t-2xl z-20">
         <div className="flex items-center gap-4">
-             <div className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-widest hidden sm:block">
-                Table Controls
+             <div className="text-[10px] sm:text-[11px] font-bold text-muted-foreground uppercase tracking-[0.15em] hidden sm:block">
+                Data Table
              </div>
              {Object.keys(filters).length > 0 && (
                 <button 
                   onClick={clearAllFilters}
-                  className="flex items-center gap-1.5 px-2 py-1 bg-destructive/10 text-destructive rounded-lg text-xs font-bold hover:bg-destructive/20 transition-colors"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 bg-destructive/10 text-destructive rounded-lg text-xs font-medium hover:bg-destructive/20 transition-all"
                 >
-                    <Trash2 size={12} /> Clear Filters ({Object.keys(filters).length})
+                    <Trash2 size={12} /> Clear ({Object.keys(filters).length})
                 </button>
              )}
         </div>
@@ -362,7 +367,7 @@ export const DataTable = <T extends Record<string, any>>({
           {enableExport && (
               <button 
                  onClick={handleExport}
-                 className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+                 className="flex items-center px-3 py-2 text-xs font-medium text-muted-foreground bg-muted/50 border border-border rounded-xl hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-all"
                  title="Export current view to Excel"
               >
                   <Download size={14} className="mr-2" />
@@ -372,7 +377,7 @@ export const DataTable = <T extends Record<string, any>>({
 
           <button 
               onClick={() => setIsAutoFit(!isAutoFit)}
-              className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-muted hover:text-foreground transition-colors"
+              className="flex items-center px-3 py-2 text-xs font-medium text-muted-foreground bg-muted/50 border border-border rounded-xl hover:bg-muted hover:text-foreground transition-all"
           >
               {isAutoFit ? <Maximize2 size={14} className="mr-2" /> : <Minimize2 size={14} className="mr-2" />}
               <span className="hidden sm:inline">{isAutoFit ? 'Stretch' : 'Auto Fit'}</span>
@@ -382,25 +387,25 @@ export const DataTable = <T extends Record<string, any>>({
           <div className="relative" ref={colMenuRef}>
             <button 
               onClick={() => setIsColumnMenuOpen(!isColumnMenuOpen)}
-              className="flex items-center px-3 py-2 text-xs font-bold text-muted-foreground bg-muted border border-border rounded-xl hover:bg-muted hover:text-foreground transition-colors"
+              className="flex items-center px-3 py-2 text-xs font-medium text-muted-foreground bg-muted/50 border border-border rounded-xl hover:bg-muted hover:text-foreground transition-all"
             >
               <SlidersHorizontal size={14} className="mr-2" />
               Columns
             </button>
             
             {isColumnMenuOpen && (
-              <div className="absolute right-0 mt-2 w-64 bg-popover rounded-2xl shadow-2xl border border-border z-50 p-3 animate-fadeIn">
-                <div className="text-[10px] font-bold text-muted-foreground px-2 py-1 uppercase mb-2 tracking-widest border-b border-border">Filter Columns</div>
-                <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-1 mt-2">
+              <div className="absolute right-0 mt-2 w-64 bg-popover rounded-2xl shadow-2xl border border-border z-50 p-3 animate-fadeIn backdrop-blur-xl">
+                <div className="text-[10px] font-bold text-muted-foreground px-2 py-1.5 uppercase tracking-[0.15em] border-b border-border mb-2">Filter Columns</div>
+                <div className="max-h-60 overflow-y-auto custom-scrollbar space-y-0.5 mt-2">
                   {columns.map(col => (
-                    <label key={String(col.key)} className="flex items-center px-2 py-2 hover:bg-muted rounded-lg cursor-pointer transition-colors">
+                    <label key={String(col.key)} className="flex items-center px-2 py-2 hover:bg-muted rounded-xl cursor-pointer transition-colors group">
                       <input 
                         type="checkbox" 
                         checked={!hiddenColumns.has(String(col.key))}
                         onChange={() => toggleColumn(String(col.key))}
                         className="w-4 h-4 text-primary rounded-md border-border focus:ring-primary bg-background"
                       />
-                      <span className="ml-3 text-sm font-medium text-foreground">{col.header}</span>
+                      <span className="ml-3 text-sm font-medium text-foreground group-hover:text-primary transition-colors">{col.header}</span>
                     </label>
                   ))}
                 </div>
