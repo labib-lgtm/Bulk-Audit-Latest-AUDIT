@@ -103,68 +103,83 @@ const Index = () => {
 
   if (!dashboardData) {
     return (
-      <div className="min-h-screen bg-black flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        {/* Background Grid */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden dark">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-grid opacity-50" />
         
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-400/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-400/5 rounded-full blur-[120px]" />
+        {/* Floating Gradient Orbs */}
+        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[180px] animate-float-slow" />
+        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-brand-400/8 rounded-full blur-[150px] animate-float-slow" style={{ animationDelay: '-5s' }} />
+        <div className="absolute top-1/2 right-1/3 w-[300px] h-[300px] bg-brand-600/6 rounded-full blur-[120px] animate-float-slow" style={{ animationDelay: '-10s' }} />
 
         <div className="relative z-10 max-w-2xl w-full text-center">
           {/* Logo */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-brand-400 flex items-center justify-center shadow-[0_0_40px_rgba(204,255,0,0.4)]">
-              <Shield className="w-9 h-9 text-black fill-current" strokeWidth={2.5} />
+          <div className="flex items-center justify-center gap-4 mb-10 animate-fade-in">
+            <div className="relative">
+              <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-primary blur-xl opacity-50" />
+              <div className="relative w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-2xl">
+                <Shield className="w-9 h-9 text-primary-foreground fill-current" strokeWidth={2.5} />
+              </div>
             </div>
             <div className="flex flex-col items-start">
-              <span className="text-4xl font-heading font-black tracking-tight text-white">LYNX</span>
-              <span className="text-2xl font-heading font-bold tracking-tight text-brand-400">MEDIA</span>
+              <span className="text-4xl font-heading font-bold tracking-tight text-foreground">LYNX</span>
+              <span className="text-2xl font-heading font-bold tracking-tight text-primary">MEDIA</span>
             </div>
           </div>
 
-          <h1 className="text-xl sm:text-2xl font-heading font-bold text-white mb-2">Amazon Advertising Analytics</h1>
-          <p className="text-slate-400 mb-10 max-w-md mx-auto">Upload your Bulk Operations file to unlock powerful insights across all your campaigns.</p>
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground mb-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+            Amazon Advertising Analytics
+          </h1>
+          <p className="text-muted-foreground mb-12 max-w-md mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
+            Upload your Bulk Operations file to unlock powerful insights across all your campaigns.
+          </p>
 
           {error && (
-            <div className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-sm flex items-center justify-center gap-2">
-              <AlertCircle size={16} /> {error}
+            <div className="mb-6 p-4 glass-dark rounded-2xl text-destructive text-sm flex items-center justify-center gap-3 border-destructive/30 animate-fade-in">
+              <AlertCircle size={18} /> {error}
             </div>
           )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
             {/* Bulk Ops Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${isLoading ? 'opacity-50 cursor-wait' : 'border-slate-700 hover:border-brand-400 hover:bg-brand-400/5'}`}>
+            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
               <input type="file" accept=".xlsx,.xls" onChange={(e) => handleFileUpload(e, 'bulk')} className="hidden" disabled={isLoading} />
-              <Upload className="w-10 h-10 text-slate-500 group-hover:text-brand-400 mb-3 transition-colors" />
-              <span className="font-bold text-white text-sm">Bulk Operations File</span>
-              <span className="text-xs text-slate-500 mt-1">Campaigns, Targets, Keywords</span>
+              <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
+                <Upload className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <span className="font-heading font-bold text-foreground">Bulk Operations File</span>
+              <span className="text-sm text-muted-foreground mt-1">Campaigns, Targets, Keywords</span>
             </label>
 
             {/* Business Report Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all ${isLoading ? 'opacity-50 cursor-wait' : 'border-slate-700 hover:border-brand-400 hover:bg-brand-400/5'}`}>
+            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
               <input type="file" accept=".xlsx,.xls,.csv" onChange={(e) => handleFileUpload(e, 'business')} className="hidden" disabled={isLoading} />
-              <FileSpreadsheet className="w-10 h-10 text-slate-500 group-hover:text-brand-400 mb-3 transition-colors" />
-              <span className="font-bold text-white text-sm">Business Report</span>
-              <span className="text-xs text-slate-500 mt-1">By Child ASIN (Optional)</span>
+              <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
+                <FileSpreadsheet className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+              </div>
+              <span className="font-heading font-bold text-foreground">Business Report</span>
+              <span className="text-sm text-muted-foreground mt-1">By Child ASIN (Optional)</span>
             </label>
           </div>
 
-          <div className="flex items-center gap-4 mb-6">
-            <div className="flex-1 h-px bg-slate-800" />
-            <span className="text-xs text-slate-600 font-bold uppercase tracking-widest">or</span>
-            <div className="flex-1 h-px bg-slate-800" />
+          <div className="flex items-center gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">or</span>
+            <div className="flex-1 h-px bg-border" />
           </div>
 
           <button
             onClick={handleLoadDemo}
             disabled={isLoading}
-            className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-brand-400 text-black font-bold rounded-2xl hover:bg-brand-300 transition-all shadow-[0_0_30px_rgba(204,255,0,0.2)] hover:shadow-[0_0_40px_rgba(204,255,0,0.3)] disabled:opacity-50"
+            className="flex items-center justify-center gap-3 w-full px-8 py-5 bg-primary text-primary-foreground font-heading font-bold text-lg rounded-2xl btn-glow transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 animate-fade-in"
+            style={{ animationDelay: '0.5s' }}
           >
-            <Zap size={18} /> Load Demo Data
+            <Zap size={20} /> Load Demo Data
           </button>
 
-          <p className="text-xs text-slate-600 mt-6">Your data is processed locally. Nothing is uploaded to any server.</p>
+          <p className="text-xs text-muted-foreground mt-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+            🔒 Your data is processed locally. Nothing is uploaded to any server.
+          </p>
         </div>
       </div>
     );
