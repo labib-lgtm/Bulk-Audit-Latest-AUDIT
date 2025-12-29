@@ -362,8 +362,8 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
 
             {/* 2. CHARTS ROW */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                    <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6">
+                <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col">
+                    <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6 text-foreground">
                         <TrendingUp className="w-4 h-4 text-emerald-500" /> Revenue Composition (Top 10 {groupByParent ? 'Parents' : 'Products'})
                     </h4>
                     <div className="h-80 w-full">
