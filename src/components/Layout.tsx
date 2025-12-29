@@ -61,16 +61,16 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
       )}
 
       {/* Sidebar - Dark Theme */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-card text-foreground transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl lg:shadow-none border-r border-border`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-sidebar text-sidebar-foreground transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} shadow-2xl lg:shadow-none border-r border-sidebar-border`}>
         
         {/* Logo Area */}
-        <div className="flex items-center justify-between h-24 px-8 bg-card border-b border-border">
+        <div className="flex items-center justify-between h-24 px-8 bg-sidebar border-b border-sidebar-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-[0_0_15px_hsl(var(--primary)/0.4)] text-primary-foreground">
                <Shield className="w-6 h-6 fill-current" strokeWidth={2.5} />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-heading font-extrabold tracking-tight text-foreground leading-none">
+              <span className="text-xl font-heading font-extrabold tracking-tight text-sidebar-foreground leading-none">
                 LYNX
               </span>
               <span className="text-lg font-heading font-bold tracking-tight text-primary leading-none">
@@ -78,14 +78,14 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
               </span>
             </div>
           </div>
-          <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => setIsMobileMenuOpen(false)} className="lg:hidden text-sidebar-foreground/60 hover:text-sidebar-foreground transition-colors">
             <X size={24} />
           </button>
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-8 space-y-1.5 overflow-y-auto custom-scrollbar">
-          <div className="px-4 mb-3 text-[11px] font-bold text-muted-foreground uppercase tracking-widest font-heading">Dashboards</div>
+          <div className="px-4 mb-3 text-[11px] font-bold text-sidebar-foreground/50 uppercase tracking-widest font-heading">Dashboards</div>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
@@ -98,11 +98,11 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                 }}
                 className={`flex items-center w-full px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200 group ${
                   isActive
-                    ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.25)] scale-[1.02]'
-                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_20px_hsl(var(--sidebar-primary)/0.25)] scale-[1.02]'
+                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                 }`}
               >
-                <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
+                <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                 {item.label}
               </button>
             );
@@ -111,7 +111,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           {/* Admin Section */}
           {isAdmin && (
             <>
-              <div className="px-4 mb-3 mt-6 text-[11px] font-bold text-muted-foreground uppercase tracking-widest font-heading">Admin</div>
+              <div className="px-4 mb-3 mt-6 text-[11px] font-bold text-sidebar-foreground/50 uppercase tracking-widest font-heading">Admin</div>
               {ADMIN_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id;
@@ -124,11 +124,11 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                     }}
                     className={`flex items-center w-full px-4 py-3 text-sm font-bold rounded-xl transition-all duration-200 group ${
                       isActive
-                        ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.25)] scale-[1.02]'
-                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                        ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_20px_hsl(var(--sidebar-primary)/0.25)] scale-[1.02]'
+                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                     }`}
                   >
-                    <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
+                    <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                     {item.label}
                   </button>
                 );
@@ -138,13 +138,13 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
         </nav>
         
         {/* User / Footer */}
-        <div className="p-4 border-t border-border bg-card">
-          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-muted border border-border">
+        <div className="p-4 border-t border-sidebar-border bg-sidebar">
+          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-sidebar-accent border border-sidebar-border">
             <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-xs font-black text-primary-foreground">
               {user?.email?.charAt(0).toUpperCase() || 'U'}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold text-foreground truncate">{user?.email || 'User'}</p>
+              <p className="text-sm font-bold text-sidebar-foreground truncate">{user?.email || 'User'}</p>
               <div className="flex items-center gap-1.5">
                 {isAdmin ? (
                   <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500/50 text-amber-500 bg-amber-500/10">
@@ -160,7 +160,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
             </div>
             <button
               onClick={signOut}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="p-2 rounded-lg text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
               title="Sign out"
             >
               <LogOut size={18} />
