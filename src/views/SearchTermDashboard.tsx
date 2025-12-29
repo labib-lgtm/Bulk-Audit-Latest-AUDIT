@@ -209,7 +209,8 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
             '2-5%': { range: '2-5%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
             '5-10%': { range: '5-10%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
             '10-20%': { range: '10-20%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
-            '>20%': { range: '>20%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
+            '20-40%': { range: '20-40%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
+            '>40%': { range: '>40%', count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 },
         };
 
         let totalSpend = 0;
@@ -217,13 +218,14 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
         aggregatedTerms.forEach(t => {
             if (t.clicks === 0) return;
             const cvr = t.orders / t.clicks;
-            let key = '>20%';
+            let key = '>40%';
             
             if (cvr === 0) key = '0%';
             else if (cvr <= 0.02) key = '0.1-2%';
             else if (cvr <= 0.05) key = '2-5%';
             else if (cvr <= 0.10) key = '5-10%';
             else if (cvr <= 0.20) key = '10-20%';
+            else if (cvr <= 0.40) key = '20-40%';
 
             buckets[key].count++;
             buckets[key].spend += t.spend;
