@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, X, Zap, Shield, Clock, TrendingUp } from "lucide-react";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -23,9 +23,15 @@ const LandingPage = () => {
   ];
 
   const results = [
-    { metric: "4+ hours", description: "saved per week on reporting" },
-    { metric: "23%", description: "average reduction in wasted ad spend" },
-    { metric: "60 seconds", description: "to find your biggest profit leaks" },
+    { metric: "4+", unit: "hours", description: "saved per week on reporting", icon: Clock },
+    { metric: "23", unit: "%", description: "average reduction in wasted spend", icon: TrendingUp },
+    { metric: "60", unit: "sec", description: "to find your profit leaks", icon: Zap },
+  ];
+
+  const steps = [
+    { step: "1", title: "Download your bulk file", desc: "30 seconds in Seller Central" },
+    { step: "2", title: "Upload it to Lynx", desc: "Drag, drop, done" },
+    { step: "3", title: "See insights instantly", desc: "TACOS, wasted spend, winners & losers" },
   ];
 
   return (
@@ -36,41 +42,55 @@ const LandingPage = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background text-foreground dark">
+        {/* Background gradient */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
+        </div>
+
         {/* Nav */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border/20">
-          <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-            <span className="text-xl font-bold text-primary">LYNX</span>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/10">
+          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+            <span className="text-2xl font-black">
+              <span className="text-primary">LYNX</span>
+              <span className="text-muted-foreground font-medium text-sm ml-2 hidden sm:inline">MEDIA</span>
+            </span>
             <Button 
               onClick={() => navigate("/auth")}
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
             >
               Get Started Free
             </Button>
           </div>
         </nav>
 
-        <main className="max-w-3xl mx-auto px-6 pt-32 pb-20">
+        <main className="relative max-w-4xl mx-auto px-6 pt-32 pb-20">
           {/* Hero */}
-          <section className="mb-20">
-            <p className="text-primary font-medium mb-4 tracking-wide">FOR AMAZON SELLERS & AGENCIES</p>
+          <section className="mb-24 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
+              <Zap className="w-4 h-4" />
+              For Amazon Sellers & Agencies
+            </div>
             
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-[1.1] mb-6">
+            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
               Stop Guessing.
               <br />
-              <span className="text-primary">Start Profiting.</span>
+              <span className="bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
+                Start Profiting.
+              </span>
             </h1>
             
-            <p className="text-xl sm:text-2xl text-muted-foreground mb-8 leading-relaxed">
-              Upload your Amazon bulk file. Get cross-campaign analytics and TACOS insights in 60 seconds. 
-              <span className="text-foreground font-medium"> No API. No setup. No BS.</span>
+            <p className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+              Upload your Amazon bulk file. Get cross-campaign analytics and TACOS insights in 
+              <span className="text-foreground font-bold"> 60 seconds.</span>
+              <br />
+              <span className="text-primary font-semibold">No API. No setup. No BS.</span>
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 onClick={() => navigate("/auth")}
                 size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-6 font-bold"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
               >
                 Analyze My Ads Free
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -79,155 +99,181 @@ const LandingPage = () => {
                 onClick={() => navigate("/dashboard")}
                 variant="outline"
                 size="lg"
-                className="text-lg px-8 py-6"
+                className="text-lg px-10 py-7 rounded-xl border-border/50 hover:bg-muted"
               >
                 See Demo
               </Button>
             </div>
-          </section>
 
-          {/* Problem */}
-          <section className="mb-20">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-8">
-              Here's the problem with Amazon PPC...
-            </h2>
-            
-            <div className="space-y-4">
-              {problems.map((problem, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <span className="text-destructive font-bold text-xl">✗</span>
-                  <p className="text-lg text-muted-foreground">{problem}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-xl mt-8 text-foreground font-medium">
-              Sound familiar? You're not alone. Most sellers are flying blind.
+            <p className="text-muted-foreground text-sm mt-6">
+              ✓ Free to start &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds
             </p>
-          </section>
-
-          {/* Solution */}
-          <section className="mb-20">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-4">
-              What if you could see EVERYTHING in one place?
-            </h2>
-            
-            <p className="text-lg text-muted-foreground mb-8">
-              Lynx takes your bulk operations file and shows you exactly what's working, what's wasting money, and what to fix next.
-            </p>
-
-            <div className="space-y-4">
-              {benefits.map((benefit, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <Check className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
-                  <p className="text-lg text-foreground">{benefit}</p>
-                </div>
-              ))}
-            </div>
           </section>
 
           {/* Results */}
-          <section className="mb-20 p-8 rounded-2xl bg-card border border-border">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center">
-              What sellers are seeing:
-            </h2>
-            
-            <div className="grid sm:grid-cols-3 gap-8">
+          <section className="mb-24">
+            <div className="grid sm:grid-cols-3 gap-4">
               {results.map((result, i) => (
-                <div key={i} className="text-center">
-                  <p className="text-4xl sm:text-5xl font-black text-primary mb-2">{result.metric}</p>
-                  <p className="text-muted-foreground">{result.description}</p>
+                <div key={i} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
+                  <result.icon className="w-8 h-8 text-primary mx-auto mb-4" />
+                  <p className="text-5xl font-black text-foreground mb-1">
+                    {result.metric}
+                    <span className="text-2xl text-primary">{result.unit}</span>
+                  </p>
+                  <p className="text-muted-foreground text-sm">{result.description}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Problem */}
+          <section className="mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4">
+                Here's the problem with Amazon PPC...
+              </h2>
+              <p className="text-muted-foreground text-lg">Sound familiar? You're not alone.</p>
+            </div>
+            
+            <div className="space-y-4 max-w-2xl mx-auto">
+              {problems.map((problem, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
+                  <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                    <X className="w-4 h-4 text-destructive" />
+                  </div>
+                  <p className="text-foreground">{problem}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Solution */}
+          <section className="mb-24">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-black mb-4">
+                What if you could see <span className="text-primary">EVERYTHING</span> in one place?
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-xl mx-auto">
+                Lynx shows you exactly what's working, what's wasting money, and what to fix next.
+              </p>
+            </div>
+
+            <div className="space-y-4 max-w-2xl mx-auto">
+              {benefits.map((benefit, i) => (
+                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-foreground font-medium">{benefit}</p>
                 </div>
               ))}
             </div>
           </section>
 
           {/* How it works */}
-          <section className="mb-20">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-8">
-              Dead simple. Here's how it works:
+          <section className="mb-24">
+            <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">
+              Dead simple. <span className="text-primary">3 steps.</span>
             </h2>
             
-            <div className="space-y-6">
-              <div className="flex gap-4">
-                <span className="text-3xl font-black text-primary">1.</span>
-                <div>
-                  <p className="text-xl font-bold">Download your bulk file from Amazon</p>
-                  <p className="text-muted-foreground">Takes 30 seconds in Seller Central</p>
+            <div className="grid sm:grid-cols-3 gap-6">
+              {steps.map((item, i) => (
+                <div key={i} className="relative p-6 rounded-2xl bg-card border border-border/50 text-center">
+                  <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
+                    {item.step}
+                  </div>
+                  <h3 className="text-lg font-bold mb-2">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm">{item.desc}</p>
+                  {i < steps.length - 1 && (
+                    <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                  )}
                 </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <span className="text-3xl font-black text-primary">2.</span>
-                <div>
-                  <p className="text-xl font-bold">Upload it to Lynx</p>
-                  <p className="text-muted-foreground">Drag, drop, done</p>
-                </div>
-              </div>
-              
-              <div className="flex gap-4">
-                <span className="text-3xl font-black text-primary">3.</span>
-                <div>
-                  <p className="text-xl font-bold">See your insights instantly</p>
-                  <p className="text-muted-foreground">TACOS, wasted spend, winning keywords, problem areas—all in one view</p>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
 
-          {/* Objection handling */}
-          <section className="mb-20">
-            <h2 className="text-2xl sm:text-3xl font-bold mb-8">
+          {/* Objections */}
+          <section className="mb-24">
+            <h2 className="text-3xl sm:text-4xl font-black text-center mb-12">
               "But what about..."
             </h2>
             
-            <div className="space-y-6">
-              <div>
-                <p className="text-lg font-bold text-foreground">"Is my data safe?"</p>
-                <p className="text-muted-foreground">Your files are processed in your browser. Nothing gets uploaded to our servers. Your competitive data stays yours.</p>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="p-6 rounded-2xl bg-card border border-border/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <Shield className="w-5 h-5 text-primary" />
+                  <p className="font-bold">"Is my data safe?"</p>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  Files are processed in your browser. Nothing uploads to our servers. Your data stays yours.
+                </p>
               </div>
               
-              <div>
-                <p className="text-lg font-bold text-foreground">"Do I need to connect my Amazon API?"</p>
-                <p className="text-muted-foreground">Nope. Just upload the bulk file you already have access to. No integrations, no permissions, no waiting.</p>
+              <div className="p-6 rounded-2xl bg-card border border-border/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <Zap className="w-5 h-5 text-primary" />
+                  <p className="font-bold">"Do I need API access?"</p>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  Nope. Just upload the bulk file you already have. No integrations needed.
+                </p>
               </div>
               
-              <div>
-                <p className="text-lg font-bold text-foreground">"What if I manage multiple accounts?"</p>
-                <p className="text-muted-foreground">Perfect for agencies. Analyze any client's data in seconds without asking for API access.</p>
+              <div className="p-6 rounded-2xl bg-card border border-border/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <TrendingUp className="w-5 h-5 text-primary" />
+                  <p className="font-bold">"Multiple accounts?"</p>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  Perfect for agencies. Analyze any client's data in seconds.
+                </p>
+              </div>
+              
+              <div className="p-6 rounded-2xl bg-card border border-border/50">
+                <div className="flex items-center gap-3 mb-3">
+                  <Clock className="w-5 h-5 text-primary" />
+                  <p className="font-bold">"How long does it take?"</p>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  60 seconds. Upload, analyze, optimize. That's it.
+                </p>
               </div>
             </div>
           </section>
 
           {/* CTA */}
-          <section className="text-center py-12 px-8 rounded-2xl bg-gradient-to-b from-primary/10 to-transparent border border-primary/20">
-            <h2 className="text-3xl sm:text-4xl font-black mb-4">
-              Ready to stop losing money?
-            </h2>
+          <section className="text-center p-10 sm:p-14 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.1),transparent_50%)]" />
             
-            <p className="text-xl text-muted-foreground mb-8">
-              Get your first analysis free. See what you've been missing.
-            </p>
+            <div className="relative">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
+                Ready to stop losing money?
+              </h2>
+              
+              <p className="text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
+                Get your first analysis free. See what you've been missing.
+              </p>
 
-            <Button 
-              onClick={() => navigate("/auth")}
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-6 font-bold"
-            >
-              Analyze My Ads Free
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            
-            <p className="text-sm text-muted-foreground mt-4">
-              No credit card required. Upload and see results in 60 seconds.
-            </p>
+              <Button 
+                onClick={() => navigate("/auth")}
+                size="lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
+              >
+                Analyze My Ads Free
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+              
+              <p className="text-sm text-muted-foreground mt-6">
+                No credit card required • Results in 60 seconds
+              </p>
+            </div>
           </section>
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border/20 py-8 px-6">
-          <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p>© {new Date().getFullYear()} Lynx Media. All rights reserved.</p>
+        <footer className="border-t border-border/10 py-8 px-6 bg-card/50">
+          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+            <p className="font-medium">© {new Date().getFullYear()} Lynx Media</p>
             <div className="flex gap-6">
               <a href="#" className="hover:text-foreground transition-colors">Terms</a>
               <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
