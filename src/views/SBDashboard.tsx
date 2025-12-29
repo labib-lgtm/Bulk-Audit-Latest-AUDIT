@@ -194,34 +194,34 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
     <div className="space-y-6 sm:space-y-8 animate-fadeIn pb-24">
        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-6">
           <SectionHeader title="Sponsored Brands" description="Brand awareness and video campaign performance." />
-          <div className="flex items-center gap-3 w-full lg:w-auto">
-             <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input 
-                  type="text" 
-                  placeholder={view === 'campaigns' ? "Search Campaigns..." : "Search Keywords..."}
-                  className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-brand-500 focus:ring-0 transition-all shadow-sm w-full sm:w-64"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-             </div>
-          </div>
-       </div>
+           <div className="flex items-center gap-3 w-full lg:w-auto">
+              <div className="relative w-full">
+                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+                 <input 
+                   type="text" 
+                   placeholder={view === 'campaigns' ? "Search Campaigns..." : "Search Keywords..."}
+                   className="pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm font-bold text-foreground focus:border-brand-500 focus:ring-0 transition-all shadow-sm w-full sm:w-64"
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                 />
+              </div>
+           </div>
+        </div>
 
-       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {metrics.map((m) => (
-            <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
-          ))}
-      </div>
-      
-       <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-2xl w-full sm:w-fit border border-slate-200">
-          <button onClick={() => setView('campaigns')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'campaigns' ? 'bg-white text-brand-600 shadow-md' : 'text-slate-500'}`}><LayoutGrid size={16} /> Campaign Summary</button>
-          <button onClick={() => setView('targets')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'targets' ? 'bg-white text-brand-600 shadow-md' : 'text-slate-500'}`}><Target size={16} /> Target Analysis</button>
-          <button onClick={() => setView('matchTypes')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'matchTypes' ? 'bg-white text-brand-600 shadow-md' : 'text-slate-500'}`}><PieIcon size={16} /> Match Type Analysis</button>
-          <button onClick={() => setView('placements')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'placements' ? 'bg-white text-brand-600 shadow-md' : 'text-slate-500'}`}><Monitor size={16} /> Placement Analysis</button>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+           {metrics.map((m) => (
+             <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+           ))}
        </div>
+       
+        <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
+           <button onClick={() => setView('campaigns')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'campaigns' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><LayoutGrid size={16} /> Campaign Summary</button>
+           <button onClick={() => setView('targets')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'targets' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><Target size={16} /> Target Analysis</button>
+           <button onClick={() => setView('matchTypes')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'matchTypes' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><PieIcon size={16} /> Match Type Analysis</button>
+           <button onClick={() => setView('placements')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'placements' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><Monitor size={16} /> Placement Analysis</button>
+        </div>
 
-       <div className="bg-slate-50/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/50">
+        <div className="bg-muted/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border/50">
           {view === 'campaigns' && (
             <DataTable data={campaignTableData} columns={[
               { key: 'name', header: 'Campaign Name', sortable: true },
@@ -240,33 +240,33 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
             ]} initialSortKey="spend" />
           )}
           {view === 'targets' && (
-             <DataTable data={allTargets} columns={[
-                { key: 'text', header: 'Target / Keyword', render: (r: any) => (<div className="flex flex-col"><span className="font-bold text-slate-900">{r.text}</span><span className="text-[10px] text-slate-400 font-bold uppercase">{r.type}</span></div>), sortable: true },
-                { key: 'matchType', header: 'Match Type', render: r => { const color = MATCH_TYPE_COLORS[r.matchType] || '#94a3b8'; return (<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border`} style={{ backgroundColor: `${color}15`, color: color, borderColor: `${color}30` }}>{r.matchType}</span>); }, sortable: true },
-                { key: 'campaignName', header: 'Campaign', sortable: true },
-                { key: 'bid', header: 'Bid', render: r => formatCurrency(r.bid), align: 'right', sortable: true },
-                { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatInt(r.impressions) },
-                { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
-                { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: r => formatPct(r.ctr) },
-                { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
-                { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc) },
-                { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: r => formatInt(r.orders) },
-                { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
-                { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
-                { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
-                { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
-             ]} initialSortKey="spend" />
-          )}
-          {view === 'matchTypes' && (
-            <div className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col items-center justify-center">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 w-full text-left">Spend Distribution</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={matchTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{matchTypeData.map((entry, index) => (<Cell key={`cell-${index}`} fill={MATCH_TYPE_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value)} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
-                    </div>
-                    <div className="lg:col-span-2">
-                         <DataTable data={matchTypeData} columns={[
-                            { key: 'type', header: 'Match Type', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: MATCH_TYPE_COLORS[r.type] || '#ccc' }}></div><span className="font-bold text-slate-900">{r.type}</span></div>), sortable: true },
+              <DataTable data={allTargets} columns={[
+                 { key: 'text', header: 'Target / Keyword', render: (r: any) => (<div className="flex flex-col"><span className="font-bold text-foreground">{r.text}</span><span className="text-[10px] text-muted-foreground font-bold uppercase">{r.type}</span></div>), sortable: true },
+                 { key: 'matchType', header: 'Match Type', render: r => { const color = MATCH_TYPE_COLORS[r.matchType] || '#94a3b8'; return (<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border`} style={{ backgroundColor: `${color}15`, color: color, borderColor: `${color}30` }}>{r.matchType}</span>); }, sortable: true },
+                 { key: 'campaignName', header: 'Campaign', sortable: true },
+                 { key: 'bid', header: 'Bid', render: r => formatCurrency(r.bid), align: 'right', sortable: true },
+                 { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatInt(r.impressions) },
+                 { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
+                 { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: r => formatPct(r.ctr) },
+                 { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
+                 { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc) },
+                 { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: r => formatInt(r.orders) },
+                 { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
+                 { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
+                 { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
+                 { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+              ]} initialSortKey="spend" />
+           )}
+           {view === 'matchTypes' && (
+             <div className="space-y-6">
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                     <div className="bg-card rounded-2xl border border-border p-6 flex flex-col items-center justify-center">
+                         <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 w-full text-left">Spend Distribution</h4>
+                         <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={matchTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{matchTypeData.map((entry, index) => (<Cell key={`cell-${index}`} fill={MATCH_TYPE_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value)} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
+                     </div>
+                     <div className="lg:col-span-2">
+                          <DataTable data={matchTypeData} columns={[
+                             { key: 'type', header: 'Match Type', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: MATCH_TYPE_COLORS[r.type] || '#ccc' }}></div><span className="font-bold text-foreground">{r.type}</span></div>), sortable: true },
                             { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                             { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
                             { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },

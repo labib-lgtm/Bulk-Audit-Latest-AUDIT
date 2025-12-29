@@ -280,11 +280,11 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
     };
 
     const CheckIcon = () => <div className="flex justify-center"><Check size={16} className="text-emerald-500" strokeWidth={3} /></div>;
-    const CrossIcon = () => <div className="flex justify-center"><X size={16} className="text-slate-200" strokeWidth={3} /></div>;
+    const CrossIcon = () => <div className="flex justify-center"><X size={16} className="text-muted-foreground/30" strokeWidth={3} /></div>;
 
     // Define the specific columns requested
     const summaryColumns = [
-        { key: 'term', header: 'Search Term', render: (r: any) => <span className="font-bold text-slate-900">{r.term}</span>, sortable: true },
+        { key: 'term', header: 'Search Term', render: (r: any) => <span className="font-bold text-foreground">{r.term}</span>, sortable: true },
         { key: 'impressions', header: 'Impressions', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.impressions) },
         { key: 'clicks', header: 'Clicks', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.clicks) },
         { key: 'ctr', header: 'CTR %', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.ctr) },
@@ -303,7 +303,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
     ];
 
     const distributionColumns = [
-        { key: 'range', header: 'Range', render: (r: any) => <span className="font-bold text-slate-900">{r.range}</span> },
+        { key: 'range', header: 'Range', render: (r: any) => <span className="font-bold text-foreground">{r.range}</span> },
         { key: 'spendShare', header: '% Spend', align: 'right' as const, render: (r: any) => formatPct(r.spendShare) },
         { key: 'spend', header: 'Spend', align: 'right' as const, render: (r: any) => formatCurrency(r.spend) },
         { key: 'sales', header: 'Sales', align: 'right' as const, render: (r: any) => formatCurrency(r.sales) },
@@ -315,7 +315,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
     ];
 
     const wastedColumns = [
-        { key: 'term', header: 'Inefficient Search Term', render: (r: any) => <span className="font-bold text-slate-900">{r.term}</span>, sortable: true },
+        { key: 'term', header: 'Inefficient Search Term', render: (r: any) => <span className="font-bold text-foreground">{r.term}</span>, sortable: true },
         { key: 'spend', header: 'Wasted Spend', align: 'right' as const, sortable: true, render: (r: any) => <span className="text-rose-600 font-bold">{formatCurrency(r.spend)}</span> },
         { key: 'clicks', header: 'Clicks', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.clicks) },
         { key: 'cpc', header: 'CPC', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.cpc) },
@@ -331,7 +331,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
             <SectionHeader title={`${targetType === 'SP' ? 'Sponsored Products' : 'Sponsored Brands'} Search Terms`} description="Deep dive into customer search queries, match types, and wasted spend." />
             
             {/* Tabs - Updated for Responsiveness */}
-            <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-2xl w-full sm:w-fit border border-slate-200">
+            <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
                 {[
                   { id: 'summary', label: 'Search Term Summary' },
                   { id: 'harvesting', label: 'Harvesting Candidates' },
@@ -345,8 +345,8 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                     onClick={() => setCurrentTab(tab.id as any)} 
                     className={`flex-1 sm:flex-none px-4 py-2.5 text-sm font-bold rounded-xl transition-all whitespace-nowrap justify-center flex items-center gap-2 ${
                       currentTab === tab.id 
-                        ? (tab.id === 'wasted' ? 'bg-white text-rose-600 shadow-md' : tab.id === 'harvesting' ? 'bg-white text-emerald-600 shadow-md' : 'bg-white text-brand-600 shadow-md') 
-                        : (tab.id === 'wasted' ? 'text-slate-500 hover:text-rose-600' : tab.id === 'harvesting' ? 'text-slate-500 hover:text-emerald-600' : 'text-slate-500 hover:text-slate-700')
+                        ? (tab.id === 'wasted' ? 'bg-card text-rose-600 shadow-md' : tab.id === 'harvesting' ? 'bg-card text-emerald-600 shadow-md' : 'bg-card text-brand-600 shadow-md') 
+                        : (tab.id === 'wasted' ? 'text-muted-foreground hover:text-rose-600' : tab.id === 'harvesting' ? 'text-muted-foreground hover:text-emerald-600' : 'text-muted-foreground hover:text-foreground')
                     }`}
                   >
                     {tab.id === 'harvesting' && <Sprout size={14} />}
@@ -355,7 +355,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                 ))}
             </div>
 
-            <div className="bg-slate-50/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/50 min-h-[500px]">
+            <div className="bg-muted/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border/50 min-h-[500px]">
                 
                 {/* 1. SUMMARY TAB */}
                 {currentTab === 'summary' && (
@@ -381,7 +381,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                         </div>
 
                         <DataTable data={harvestingCandidates} columns={[
-                            { key: 'term', header: 'High Performing Search Term', render: (r: any) => <span className="font-bold text-slate-900">{r.term}</span>, sortable: true },
+                            { key: 'term', header: 'High Performing Search Term', render: (r: any) => <span className="font-bold text-foreground">{r.term}</span>, sortable: true },
                             { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
                             { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
                             { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-emerald-600">{formatPct(r.acos)}</span> },
@@ -395,15 +395,15 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                 {currentTab === 'ngram' && (
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
-                            <span className="text-sm font-bold text-slate-500">N-Gram Size:</span>
-                            <div className="flex bg-white rounded-lg border border-slate-200 p-1">
+                            <span className="text-sm font-bold text-muted-foreground">N-Gram Size:</span>
+                            <div className="flex bg-card rounded-lg border border-border p-1">
                                 {[1, 2, 3].map(n => (
-                                    <button key={n} onClick={() => setNgramSize(n as 1|2|3)} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${ngramSize === n ? 'bg-brand-400 text-black shadow-sm' : 'text-slate-500 hover:bg-slate-50'}`}>{n}-Word</button>
+                                    <button key={n} onClick={() => setNgramSize(n as 1|2|3)} className={`px-4 py-1.5 text-xs font-bold rounded-md transition-colors ${ngramSize === n ? 'bg-brand-400 text-black shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}>{n}-Word</button>
                                 ))}
                             </div>
                         </div>
                         <DataTable data={ngramData} columns={[
-                            { key: 'gram', header: 'N-Gram Phrase', render: r => <span className="font-bold text-slate-900 bg-slate-100 px-2 py-1 rounded-md">{r.gram}</span>, sortable: true },
+                            { key: 'gram', header: 'N-Gram Phrase', render: r => <span className="font-bold text-foreground bg-muted px-2 py-1 rounded-md">{r.gram}</span>, sortable: true },
                             { key: 'count', header: 'Frequency', align: 'right', sortable: true, render: r => formatInt(r.count) },
                             { key: 'spend', header: 'Spend', align: 'right', sortable: true, render: r => formatCurrency(r.spend) },
                             { key: 'sales', header: 'Sales', align: 'right', sortable: true, render: r => formatCurrency(r.sales) },
@@ -418,18 +418,18 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                 {/* 3. BRANDED TAB */}
                 {currentTab === 'brand' && (
                     <div className="space-y-6">
-                         <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-                             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Define Brand Terms (Comma Separated)</label>
+                         <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
+                             <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Define Brand Terms (Comma Separated)</label>
                              <div className="flex gap-3">
                                 <input 
                                     type="text" 
                                     value={brandText} 
                                     onChange={(e) => setBrandText(e.target.value)}
                                     placeholder="e.g. nike, adidas, puma"
-                                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-brand-500 outline-none"
+                                    className="flex-1 bg-muted border border-border rounded-xl px-4 py-3 text-sm font-medium text-foreground focus:ring-2 focus:ring-brand-500 outline-none"
                                 />
                              </div>
-                             <p className="text-xs text-slate-400 mt-2">Enter your brand name and misspellings to separate Branded vs Non-Branded performance.</p>
+                             <p className="text-xs text-muted-foreground mt-2">Enter your brand name and misspellings to separate Branded vs Non-Branded performance.</p>
                          </div>
                          
                          {brandData ? (
@@ -478,7 +478,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                                  </div>
                              </div>
                          ) : (
-                             <div className="text-center py-12 bg-slate-100 rounded-2xl border border-dashed border-slate-300 text-slate-400 font-medium">
+                             <div className="text-center py-12 bg-muted rounded-2xl border border-dashed border-border text-muted-foreground font-medium">
                                  Enter brand terms above to see analysis.
                              </div>
                          )}
@@ -490,33 +490,33 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                     <div className="space-y-8">
                         {/* ACOS Distribution */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-heading font-bold text-slate-800 flex items-center gap-2">
+                            <h3 className="text-lg font-heading font-bold text-foreground flex items-center gap-2">
                                 <Percent className="w-5 h-5 text-indigo-500" /> ACOS Distribution
                             </h3>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-slate-900 mb-6">Spend by ACOS Range</h4>
+                                <div className="bg-card p-6 rounded-2xl border border-border">
+                                    <h4 className="font-bold text-foreground mb-6">Spend by ACOS Range</h4>
                                     <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart data={distributionData}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="range" tick={{fontSize: 10}} />
-                                                <YAxis tickFormatter={val => `$${val}`} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                                <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
+                                                <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                                                 <Bar dataKey="spend" fill="#6366f1" radius={[4, 4, 0, 0]} name="Spend" />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
                                 </div>
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-slate-900 mb-6">Sales by ACOS Range</h4>
+                                <div className="bg-card p-6 rounded-2xl border border-border">
+                                    <h4 className="font-bold text-foreground mb-6">Sales by ACOS Range</h4>
                                     <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart data={distributionData}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="range" tick={{fontSize: 10}} />
-                                                <YAxis tickFormatter={val => `$${val}`} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                                <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
+                                                <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                                                 <Bar dataKey="sales" fill="#10b981" radius={[4, 4, 0, 0]} name="Sales" />
                                             </BarChart>
                                         </ResponsiveContainer>
@@ -527,34 +527,34 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                         </div>
 
                         {/* CVR Distribution */}
-                        <div className="space-y-4 pt-8 border-t border-slate-200">
-                            <h3 className="text-lg font-heading font-bold text-slate-800 flex items-center gap-2">
+                        <div className="space-y-4 pt-8 border-t border-border">
+                            <h3 className="text-lg font-heading font-bold text-foreground flex items-center gap-2">
                                 <Target className="w-5 h-5 text-emerald-500" /> CVR Distribution
                             </h3>
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-slate-900 mb-6">Spend by CVR Range</h4>
+                                <div className="bg-card p-6 rounded-2xl border border-border">
+                                    <h4 className="font-bold text-foreground mb-6">Spend by CVR Range</h4>
                                     <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart data={cvrDistributionData}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="range" tick={{fontSize: 10}} />
-                                                <YAxis tickFormatter={val => `$${val}`} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                                <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
+                                                <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                                                 <Bar dataKey="spend" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="Spend" />
                                             </BarChart>
                                         </ResponsiveContainer>
                                     </div>
                                 </div>
-                                <div className="bg-white p-6 rounded-2xl border border-slate-200">
-                                    <h4 className="font-bold text-slate-900 mb-6">Sales by CVR Range</h4>
+                                <div className="bg-card p-6 rounded-2xl border border-border">
+                                    <h4 className="font-bold text-foreground mb-6">Sales by CVR Range</h4>
                                     <div className="h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart data={cvrDistributionData}>
-                                                <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                                                <XAxis dataKey="range" tick={{fontSize: 10}} />
-                                                <YAxis tickFormatter={val => `$${val}`} />
-                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} />
+                                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                                                <XAxis dataKey="range" tick={{fontSize: 10, fill: 'hsl(var(--foreground))'}} />
+                                                <YAxis tickFormatter={val => `$${val}`} tick={{fill: 'hsl(var(--foreground))'}} />
+                                                <RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                                                 <Bar dataKey="sales" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Sales" />
                                             </BarChart>
                                         </ResponsiveContainer>
