@@ -151,11 +151,18 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                   ))}
                               </Pie>
                               <RechartsTooltip 
-                                formatter={(val: number, name: string, props: any) => [formatCurrency(val), props.payload?.name || 'Spend']} 
-                                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} 
-                                itemStyle={{ color: 'hsl(var(--foreground))' }} 
-                                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
-                                labelFormatter={(label: string) => ''}
+                                content={({ active, payload }) => {
+                                  if (active && payload && payload.length) {
+                                    const data = payload[0].payload;
+                                    return (
+                                      <div className="bg-card border border-border rounded-lg px-3 py-2 shadow-lg">
+                                        <p className="text-foreground font-semibold text-sm">{data.name}</p>
+                                        <p className="text-foreground text-sm">{formatCurrency(data.spend)}</p>
+                                      </div>
+                                    );
+                                  }
+                                  return null;
+                                }}
                               />
                           </PieChart>
                       </ResponsiveContainer>
