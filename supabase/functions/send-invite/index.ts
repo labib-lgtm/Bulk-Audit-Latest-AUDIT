@@ -11,6 +11,57 @@ interface InviteRequest {
   role?: string;
 }
 
+// Valid roles for the application
+const VALID_ROLES = ["user", "admin"] as const;
+type ValidRole = typeof VALID_ROLES[number];
+
+// Email validation regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Rate limit: max invitations per admin per time window
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MINUTES = 15;
+
+function validateEmail(email: unknown): { valid: boolean; error?: string } {
+  if (typeof email !== "string") {
+    return { valid: false, error: "Email must be a string" };
+  }
+  
+  const trimmed = email.trim();
+  
+  if (!trimmed) {
+    return { valid: false, error: "Email is required" };
+  }
+  
+  if (trimmed.length > 255) {
+    return { valid: false, error: "Email is too long" };
+  }
+  
+  if (!EMAIL_REGEX.test(trimmed)) {
+    return { valid: false, error: "Invalid email format" };
+  }
+  
+  return { valid: true };
+}
+
+function validateRole(role: unknown): { valid: boolean; value: ValidRole; error?: string } {
+  if (role === undefined || role === null) {
+    return { valid: true, value: "user" };
+  }
+  
+  if (typeof role !== "string") {
+    return { valid: false, value: "user", error: "Role must be a string" };
+  }
+  
+  const trimmed = role.trim().toLowerCase();
+  
+  if (!VALID_ROLES.includes(trimmed as ValidRole)) {
+    return { valid: false, value: "user", error: "Invalid role. Must be 'user' or 'admin'" };
+  }
+  
+  return { valid: true, value: trimmed as ValidRole };
+}
+
 serve(async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -66,24 +117,91 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    const { email, role = "user" }: InviteRequest = await req.json();
-
-    if (!email) {
+    // Parse and validate input
+    let requestBody: InviteRequest;
+    try {
+      requestBody = await req.json();
+    } catch {
       return new Response(
-        JSON.stringify({ error: "Email is required" }),
+        JSON.stringify({ error: "Invalid JSON body" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    console.log(`Sending invitation to ${email} with role ${role}`);
+    const { email: rawEmail, role: rawRole } = requestBody;
+
+    // Validate email
+    const emailValidation = validateEmail(rawEmail);
+    if (!emailValidation.valid) {
+      return new Response(
+        JSON.stringify({ error: emailValidation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const email = (rawEmail as string).trim().toLowerCase();
+
+    // Validate role
+    const roleValidation = validateRole(rawRole);
+    if (!roleValidation.valid) {
+      return new Response(
+        JSON.stringify({ error: roleValidation.error }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const role = roleValidation.value;
+
+    // Rate limiting: Check recent invitations from this admin
+    const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MINUTES * 60 * 1000).toISOString();
+    const { count: recentInvitesCount, error: countError } = await supabaseAdmin
+      .from("invitations")
+      .select("id", { count: "exact", head: true })
+      .eq("invited_by", user.id)
+      .gte("created_at", windowStart);
+
+    if (countError) {
+      console.error("Failed to check rate limit:", countError);
+      // Continue anyway - don't block on rate limit check failure
+    } else if (recentInvitesCount !== null && recentInvitesCount >= RATE_LIMIT_MAX) {
+      console.warn(`Rate limit exceeded for user ${user.id}: ${recentInvitesCount} invites in last ${RATE_LIMIT_WINDOW_MINUTES} minutes`);
+      return new Response(
+        JSON.stringify({ error: `Rate limit exceeded. Please wait before sending more invitations.` }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Processing invitation request for ${email} with role ${role} by admin ${user.id}`);
 
     // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const existingUser = existingUsers?.users?.find(u => u.email === email);
+    const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (listError) {
+      console.error("Failed to check existing users:", listError);
+      return new Response(
+        JSON.stringify({ error: "Failed to process invitation. Please try again." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    const existingUser = existingUsers?.users?.find(u => u.email?.toLowerCase() === email);
     
     if (existingUser) {
       return new Response(
-        JSON.stringify({ error: "User with this email already exists" }),
+        JSON.stringify({ error: "A user with this email already exists" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check if there's already a pending invitation for this email
+    const { data: existingInvite } = await supabaseAdmin
+      .from("invitations")
+      .select("id")
+      .eq("email", email)
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (existingInvite) {
+      return new Response(
+        JSON.stringify({ error: "An invitation has already been sent to this email" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -94,7 +212,7 @@ serve(async (req: Request): Promise<Response> => {
     if (inviteError) {
       console.error("Failed to send invitation:", inviteError);
       return new Response(
-        JSON.stringify({ error: inviteError.message }),
+        JSON.stringify({ error: "Failed to send invitation. Please try again." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -105,7 +223,7 @@ serve(async (req: Request): Promise<Response> => {
       .insert({
         email,
         invited_by: user.id,
-        role: role as "admin" | "user",
+        role: role,
       });
 
     if (insertError) {
@@ -114,16 +232,17 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     // If a specific role was requested, update the user_roles table
-    // This will be created when the user accepts the invite (via trigger)
-    // but we can update it to the requested role
     if (role === "admin" && inviteData.user) {
-      // Update the role for the invited user once they're created
-      await supabaseAdmin
+      const { error: upsertError } = await supabaseAdmin
         .from("user_roles")
         .upsert({
           user_id: inviteData.user.id,
           role: "admin",
         });
+      
+      if (upsertError) {
+        console.error("Failed to set admin role:", upsertError);
+      }
     }
 
     console.log(`Invitation sent successfully to ${email}`);
@@ -131,16 +250,15 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: `Invitation sent to ${email}`,
-        user: inviteData.user 
+        message: `Invitation sent to ${email}` 
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: unknown) {
     console.error("Error in send-invite function:", error);
-    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    // Don't expose internal error details
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify({ error: "An unexpected error occurred. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
