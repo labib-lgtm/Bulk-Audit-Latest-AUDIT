@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserRole, AppRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/hooks/useAuth';
-import { Shield, Users, Crown, User, Trash2, UserPlus } from 'lucide-react';
+import { Shield, Users, Crown, User, Trash2, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-
+import { InviteUserDialog } from '@/components/InviteUserDialog';
 interface TeamMember {
   id: string;
   user_id: string;
@@ -117,6 +117,7 @@ export const TeamManagement: React.FC = () => {
           </h1>
           <p className="text-muted-foreground mt-1">Manage user roles and permissions</p>
         </div>
+        <InviteUserDialog onInviteSent={fetchTeamMembers} />
       </div>
 
       {/* Stats Cards */}
