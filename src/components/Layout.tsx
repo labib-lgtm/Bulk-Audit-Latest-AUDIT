@@ -92,7 +92,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-          <div className="px-3 mb-4 text-[10px] font-bold text-sidebar-foreground/40 uppercase tracking-[0.2em] font-heading">
+          <div className="px-3 mb-4 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
             Dashboards
           </div>
           {NAV_ITEMS.map((item) => {
@@ -108,7 +108,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                 className={`relative flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${
                   isActive
                     ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_30px_-5px_hsl(var(--sidebar-primary)/0.5)]'
-                    : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                    : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                 }`}
               >
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all ${
@@ -116,7 +116,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                     ? 'bg-sidebar-primary-foreground/10' 
                     : 'bg-transparent group-hover:bg-sidebar-primary/10'
                 }`}>
-                  <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/50 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
+                  <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
                 <span className="truncate">{item.label}</span>
                 {isActive && (
@@ -129,7 +129,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           {/* Admin Section */}
           {isAdmin && (
             <>
-              <div className="px-3 mb-4 mt-8 text-[10px] font-bold text-sidebar-foreground/40 uppercase tracking-[0.2em] font-heading">
+              <div className="px-3 mb-4 mt-8 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
                 Admin
               </div>
               {ADMIN_NAV_ITEMS.map((item) => {
@@ -145,7 +145,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                     className={`relative flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${
                       isActive
                         ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_30px_-5px_hsl(var(--sidebar-primary)/0.5)]'
-                        : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                     }`}
                   >
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all ${
@@ -153,7 +153,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                         ? 'bg-sidebar-primary-foreground/10' 
                         : 'bg-transparent group-hover:bg-sidebar-primary/10'
                     }`}>
-                      <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/50 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
+                      <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                     </div>
                     <span className="truncate">{item.label}</span>
                     {isActive && (
