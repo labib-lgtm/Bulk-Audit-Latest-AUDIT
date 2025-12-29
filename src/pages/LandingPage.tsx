@@ -110,8 +110,9 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20">
-        {/* Gradient orbs */}
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-blue-600/20 via-purple-600/10 to-transparent rounded-full blur-[120px] pointer-events-none" />
+        {/* Gradient orbs - Brand green */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-gradient-to-b from-primary/25 via-primary/10 to-transparent rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-[-10%] w-[400px] h-[400px] bg-primary/15 rounded-full blur-[150px] pointer-events-none" />
         
         <div className="relative z-10 max-w-5xl mx-auto text-center">
           <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6 animate-fade-in">
@@ -121,7 +122,7 @@ const LandingPage = () => {
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             <span className="text-foreground/80">A one of a kind</span>
             <br />
-            <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-blue-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary via-brand-400 to-primary bg-clip-text text-transparent">
               hyper-growth platform
             </span>
             <br />
@@ -194,8 +195,8 @@ const LandingPage = () => {
           <p className="text-primary text-sm font-medium tracking-[0.2em] uppercase mb-6">
             MORE THAN A TOOL
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground">
-            We are a community of <span className="text-foreground">Amazon sellers</span> dedicated to helping each other <span className="text-foreground">grow, scale</span> and reach new heights through <span className="text-foreground">data-driven optimization</span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-medium leading-relaxed text-muted-foreground/80">
+            We are a community of <span className="text-primary">Amazon sellers</span> dedicated to helping each other <span className="text-primary">grow, scale</span> and reach new heights through <span className="text-primary">data-driven optimization</span>
           </h2>
         </div>
       </section>
@@ -205,7 +206,7 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-6">
             {pillars.map((pillar, index) => (
-              <div 
+              <div
                 key={index}
                 className="p-8 rounded-2xl bg-gradient-to-b from-[#13131a] to-[#0d0d12] border border-border/30 hover:border-primary/20 transition-all"
               >
@@ -272,7 +273,7 @@ const LandingPage = () => {
       {/* Community Card */}
       <section className="py-24 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-3xl bg-gradient-to-br from-primary/20 via-[#13131a] to-[#0d0d12] border border-primary/20 p-10 md:p-14 relative overflow-hidden">
+          <div className="rounded-3xl bg-gradient-to-br from-primary/15 via-card to-background border border-primary/20 p-10 md:p-14 relative overflow-hidden">
             <div className="absolute top-6 left-6 w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
               <Users className="w-6 h-6 text-primary" />
             </div>
