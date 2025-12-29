@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import lynxLogoDark from "@/assets/lynx-logo-dark.png";
+import dashboardLaptopMockup from "@/assets/dashboard-laptop-mockup.png";
+import dashboardMobileMockup from "@/assets/dashboard-mobile-mockup.png";
 import { useState } from "react";
 
 // Animation variants with proper typing
@@ -239,12 +241,11 @@ const LandingPage = () => {
             >
               <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-t-xl p-2 border border-border/30">
                 <div className="rounded-lg overflow-hidden bg-[#13131a] aspect-[16/10]">
-                  <div className="w-full h-full bg-gradient-to-br from-[#1a1a28] via-[#15151f] to-[#0f0f15] flex items-center justify-center">
-                    <div className="text-center p-8">
-                      <BarChart3 className="w-16 h-16 text-primary/40 mx-auto mb-4" />
-                      <p className="text-muted-foreground text-sm">Dashboard Preview</p>
-                    </div>
-                  </div>
+                  <img 
+                    src={dashboardLaptopMockup} 
+                    alt="Lynx Media Dashboard" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
               </div>
               <div className="h-4 bg-gradient-to-b from-[#1a1a24] to-[#2a2a34] rounded-b-lg mx-4" />
@@ -261,9 +262,11 @@ const LandingPage = () => {
             >
               <div className="relative bg-gradient-to-b from-[#1a1a24] to-[#0d0d12] rounded-3xl p-1.5 border border-border/30">
                 <div className="rounded-2xl overflow-hidden bg-[#13131a] aspect-[9/19]">
-                  <div className="w-full h-full bg-gradient-to-br from-[#1a1a28] via-[#15151f] to-[#0f0f15] flex items-center justify-center">
-                    <TrendingUp className="w-8 h-8 text-primary/40" />
-                  </div>
+                  <img 
+                    src={dashboardMobileMockup} 
+                    alt="Lynx Media Mobile Dashboard" 
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
               </div>
             </motion.div>
