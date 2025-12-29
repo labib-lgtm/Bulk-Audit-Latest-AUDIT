@@ -261,13 +261,13 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'title', header: groupByParent ? 'Parent Product' : 'Product', sortable: true,
             render: (r: any) => (
                 <div className="flex flex-col max-w-[180px]">
-                    <span className="font-bold text-slate-800 text-xs truncate mb-1" title={r.title}>{r.title}</span>
+                    <span className="font-bold text-foreground text-xs truncate mb-1" title={r.title}>{r.title}</span>
                     <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-mono w-fit px-1.5 rounded ${r.isParent ? 'bg-violet-100 text-violet-700 font-bold' : 'bg-slate-100 text-slate-500'}`}>
+                        <span className={`text-[10px] font-mono w-fit px-1.5 rounded ${r.isParent ? 'bg-violet-500/20 text-violet-400 font-bold' : 'bg-muted text-muted-foreground'}`}>
                             {r.asin}
                         </span>
                         {r.isParent && (
-                            <span className="text-[9px] font-bold text-slate-400 bg-slate-50 border border-slate-100 px-1 rounded flex items-center gap-1">
+                            <span className="text-[9px] font-bold text-muted-foreground bg-muted border border-border px-1 rounded flex items-center gap-1">
                                 <Layers size={10} /> {r.variantCount} Vars
                             </span>
                         )}
@@ -276,7 +276,7 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             )
         },
         // Hide Parent ASIN column if grouped, show if not
-        ...(groupByParent ? [] : [{ key: 'parentAsin', header: 'Parent ASIN', sortable: true, render: (r: any) => <span className="text-xs font-mono text-slate-500">{r.parentAsin}</span> }]),
+        ...(groupByParent ? [] : [{ key: 'parentAsin', header: 'Parent ASIN', sortable: true, render: (r: any) => <span className="text-xs font-mono text-muted-foreground">{r.parentAsin}</span> }]),
         
         // Traffic (Ads)
         { key: 'adImpressions', header: 'Impressions', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.adImpressions) },
@@ -302,8 +302,8 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
         { key: 'activeTargets', header: 'Active Targets', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.activeTargets) },
         
         // Total Performance
-        { key: 'totalSales', header: 'Tot Sales', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-slate-900">{formatCurrency(r.totalSales)}</span> },
-        { key: 'tacos', header: 'TACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.tacos > 0.2 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.tacos)}</span> },
+        { key: 'totalSales', header: 'Tot Sales', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-foreground">{formatCurrency(r.totalSales)}</span> },
+        { key: 'tacos', header: 'TACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.tacos > 0.2 ? 'text-rose-400 font-bold' : ''}>{formatPct(r.tacos)}</span> },
         { key: 'adDependency', header: 'Ad Rev %', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.adDependency) },
         
         // Organic / Total Efficiency
@@ -317,16 +317,16 @@ export const AsinAuditDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                 <SectionHeader title="ASIN Level Audit" description="Profitability analysis and growth opportunities by product." />
                 
                 {/* Group By Parent Toggle */}
-                <div className="bg-white border border-slate-200 p-1 rounded-xl flex items-center shadow-sm self-start lg:self-end">
+                <div className="bg-card border border-border p-1 rounded-xl flex items-center shadow-sm self-start lg:self-end">
                     <button 
                         onClick={() => setGroupByParent(false)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${!groupByParent ? 'bg-slate-900 text-white shadow' : 'text-slate-500 hover:text-slate-900'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${!groupByParent ? 'bg-foreground text-background shadow' : 'text-muted-foreground hover:text-foreground'}`}
                     >
                         <Box size={14} /> Child Items
                     </button>
                     <button 
                         onClick={() => setGroupByParent(true)}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${groupByParent ? 'bg-violet-600 text-white shadow' : 'text-slate-500 hover:text-violet-600'}`}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${groupByParent ? 'bg-violet-600 text-white shadow' : 'text-muted-foreground hover:text-violet-400'}`}
                     >
                         <Layers size={14} /> Group by Parent
                     </button>
