@@ -591,53 +591,53 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
            {channelStats.map((channel) => {
                const Icon = channel.icon;
                return (
-                   <div key={channel.key} className={`rounded-xl border ${channel.border} ${channel.bg} p-5 flex flex-col relative overflow-hidden h-full`}>
-                       {/* Header */}
-                       <div className="flex items-center gap-3 mb-4 z-10">
-                           <div className={`w-8 h-8 rounded-lg bg-white/60 flex items-center justify-center ${channel.iconColor} shadow-sm`}>
-                               <Icon size={16} strokeWidth={2.5} />
-                           </div>
-                           <h4 className={`text-sm font-bold font-heading uppercase tracking-wide ${channel.text}`}>{channel.label}</h4>
-                           <div className="ml-auto flex items-center gap-1 bg-white/60 px-2 py-1 rounded text-[10px] font-bold shadow-sm">
-                               <span className={channel.subColor}>{formatPct(channel.share)}</span> SHARE
-                           </div>
-                       </div>
-                       
-                       {/* Metrics Grid */}
-                       <div className="grid grid-cols-2 gap-4 z-10 mb-4 pb-4 border-b border-black/5">
-                           <div>
-                               <p className={`text-[10px] uppercase font-bold ${channel.subColor} opacity-70 mb-1`}>Sales</p>
-                               <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatCompactCurrency(channel.sales)}</p>
-                           </div>
-                           <div className="text-right">
-                               <p className={`text-[10px] uppercase font-bold ${channel.subColor} opacity-70 mb-1`}>ROAS</p>
-                               <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatNum(channel.roas)}</p>
-                           </div>
-                       </div>
+                    <div key={channel.key} className={`rounded-2xl border ${channel.border} bg-card p-5 flex flex-col relative overflow-hidden h-full`}>
+                        {/* Header */}
+                        <div className="flex items-center gap-3 mb-4 z-10">
+                            <div className={`w-9 h-9 rounded-xl ${channel.bg} flex items-center justify-center ${channel.iconColor}`}>
+                                <Icon size={18} strokeWidth={2.5} />
+                            </div>
+                            <h4 className={`text-sm font-bold font-heading uppercase tracking-wide ${channel.text}`}>{channel.label}</h4>
+                            <div className={`ml-auto flex items-center gap-1 ${channel.bg} px-2.5 py-1 rounded-lg text-[10px] font-bold`}>
+                                <span className={channel.text}>{formatPct(channel.share)}</span> <span className="text-muted-foreground">SHARE</span>
+                            </div>
+                        </div>
+                        
+                        {/* Metrics Grid */}
+                        <div className="grid grid-cols-2 gap-4 z-10 mb-4 pb-4 border-b border-border">
+                            <div>
+                                <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Sales</p>
+                                <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatCompactCurrency(channel.sales)}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">ROAS</p>
+                                <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatNum(channel.roas)}</p>
+                            </div>
+                        </div>
 
-                       {/* Target Summary Table */}
-                       <div className="flex-1 z-10">
-                           <table className="w-full text-xs">
-                               <tbody>
-                                   {channel.details.map((detail, idx) => (
-                                       <tr key={idx} className={`${detail.h ? 'font-bold border-b border-black/5' : ''}`}>
-                                           <td className={`py-1 ${detail.h ? channel.text : channel.subColor} ${detail.h ? 'text-[11px] uppercase tracking-wider' : 'opacity-90'}`}>
-                                               {detail.h && <Target className="w-3 h-3 inline-block mr-1 mb-0.5" />}
-                                               {detail.l}
-                                           </td>
-                                           <td className={`py-1 text-right font-bold ${channel.valueColor}`}>
-                                               {detail.v}
-                                           </td>
-                                       </tr>
-                                   ))}
-                               </tbody>
-                           </table>
-                       </div>
-                       
-                       {/* Footer */}
-                       <div className="mt-4 pt-3 border-t border-black/5 flex items-center justify-between z-10">
-                           <span className={`text-xs font-bold ${channel.subColor}`}>Spend: {formatCurrency(channel.spend)}</span>
-                       </div>
+                        {/* Target Summary Table */}
+                        <div className="flex-1 z-10">
+                            <table className="w-full text-xs">
+                                <tbody>
+                                    {channel.details.map((detail, idx) => (
+                                        <tr key={idx} className={`${detail.h ? 'font-bold border-b border-border' : ''}`}>
+                                            <td className={`py-1.5 ${detail.h ? channel.text : 'text-foreground/80'} ${detail.h ? 'text-[11px] uppercase tracking-wider' : ''}`}>
+                                                {detail.h && <Target className="w-3 h-3 inline-block mr-1.5 mb-0.5" />}
+                                                {detail.l}
+                                            </td>
+                                            <td className={`py-1.5 text-right font-bold text-foreground`}>
+                                                {detail.v}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        {/* Footer */}
+                        <div className="mt-4 pt-3 border-t border-border flex items-center justify-between z-10">
+                            <span className="text-xs font-bold text-muted-foreground">Spend: {formatCurrency(channel.spend)}</span>
+                        </div>
                    </div>
                );
            })}
