@@ -150,7 +150,13 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                   ))}
                               </Pie>
-                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} />
+                              <RechartsTooltip 
+                                formatter={(val: number, name: string, props: any) => [formatCurrency(val), props.payload?.name || 'Spend']} 
+                                contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} 
+                                itemStyle={{ color: 'hsl(var(--foreground))' }} 
+                                labelStyle={{ color: 'hsl(var(--foreground))', fontWeight: 'bold' }}
+                                labelFormatter={(label: string) => ''}
+                              />
                           </PieChart>
                       </ResponsiveContainer>
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col">
