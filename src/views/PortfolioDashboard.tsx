@@ -174,10 +174,6 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                               />
                           </PieChart>
                       </ResponsiveContainer>
-                      <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col">
-                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Top 8</span>
-                          <span className="text-lg font-black text-foreground">Portfolios</span>
-                      </div>
                   </div>
               </div>
 
