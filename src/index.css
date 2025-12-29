@@ -55,7 +55,7 @@
     --glow-primary: 0 0 60px hsl(78 100% 50% / 0.2);
     --glow-strong: 0 0 100px hsl(78 100% 50% / 0.3);
 
-    --sidebar-background: 240 10% 12%;
+    --sidebar-background: 0 0% 0%;
     --sidebar-foreground: 0 0% 98%;
     --sidebar-primary: 78 100% 50%;
     --sidebar-primary-foreground: 240 10% 10%;
