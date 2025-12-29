@@ -158,16 +158,16 @@ export const DiagnosticsDashboard: React.FC<DiagnosticsProps> = ({ data, setting
             <SectionHeader title="Diagnostics & Optimization" description={`Identify inefficiencies based on your Target ACOS (${formatPct(settings.targetAcos)} Global, with Product overrides).`} />
             
             {/* Bleeders Section */}
-            <div className="bg-white rounded-2xl border border-rose-100 shadow-sm overflow-hidden">
-                <div className="bg-rose-50 px-6 py-4 border-b border-rose-100 flex items-center justify-between">
+            <div className="bg-card rounded-2xl border border-rose-200/50 shadow-sm overflow-hidden">
+                <div className="bg-rose-50 dark:bg-rose-950/30 px-6 py-4 border-b border-rose-200/50 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <AlertCircle className="text-rose-600 w-5 h-5" />
                         <div>
-                            <h3 className="font-bold text-rose-900">Bleeders (Zero Sales)</h3>
-                            <p className="text-xs text-rose-700">Spend {'>'} {formatCurrency(settings.minSpendThreshold, settings.currencySymbol)} with 0 orders.</p>
+                            <h3 className="font-bold text-rose-900 dark:text-rose-300">Bleeders (Zero Sales)</h3>
+                            <p className="text-xs text-rose-700 dark:text-rose-400">Spend {'>'} {formatCurrency(settings.minSpendThreshold, settings.currencySymbol)} with 0 orders.</p>
                         </div>
                     </div>
-                    <button onClick={handleExportBleeders} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-rose-200 rounded-lg text-xs font-bold text-rose-700 hover:bg-rose-100 transition-colors shadow-sm">
+                    <button onClick={handleExportBleeders} className="flex items-center gap-2 px-3 py-1.5 bg-card border border-rose-200 rounded-lg text-xs font-bold text-rose-700 dark:text-rose-400 hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors shadow-sm">
                         <FileDown size={14} /> Export Bulk File (Pauses)
                     </button>
                 </div>
@@ -175,7 +175,7 @@ export const DiagnosticsDashboard: React.FC<DiagnosticsProps> = ({ data, setting
                     <DataTable data={bleeders} columns={[
                         { key: 'name', header: 'Target / Keyword', sortable: true },
                         { key: 'type', header: 'Type', sortable: true },
-                        { key: 'matchType', header: 'Match', sortable: true, render: (r: any) => <span className="text-[10px] font-mono bg-slate-100 px-1 rounded">{r.matchType}</span> },
+                        { key: 'matchType', header: 'Match', sortable: true, render: (r: any) => <span className="text-[10px] font-mono bg-muted px-1 rounded">{r.matchType}</span> },
                         { key: 'spend', header: 'Wasted Spend', render: (r: any) => <span className="font-bold text-rose-600">{formatCurrency(r.spend, settings.currencySymbol)}</span>, align: 'right', sortable: true },
                         { key: 'clicks', header: 'Clicks', align: 'right', sortable: true },
                         { key: 'cpc', header: 'CPC', render: (r: any) => formatCurrency(safeDiv(r.spend, r.clicks), settings.currencySymbol), align: 'right', sortable: true },
@@ -184,16 +184,16 @@ export const DiagnosticsDashboard: React.FC<DiagnosticsProps> = ({ data, setting
             </div>
 
             {/* Optimization Section */}
-            <div className="bg-white rounded-2xl border border-amber-100 shadow-sm overflow-hidden">
-                 <div className="bg-amber-50 px-6 py-4 border-b border-amber-100 flex items-center justify-between">
+            <div className="bg-card rounded-2xl border border-amber-200/50 shadow-sm overflow-hidden">
+                 <div className="bg-amber-50 dark:bg-amber-950/30 px-6 py-4 border-b border-amber-200/50 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="text-amber-600 w-5 h-5" />
                         <div>
-                            <h3 className="font-bold text-amber-900">Bid Optimization Opportunities</h3>
-                            <p className="text-xs text-amber-700">Targets performing worse than their assigned Target ACOS.</p>
+                            <h3 className="font-bold text-amber-900 dark:text-amber-300">Bid Optimization Opportunities</h3>
+                            <p className="text-xs text-amber-700 dark:text-amber-400">Targets performing worse than their assigned Target ACOS.</p>
                         </div>
                     </div>
-                    <button onClick={handleExportOptimization} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-amber-200 rounded-lg text-xs font-bold text-amber-700 hover:bg-amber-100 transition-colors shadow-sm">
+                    <button onClick={handleExportOptimization} className="flex items-center gap-2 px-3 py-1.5 bg-card border border-amber-200 rounded-lg text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors shadow-sm">
                         <FileDown size={14} /> Export Bulk File (Bids)
                     </button>
                 </div>
@@ -205,8 +205,8 @@ export const DiagnosticsDashboard: React.FC<DiagnosticsProps> = ({ data, setting
                         { key: 'spend', header: 'Spend', render: (r: any) => formatCurrency(r.spend, settings.currencySymbol), align: 'right', sortable: true },
                         { key: 'sales', header: 'Sales', render: (r: any) => formatCurrency(r.sales, settings.currencySymbol), align: 'right', sortable: true },
                         { key: 'currentAcos', header: 'Current ACOS', render: (r: any) => <span className="font-bold text-rose-600">{formatPct(r.currentAcos)}</span>, align: 'right', sortable: true },
-                        { key: 'targetAcos', header: 'Target', render: (r: any) => <span className="font-bold text-slate-500 text-xs bg-slate-100 px-1 rounded">{formatPct(r.targetAcos)}</span>, align: 'right', sortable: true },
-                        { key: 'recommendedBid', header: 'Rec. Bid', render: (r: any) => <span className="font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded border border-emerald-100">{formatCurrency(r.recommendedBid, settings.currencySymbol)}</span>, align: 'right', sortable: true },
+                        { key: 'targetAcos', header: 'Target', render: (r: any) => <span className="font-bold text-muted-foreground text-xs bg-muted px-1 rounded">{formatPct(r.targetAcos)}</span>, align: 'right', sortable: true },
+                        { key: 'recommendedBid', header: 'Rec. Bid', render: (r: any) => <span className="font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 px-2 py-1 rounded border border-emerald-200/50">{formatCurrency(r.recommendedBid, settings.currencySymbol)}</span>, align: 'right', sortable: true },
                      ]} initialSortKey="spend" />
                 </div>
             </div>
