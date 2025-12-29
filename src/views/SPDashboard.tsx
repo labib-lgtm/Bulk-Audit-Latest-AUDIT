@@ -213,11 +213,11 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
         <SectionHeader title="Sponsored Products Intelligence" description="Operational PPC diagnostics and target analysis." />
         <div className="flex items-center gap-3 w-full lg:w-auto">
              <div className="relative w-full">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <input 
                   type="text" 
                   placeholder={view === 'campaigns' ? "Search Campaigns..." : "Search Keywords & Targets..."}
-                  className="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold focus:border-brand-500 focus:ring-0 transition-all shadow-sm w-full sm:w-64"
+                  className="pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm font-medium text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-0 transition-all shadow-sm w-full sm:w-64"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -229,17 +229,17 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
             <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
           ))}
       </div>
-      <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 rounded-2xl w-full sm:w-fit border border-slate-200">
+      <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
           {[{ id: 'campaigns', label: 'Campaign Summary', icon: LayoutGrid }, { id: 'targets', label: 'Target Analysis', icon: Target }, { id: 'matchTypes', label: 'Match Type Analysis', icon: PieIcon }, { id: 'placements', label: 'Placement Analysis', icon: Monitor }].map(t => (
-            <button key={t.id} onClick={() => setView(t.id as any)} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all flex-1 sm:flex-none justify-center ${view === t.id ? 'bg-white text-brand-600 shadow-md' : 'text-slate-500 hover:text-slate-800'}`}>
+            <button key={t.id} onClick={() => setView(t.id as any)} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all flex-1 sm:flex-none justify-center ${view === t.id ? 'bg-card text-primary shadow-md' : 'text-muted-foreground hover:text-foreground'}`}>
                 <t.icon size={16} />{t.label}
             </button>
           ))}
       </div>
-      <div className="bg-slate-50/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/50">
+      <div className="bg-card/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border">
         {view === 'campaigns' && <DataTable data={campaignTableData} columns={[
                 { key: 'name', header: 'Campaign Name', sortable: true },
-                { key: 'state', header: 'State', render: r => <span className={`uppercase text-[10px] font-bold px-2 py-1 rounded-full ${r.state === 'enabled' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>{r.state}</span> },
+                { key: 'state', header: 'State', render: r => <span className={`uppercase text-[10px] font-bold px-2 py-1 rounded-full ${r.state === 'enabled' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-muted text-muted-foreground'}`}>{r.state}</span> },
                 { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                 { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
                 { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
@@ -250,32 +250,32 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
                 { key: 'ctr', header: 'CTR', render: (r: any) => formatPct(safeDiv(r.clicks, r.impressions)), align: 'right', sortable: true },
         ]} initialSortKey="spend" />}
         {view === 'targets' && <DataTable data={allTargets} columns={[
-                { key: 'text', header: 'Target / Keyword', render: (r: any) => (<div className="flex flex-col"><span className="font-bold text-slate-900">{r.text}</span><span className="text-[10px] text-slate-400 font-bold uppercase">{r.type}</span></div>), sortable: true },
-                { key: 'matchType', header: 'Match Type', render: r => { const color = MATCH_TYPE_COLORS[r.matchType] || MATCH_TYPE_COLORS['Other']; return (<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border`} style={{ backgroundColor: `${color}15`, color: color, borderColor: `${color}30` }}>{r.matchType}</span>); }, sortable: true },
+                { key: 'text', header: 'Target / Keyword', render: (r: any) => (<div className="flex flex-col"><span className="font-bold text-foreground">{r.text}</span><span className="text-[10px] text-muted-foreground font-bold uppercase">{r.type}</span></div>), sortable: true },
+                { key: 'matchType', header: 'Match Type', render: r => { const color = MATCH_TYPE_COLORS[r.matchType] || MATCH_TYPE_COLORS['Other']; return (<span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border`} style={{ backgroundColor: `${color}20`, color: color, borderColor: `${color}40` }}>{r.matchType}</span>); }, sortable: true },
                 { key: 'campaignName', header: 'Campaign', sortable: true },
                 { key: 'bid', header: 'Bid', render: r => formatCurrency(r.bid), align: 'right', sortable: true },
                 { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                 { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
                 { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
                 { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
-                { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+                { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-400 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
                 { key: 'orders', header: 'Orders', align: 'right', sortable: true },
                 { key: 'cvr', header: 'CVR', render: r => formatPct(r.cvr), align: 'right', sortable: true }
         ]} initialSortKey="spend" />}
         {view === 'matchTypes' && (
             <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col items-center justify-center">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4 w-full text-left">Spend Distribution</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={matchTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{matchTypeData.map((entry, index) => (<Cell key={`cell-${index}`} fill={MATCH_TYPE_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value)} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
+                    <div className="bg-card rounded-2xl border border-border p-6 flex flex-col items-center justify-center">
+                        <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 w-full text-left">Spend Distribution</h4>
+                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={matchTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{matchTypeData.map((entry, index) => (<Cell key={`cell-${index}`} fill={MATCH_TYPE_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
                     </div>
                     <div className="lg:col-span-2">
                          <DataTable data={matchTypeData} columns={[
-                            { key: 'type', header: 'Match Type', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: MATCH_TYPE_COLORS[r.type] }}></div><span className="font-bold text-slate-900">{r.type}</span></div>), sortable: true },
+                            { key: 'type', header: 'Match Type', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: MATCH_TYPE_COLORS[r.type] }}></div><span className="font-bold text-foreground">{r.type}</span></div>), sortable: true },
                             { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                             { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
                             { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
-                            { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+                            { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-400 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
                             { key: 'cvr', header: 'CVR', render: r => formatPct(r.cvr), align: 'right', sortable: true },
                             { key: 'cpc', header: 'CPC', render: r => formatCurrency(r.cpc), align: 'right', sortable: true },
                             { key: 'count', header: 'Target Count', align: 'right', sortable: true },
@@ -287,21 +287,21 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
         {view === 'placements' && (
             <div className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Placement Efficiency (CPC vs CVR)</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} /><XAxis type="number" hide /><YAxis type="category" dataKey="placement" width={100} tick={{fontSize: 10}} /><RechartsTooltip formatter={(value: number, name: string) => name === 'CPC' ? formatCurrency(value) : formatPct(value)} cursor={{fill: '#f8fafc'}} /><Legend /><Bar dataKey="cpc" name="CPC" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} /><Bar dataKey="cvr" name="CVR" fill="#34d399" radius={[0, 4, 4, 0]} barSize={20} /></BarChart></ResponsiveContainer></div>
+                    <div className="bg-card rounded-2xl border border-border p-6">
+                        <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Placement Efficiency (CPC vs CVR)</h4>
+                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} layout="vertical" margin={{ top: 5, right: 30, left: 40, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" /><XAxis type="number" hide /><YAxis type="category" dataKey="placement" width={100} tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} /><RechartsTooltip formatter={(value: number, name: string) => name === 'CPC' ? formatCurrency(value) : formatPct(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} /><Legend /><Bar dataKey="cpc" name="CPC" fill="#8b5cf6" radius={[0, 4, 4, 0]} barSize={20} /><Bar dataKey="cvr" name="CVR" fill="#34d399" radius={[0, 4, 4, 0]} barSize={20} /></BarChart></ResponsiveContainer></div>
                     </div>
-                    <div className="bg-white rounded-2xl border border-slate-200 p-6">
-                        <h4 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Spend vs Sales</h4>
-                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="placement" tick={{fontSize: 10}} interval={0} /><YAxis /><RechartsTooltip formatter={(value: number) => formatCurrency(value)} /><Legend /><Bar dataKey="spend" name="Spend" fill="#f43f5e" radius={[4, 4, 0, 0]} /><Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
+                    <div className="bg-card rounded-2xl border border-border p-6">
+                        <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4">Spend vs Sales</h4>
+                        <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><BarChart data={placementData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" /><XAxis dataKey="placement" tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} interval={0} /><YAxis tick={{fill: 'hsl(var(--muted-foreground))'}} /><RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} /><Legend /><Bar dataKey="spend" name="Spend" fill="#f43f5e" radius={[4, 4, 0, 0]} /><Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} /></BarChart></ResponsiveContainer></div>
                     </div>
                 </div>
                 <DataTable data={placementData} columns={[
-                    { key: 'placement', header: 'Placement', render: r => <span className="font-bold text-slate-900">{r.placement}</span>, sortable: true },
+                    { key: 'placement', header: 'Placement', render: r => <span className="font-bold text-foreground">{r.placement}</span>, sortable: true },
                     { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
                     { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
                     { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
-                    { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+                    { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-400 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
                     { key: 'cvr', header: 'CVR', render: r => formatPct(r.cvr), align: 'right', sortable: true },
                     { key: 'cpc', header: 'CPC', render: r => formatCurrency(r.cpc), align: 'right', sortable: true },
                     { key: 'ctr', header: 'CTR', render: r => formatPct(r.ctr), align: 'right', sortable: true },

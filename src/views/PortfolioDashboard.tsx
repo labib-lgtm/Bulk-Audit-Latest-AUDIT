@@ -90,9 +90,9 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
   }, [portfolioMetrics]);
 
   const columns = [
-     { key: 'name', header: 'Portfolio Name', sortable: true, render: (r: any) => <span className="font-bold text-slate-700">{r.name}</span> },
+     { key: 'name', header: 'Portfolio Name', sortable: true, render: (r: any) => <span className="font-bold text-foreground">{r.name}</span> },
      { key: 'state', header: 'Status', sortable: true, render: (r: any) => (
-         <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold ${r.state === 'enabled' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500'}`}>
+         <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold ${r.state === 'enabled' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-muted text-muted-foreground'}`}>
              {r.state}
          </span>
      )},
@@ -104,16 +104,16 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
      { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
      { key: 'cvr', header: 'CVR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.cvr) },
      { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
-     { key: 'roas', header: 'ROAS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.roas > 4 ? 'text-emerald-600 font-bold' : ''}>{formatNum(r.roas)}</span> },
+     { key: 'roas', header: 'ROAS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.roas > 4 ? 'text-emerald-400 font-bold' : ''}>{formatNum(r.roas)}</span> },
      { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.acos) },
      { key: 'utilization', header: 'Budget Util.', align: 'right' as const, sortable: true, render: (r: any) => r.budget > 0 ? (
         <div className="flex flex-col items-end">
-            <span className={`text-xs font-bold ${r.utilization > 1 ? 'text-rose-600' : r.utilization > 0.9 ? 'text-amber-600' : 'text-slate-600'}`}>{formatPct(r.utilization)}</span>
-            <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+            <span className={`text-xs font-bold ${r.utilization > 1 ? 'text-rose-400' : r.utilization > 0.9 ? 'text-amber-400' : 'text-muted-foreground'}`}>{formatPct(r.utilization)}</span>
+            <div className="w-16 h-1.5 bg-muted rounded-full overflow-hidden">
                 <div className={`h-full rounded-full ${r.utilization > 1 ? 'bg-rose-500' : r.utilization > 0.9 ? 'bg-amber-400' : 'bg-emerald-500'}`} style={{ width: `${Math.min(r.utilization * 100, 100)}%` }}></div>
             </div>
         </div>
-     ) : <span className="text-slate-300">-</span> },
+     ) : <span className="text-muted-foreground">-</span> },
   ];
 
   return (
@@ -130,9 +130,9 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Spend Mix Pie Chart */}
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                  <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6">
-                    <PieChartIcon className="w-4 h-4 text-indigo-500" /> Spend Allocation
+              <div className="bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col">
+                  <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6 text-foreground">
+                    <PieChartIcon className="w-4 h-4 text-indigo-400" /> Spend Allocation
                   </h4>
                   <div className="flex-1 min-h-[250px] relative">
                       <ResponsiveContainer width="100%" height="100%">
@@ -150,28 +150,28 @@ export const PortfolioDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
                                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                   ))}
                               </Pie>
-                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} />
+                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                           </PieChart>
                       </ResponsiveContainer>
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col">
-                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Top 8</span>
-                          <span className="text-lg font-black text-slate-900">Portfolios</span>
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Top 8</span>
+                          <span className="text-lg font-black text-foreground">Portfolios</span>
                       </div>
                   </div>
               </div>
 
               {/* Spend vs Sales Bar Chart */}
-              <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
-                   <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6">
-                    <BarChartIcon className="w-4 h-4 text-emerald-500" /> Spend vs. Sales (Top Portfolios)
+              <div className="lg:col-span-2 bg-card p-6 rounded-2xl border border-border shadow-sm flex flex-col">
+                   <h4 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 mb-6 text-foreground">
+                    <BarChartIcon className="w-4 h-4 text-emerald-400" /> Spend vs. Sales (Top Portfolios)
                   </h4>
                   <div className="flex-1 min-h-[250px]">
                       <ResponsiveContainer width="100%" height="100%">
                           <BarChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                              <XAxis dataKey="name" tick={{fontSize: 10}} interval={0} tickFormatter={(val) => val.length > 15 ? val.substring(0,15)+'...' : val} />
-                              <YAxis tickFormatter={(val) => `$${val}`} tick={{fontSize: 11}} />
-                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} cursor={{fill: '#f8fafc'}} />
+                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                              <XAxis dataKey="name" tick={{fontSize: 10, fill: 'hsl(var(--muted-foreground))'}} interval={0} tickFormatter={(val) => val.length > 15 ? val.substring(0,15)+'...' : val} />
+                              <YAxis tickFormatter={(val) => `$${val}`} tick={{fontSize: 11, fill: 'hsl(var(--muted-foreground))'}} />
+                              <RechartsTooltip formatter={(val: number) => formatCurrency(val)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px' }} />
                               <Legend iconType="circle" />
                               <Bar dataKey="spend" name="Spend" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={50} />
                               <Bar dataKey="sales" name="Sales" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={50} />
