@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Check, X, Zap, Shield, Clock, TrendingUp } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import { motion } from "framer-motion";
 
 // Animated counter hook
 const useCountUp = (end: number, duration: number = 2000) => {
@@ -141,27 +142,53 @@ const LandingPage = () => {
         <main className="relative max-w-4xl mx-auto px-6 pt-32 pb-20">
           {/* Hero */}
           <section className="mb-24 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8"
+            >
               <Zap className="w-4 h-4" />
               For Amazon Sellers & Agencies
-            </div>
+            </motion.div>
             
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
-              Stop Guessing.
-              <br />
-              <span className="bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
+              <motion.span
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="block"
+              >
+                Stop Guessing.
+              </motion.span>
+              <motion.span 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
+              >
                 Start Profiting.
-              </span>
+              </motion.span>
             </h1>
             
-            <p className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto"
+            >
               Upload your Amazon bulk file. Get cross-campaign analytics and TACOS insights in 
               <span className="text-foreground font-bold"> 60 seconds.</span>
               <br />
               <span className="text-primary font-semibold">No API. No setup. No BS.</span>
-            </p>
+            </motion.p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
               <Button 
                 onClick={() => navigate("/auth")}
                 size="lg"
@@ -178,11 +205,16 @@ const LandingPage = () => {
               >
                 See Demo
               </Button>
-            </div>
+            </motion.div>
 
-            <p className="text-muted-foreground text-sm mt-6">
+            <motion.p 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1 }}
+              className="text-muted-foreground text-sm mt-6"
+            >
               ✓ Free to start &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds
-            </p>
+            </motion.p>
           </section>
 
           {/* Results */}
