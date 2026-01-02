@@ -2,6 +2,81 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Check, X, Zap, Shield, Clock, TrendingUp } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+
+// Animated counter hook
+const useCountUp = (end: number, duration: number = 2000) => {
+  const [count, setCount] = useState(0);
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isVisible) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    let startTime: number;
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      
+      // Ease out cubic
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(easeOut * end));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [isVisible, end, duration]);
+
+  return { count, ref };
+};
+
+// Result card component with animated counter
+const ResultCard = ({ 
+  metric, 
+  unit, 
+  suffix, 
+  description, 
+  icon: Icon 
+}: { 
+  metric: number; 
+  unit: string; 
+  suffix: string; 
+  description: string; 
+  icon: React.ElementType;
+}) => {
+  const { count, ref } = useCountUp(metric, 1500);
+  
+  return (
+    <div ref={ref} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
+      <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
+      <p className="text-5xl font-black text-foreground mb-1">
+        {count}{suffix}
+        <span className="text-2xl text-primary">{unit}</span>
+      </p>
+      <p className="text-muted-foreground text-sm">{description}</p>
+    </div>
+  );
+};
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -113,16 +188,9 @@ const LandingPage = () => {
           {/* Results */}
           <section className="mb-24">
             <div className="grid sm:grid-cols-3 gap-4">
-              {results.map((result, i) => (
-                <div key={i} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
-                  <result.icon className="w-8 h-8 text-primary mx-auto mb-4" />
-                  <p className="text-5xl font-black text-foreground mb-1">
-                    {result.metric}
-                    <span className="text-2xl text-primary">{result.unit}</span>
-                  </p>
-                  <p className="text-muted-foreground text-sm">{result.description}</p>
-                </div>
-              ))}
+              <ResultCard metric={4} unit="+" suffix="hours" description="saved per week on reporting" icon={Clock} />
+              <ResultCard metric={23} unit="%" suffix="" description="average reduction in wasted spend" icon={TrendingUp} />
+              <ResultCard metric={60} unit="sec" suffix="" description="to find your profit leaks" icon={Zap} />
             </div>
           </section>
 
