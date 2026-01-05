@@ -238,32 +238,54 @@ serve(async (req: Request): Promise<Response> => {
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
           </head>
-          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 40px 20px; border-radius: 12px 12px 0 0; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited! 🎉</h1>
-            </div>
-            <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
-              <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
-                Hello,
-              </p>
-              <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
-                You've been invited to join <strong>Lynx Analytics</strong> as a <strong style="color: #6366f1;">${role}</strong>.
-              </p>
-              <p style="font-size: 16px; color: #374151; margin-bottom: 30px;">
-                Click the button below to create your account and get started:
-              </p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${inviteSignupUrl}" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);">
-                  Accept Invitation
-                </a>
+          <body style="font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #0f1012;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+              <!-- Header with Logo -->
+              <div style="background: linear-gradient(135deg, #0f1012 0%, #171a1d 100%); padding: 40px 30px; border-radius: 16px 16px 0 0; text-align: center; border: 1px solid #2a2d32; border-bottom: none;">
+                <div style="margin-bottom: 24px;">
+                  <span style="font-size: 32px; font-weight: 700; color: #80D010; letter-spacing: -0.5px;">LYNX</span>
+                  <span style="font-size: 32px; font-weight: 400; color: #ffffff; letter-spacing: -0.5px;"> Analytics</span>
+                </div>
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 600;">You're Invited! 🎉</h1>
               </div>
-              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
-                If you didn't expect this invitation, you can safely ignore this email.
-              </p>
-              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-              <p style="font-size: 12px; color: #9ca3af; text-align: center;">
-                © ${new Date().getFullYear()} Lynx Analytics. All rights reserved.
-              </p>
+              
+              <!-- Main Content -->
+              <div style="background: #171a1d; padding: 40px 30px; border: 1px solid #2a2d32; border-top: none; border-radius: 0 0 16px 16px;">
+                <p style="font-size: 16px; color: #e5e7eb; margin-bottom: 20px;">
+                  Hello,
+                </p>
+                <p style="font-size: 16px; color: #e5e7eb; margin-bottom: 20px;">
+                  You've been invited to join <strong style="color: #80D010;">Lynx Analytics</strong> as a <strong style="color: #80D010; text-transform: capitalize;">${role}</strong>.
+                </p>
+                <p style="font-size: 16px; color: #a1a1aa; margin-bottom: 30px;">
+                  Click the button below to create your account and get started with powerful Amazon advertising analytics.
+                </p>
+                
+                <!-- CTA Button -->
+                <div style="text-align: center; margin: 35px 0;">
+                  <a href="${inviteSignupUrl}" style="background: #80D010; color: #0f1012; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 20px rgba(128, 208, 16, 0.3); transition: all 0.2s;">
+                    Accept Invitation
+                  </a>
+                </div>
+                
+                <!-- Divider -->
+                <div style="border-top: 1px solid #2a2d32; margin: 35px 0;"></div>
+                
+                <!-- Security Note -->
+                <p style="font-size: 14px; color: #71717a; margin-bottom: 0;">
+                  If you didn't expect this invitation, you can safely ignore this email.
+                </p>
+              </div>
+              
+              <!-- Footer -->
+              <div style="text-align: center; padding: 30px 20px;">
+                <p style="font-size: 12px; color: #52525b; margin: 0;">
+                  © ${new Date().getFullYear()} Lynx Media. All rights reserved.
+                </p>
+                <p style="font-size: 11px; color: #3f3f46; margin: 8px 0 0 0;">
+                  Amazon Advertising Analytics Platform
+                </p>
+              </div>
             </div>
           </body>
         </html>
