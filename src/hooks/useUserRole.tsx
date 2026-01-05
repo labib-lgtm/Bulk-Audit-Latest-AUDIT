@@ -46,6 +46,47 @@ export const useUserRole = () => {
     }
   }, [user, authLoading]);
 
+  // Real-time listener for access revocation
+  useEffect(() => {
+    if (!user) return;
+
+    const channel = supabase
+      .channel('user-role-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'user_roles',
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // User's role was deleted - revoke access immediately
+          console.log('Access revoked - role deleted');
+          setRole(null);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'user_roles',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          // User's role was updated
+          console.log('Role updated:', payload.new);
+          setRole((payload.new as { role: AppRole }).role);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
   const hasAccess = role !== null;
   
   return {
