@@ -37,7 +37,17 @@ export const TeamManagement: React.FC = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('get-team-members');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        console.error('No session found');
+        return;
+      }
+      
+      const { data, error } = await supabase.functions.invoke('get-team-members', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
       if (error) throw error;
       setTeamMembers(data?.teamMembers || []);
