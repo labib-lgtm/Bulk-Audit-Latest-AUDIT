@@ -197,9 +197,49 @@ serve(async (req: Request): Promise<Response> => {
     const existingUser = existingUsers?.users?.find(u => u.email?.toLowerCase() === email);
     
     if (existingUser) {
+      // Check if user already has a role
+      const { data: existingRole } = await supabaseAdmin
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", existingUser.id)
+        .maybeSingle();
+      
+      if (existingRole) {
+        return new Response(
+          JSON.stringify({ error: "This user already has access to the application" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // User exists but has no role - re-grant access
+      console.log(`Re-granting access to existing user ${existingUser.id} with role ${role}`);
+      
+      const { error: roleError } = await supabaseAdmin
+        .from("user_roles")
+        .insert({ user_id: existingUser.id, role: role });
+      
+      if (roleError) {
+        console.error("Failed to restore user role:", roleError);
+        return new Response(
+          JSON.stringify({ error: "Failed to restore access. Please try again." }),
+          { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      // Update any existing invitation status
+      await supabaseAdmin
+        .from("invitations")
+        .update({ status: "accepted" })
+        .eq("email", email)
+        .eq("status", "pending");
+      
       return new Response(
-        JSON.stringify({ error: "A user with this email already exists" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ 
+          success: true, 
+          message: `Access restored for ${email} with role: ${role}`,
+          restored: true
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
