@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { Resend } from "https://esm.sh/resend@2.0.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -71,6 +72,17 @@ serve(async (req: Request): Promise<Response> => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Email service is not configured. Please contact support." }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const resend = new Resend(resendApiKey);
     
     // Create admin client with service role key
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
@@ -206,16 +218,67 @@ serve(async (req: Request): Promise<Response> => {
       );
     }
 
-    // Send invitation using Supabase's built-in invite
-    const { data: inviteData, error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+    // Generate a signup link for the invited user
+    const appUrl = Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "") || "";
+    const signupUrl = `${supabaseUrl.replace("https://", "https://").replace(".supabase.co", ".lovable.app")}/auth`;
+    
+    // Get the actual app URL from the request origin or use a fallback
+    const origin = req.headers.get("origin") || "https://lynx-analytics.lovable.app";
+    const inviteSignupUrl = `${origin}/auth?invite=true&email=${encodeURIComponent(email)}`;
 
-    if (inviteError) {
-      console.error("Failed to send invitation:", inviteError);
+    // Send invitation email using Resend
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: "Lynx Analytics <onboarding@resend.dev>",
+      to: [email],
+      subject: "You've been invited to join Lynx Analytics",
+      html: `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+            <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 40px 20px; border-radius: 12px 12px 0 0; text-align: center;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">You're Invited! 🎉</h1>
+            </div>
+            <div style="background: #ffffff; padding: 40px 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
+              <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                Hello,
+              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 20px;">
+                You've been invited to join <strong>Lynx Analytics</strong> as a <strong style="color: #6366f1;">${role}</strong>.
+              </p>
+              <p style="font-size: 16px; color: #374151; margin-bottom: 30px;">
+                Click the button below to create your account and get started:
+              </p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${inviteSignupUrl}" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);">
+                  Accept Invitation
+                </a>
+              </div>
+              <p style="font-size: 14px; color: #6b7280; margin-top: 30px;">
+                If you didn't expect this invitation, you can safely ignore this email.
+              </p>
+              <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+              <p style="font-size: 12px; color: #9ca3af; text-align: center;">
+                © ${new Date().getFullYear()} Lynx Analytics. All rights reserved.
+              </p>
+            </div>
+          </body>
+        </html>
+      `,
+    });
+
+    if (emailError) {
+      console.error("Failed to send invitation email:", emailError);
       return new Response(
-        JSON.stringify({ error: "Failed to send invitation. Please try again." }),
+        JSON.stringify({ error: "Failed to send invitation email. Please try again." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    console.log("Email sent successfully:", emailData);
 
     // Store the invitation record
     const { error: insertError } = await supabaseAdmin
@@ -228,21 +291,7 @@ serve(async (req: Request): Promise<Response> => {
 
     if (insertError) {
       console.error("Failed to store invitation record:", insertError);
-      // Don't fail the request, the invite was still sent
-    }
-
-    // If a specific role was requested, update the user_roles table
-    if (role === "admin" && inviteData.user) {
-      const { error: upsertError } = await supabaseAdmin
-        .from("user_roles")
-        .upsert({
-          user_id: inviteData.user.id,
-          role: "admin",
-        });
-      
-      if (upsertError) {
-        console.error("Failed to set admin role:", upsertError);
-      }
+      // Don't fail the request, the invite email was still sent
     }
 
     console.log(`Invitation sent successfully to ${email}`);
