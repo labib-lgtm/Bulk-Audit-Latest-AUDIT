@@ -222,8 +222,8 @@ serve(async (req: Request): Promise<Response> => {
     const appUrl = Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "") || "";
     const signupUrl = `${supabaseUrl.replace("https://", "https://").replace(".supabase.co", ".lovable.app")}/auth`;
     
-    // Get the actual app URL from the request origin or use a fallback
-    const origin = req.headers.get("origin") || "https://lynx-analytics.lovable.app";
+    // Use the production domain for invitation links
+    const origin = "https://bulkaudit.lynxmedia.co";
     const inviteSignupUrl = `${origin}/auth?invite=true&email=${encodeURIComponent(email)}`;
 
     // Send invitation email using Resend
