@@ -2,3 +2,6 @@ project_id = "xxmvzsewtczuzhtcqkxk"
 
 [functions.send-invite]
 verify_jwt = false
+
+[functions.get-team-members]
+verify_jwt = false
