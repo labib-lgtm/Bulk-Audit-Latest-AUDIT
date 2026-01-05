@@ -17,6 +17,8 @@ import { processBulkFile, processBusinessReport } from '../services/dataProcesso
 import { generateMockData } from '../services/mockData';
 import { DashboardData, AppSettings, ProductGoal } from '../types';
 import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 
 const EMPTY_DATA: DashboardData = {
   portfolios: [], spCampaigns: [], spAdGroups: [], spKeywords: [], spProductTargets: [], spPlacements: [], spSkus: [],
@@ -34,6 +36,9 @@ const DEFAULT_SETTINGS: AppSettings = {
 };
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+  const { hasAccess, isLoading: roleLoading } = useUserRole();
+  
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [currentView, setCurrentView] = useState('executive');
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
@@ -100,6 +105,36 @@ const Index = () => {
       default: return <ExecutiveDashboard data={dashboardData} />;
     }
   };
+
+  // Show loading while checking role
+  if (roleLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center dark">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Block access for users without a role
+  if (!hasAccess && user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center text-foreground font-sans dark">
+        <div className="text-center max-w-md p-8">
+          <Shield className="w-16 h-16 text-destructive mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Revoked</h1>
+          <p className="text-muted-foreground mb-6">
+            Your access to this application has been revoked. Please contact an administrator if you believe this is an error.
+          </p>
+          <button
+            onClick={signOut}
+            className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-xl hover:opacity-90 transition-all"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!dashboardData) {
     return (
