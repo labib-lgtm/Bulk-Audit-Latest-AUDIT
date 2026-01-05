@@ -27,8 +27,11 @@ export const useUserRole = () => {
         if (error) {
           console.error('Error fetching user role:', error);
           setRole(null);
+        } else if (data?.role) {
+          setRole(data.role as AppRole);
         } else {
-          setRole(data?.role as AppRole || 'user');
+          // No role found - user has been removed or never had access
+          setRole(null);
         }
       } catch (err) {
         console.error('Error fetching user role:', err);
