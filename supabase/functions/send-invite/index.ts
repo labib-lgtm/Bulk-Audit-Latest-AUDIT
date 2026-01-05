@@ -228,7 +228,7 @@ serve(async (req: Request): Promise<Response> => {
 
     // Send invitation email using Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
-      from: "Lynx Analytics <onboarding@resend.dev>",
+      from: "Lynx Analytics <noreply@lynxmedia.co>",
       to: [email],
       subject: "You've been invited to join Lynx Analytics",
       html: `
