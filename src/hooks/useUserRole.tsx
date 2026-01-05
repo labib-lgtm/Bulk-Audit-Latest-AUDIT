@@ -43,10 +43,13 @@ export const useUserRole = () => {
     }
   }, [user, authLoading]);
 
+  const hasAccess = role !== null;
+  
   return {
     role,
     isAdmin: role === 'admin',
     isUser: role === 'user',
+    hasAccess,
     isLoading: authLoading || isLoading,
   };
 };

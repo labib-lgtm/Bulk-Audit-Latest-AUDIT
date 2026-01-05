@@ -49,7 +49,28 @@ const ADMIN_NAV_ITEMS = [
 export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { user, signOut } = useAuth();
-  const { isAdmin, role } = useUserRole();
+  const { isAdmin, role, hasAccess, isLoading } = useUserRole();
+
+  // Block access for users without a role
+  if (!isLoading && !hasAccess && user) {
+    return (
+      <div className="flex h-screen bg-background items-center justify-center text-foreground font-sans dark">
+        <div className="text-center max-w-md p-8">
+          <Shield className="w-16 h-16 text-destructive mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Access Revoked</h1>
+          <p className="text-muted-foreground mb-6">
+            Your access to this application has been revoked. Please contact an administrator if you believe this is an error.
+          </p>
+          <button
+            onClick={signOut}
+            className="px-6 py-3 bg-primary text-primary-foreground font-medium rounded-xl hover:opacity-90 transition-all"
+          >
+            Sign Out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-background overflow-hidden text-foreground font-sans dark">

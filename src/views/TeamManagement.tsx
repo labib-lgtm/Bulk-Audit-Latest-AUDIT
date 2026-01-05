@@ -37,13 +37,16 @@ export const TeamManagement: React.FC = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const response = await supabase.functions.invoke('get-team-members', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+      });
 
-      if (error) throw error;
-      setTeamMembers(data || []);
+      if (response.error) throw response.error;
+      setTeamMembers(response.data?.teamMembers || []);
     } catch (err) {
       console.error('Error fetching team members:', err);
       toast.error('Failed to load team members');
@@ -345,7 +348,7 @@ export const TeamManagement: React.FC = () => {
           <Table>
             <TableHeader>
               <TableRow className="border-border hover:bg-muted/50">
-                <TableHead className="text-muted-foreground">User ID</TableHead>
+                <TableHead className="text-muted-foreground">Email</TableHead>
                 <TableHead className="text-muted-foreground">Role</TableHead>
                 <TableHead className="text-muted-foreground">Joined</TableHead>
                 <TableHead className="text-muted-foreground text-right">Actions</TableHead>
@@ -354,11 +357,14 @@ export const TeamManagement: React.FC = () => {
             <TableBody>
               {teamMembers.map((member) => (
                 <TableRow key={member.id} className="border-border hover:bg-muted/50">
-                  <TableCell className="font-mono text-sm text-foreground">
-                    {member.user_id.slice(0, 8)}...
-                    {member.user_id === user?.id && (
-                      <Badge variant="outline" className="ml-2 text-xs">You</Badge>
-                    )}
+                  <TableCell className="text-foreground">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      {member.email || member.user_id.slice(0, 8) + '...'}
+                      {member.user_id === user?.id && (
+                        <Badge variant="outline" className="ml-2 text-xs">You</Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Select
