@@ -37,16 +37,10 @@ export const TeamManagement: React.FC = () => {
 
   const fetchTeamMembers = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      const response = await supabase.functions.invoke('get-team-members', {
-        headers: {
-          Authorization: `Bearer ${session?.access_token}`,
-        },
-      });
+      const { data, error } = await supabase.functions.invoke('get-team-members');
 
-      if (response.error) throw response.error;
-      setTeamMembers(response.data?.teamMembers || []);
+      if (error) throw error;
+      setTeamMembers(data?.teamMembers || []);
     } catch (err) {
       console.error('Error fetching team members:', err);
       toast.error('Failed to load team members');
