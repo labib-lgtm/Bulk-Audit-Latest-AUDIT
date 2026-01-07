@@ -361,13 +361,14 @@ const LandingPage = () => {
         </main>
 
         {/* Footer */}
-        <footer className="border-t border-border/10 py-8 px-6 bg-card/50">
-          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
-            <p className="font-medium">© {new Date().getFullYear()} Lynx Media</p>
+        <footer className="border-t border-border/10 py-12 px-6 bg-card/50">
+          <div className="max-w-4xl mx-auto flex flex-col items-center gap-6 text-sm text-muted-foreground">
+            <img src={lynxLogo} alt="Lynx Media" className="h-8 opacity-80" />
             <div className="flex gap-6">
               <a href="#" className="hover:text-foreground transition-colors">Terms</a>
               <a href="#" className="hover:text-foreground transition-colors">Privacy</a>
             </div>
+            <p className="text-xs">© {new Date().getFullYear()} Lynx Media. All rights reserved.</p>
           </div>
         </footer>
       </div>
