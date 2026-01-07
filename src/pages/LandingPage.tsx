@@ -10,108 +10,102 @@ const useCountUp = (end: number, duration: number = 2000) => {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !isVisible) {
+        setIsVisible(true);
+      }
+    }, {
+      threshold: 0.3
+    });
     if (ref.current) {
       observer.observe(ref.current);
     }
-
     return () => observer.disconnect();
   }, [isVisible]);
-
   useEffect(() => {
     if (!isVisible) return;
-
     let startTime: number;
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      
+
       // Ease out cubic
       const easeOut = 1 - Math.pow(1 - progress, 3);
       setCount(Math.floor(easeOut * end));
-
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
     };
-
     requestAnimationFrame(animate);
   }, [isVisible, end, duration]);
-
-  return { count, ref };
+  return {
+    count,
+    ref
+  };
 };
 
 // Result card component with animated counter
-const ResultCard = ({ 
-  metric, 
-  unit, 
-  suffix, 
-  description, 
-  icon: Icon 
-}: { 
-  metric: number; 
-  unit: string; 
-  suffix: string; 
-  description: string; 
+const ResultCard = ({
+  metric,
+  unit,
+  suffix,
+  description,
+  icon: Icon
+}: {
+  metric: number;
+  unit: string;
+  suffix: string;
+  description: string;
   icon: React.ElementType;
 }) => {
-  const { count, ref } = useCountUp(metric, 1500);
-  
-  return (
-    <div ref={ref} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
+  const {
+    count,
+    ref
+  } = useCountUp(metric, 1500);
+  return <div ref={ref} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
       <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
       <p className="text-5xl font-black text-foreground mb-1">
         {count}{suffix}
         <span className="text-2xl text-primary">{unit}</span>
       </p>
       <p className="text-muted-foreground text-sm">{description}</p>
-    </div>
-  );
+    </div>;
 };
-
 const LandingPage = () => {
   const navigate = useNavigate();
-
-  const problems = [
-    "Spending 4+ hours per week pulling reports from Amazon",
-    "No idea which campaigns are actually profitable after ad spend",
-    "ACOS looks good but you're still losing money",
-    "Wasting budget on keywords that will never convert",
-    "Can't see the big picture across SP, SB, and SD",
-  ];
-
-  const benefits = [
-    "See your TRUE profitability with TACOS (not just ACOS)",
-    "Identify wasted spend in under 60 seconds",
-    "Cross-campaign analytics in one dashboard",
-    "Find your winning keywords and kill the losers",
-    "No API setup. No developer. Just upload and go.",
-  ];
-
-  const results = [
-    { metric: "4+", unit: "hours", description: "saved per week on reporting", icon: Clock },
-    { metric: "23", unit: "%", description: "average reduction in wasted spend", icon: TrendingUp },
-    { metric: "60", unit: "sec", description: "to find your profit leaks", icon: Zap },
-  ];
-
-  const steps = [
-    { step: "1", title: "Download your bulk file", desc: "30 seconds in Seller Central" },
-    { step: "2", title: "Upload it to Lynx", desc: "Drag, drop, done" },
-    { step: "3", title: "See insights instantly", desc: "TACOS, wasted spend, winners & losers" },
-  ];
-
-  return (
-    <>
+  const problems = ["Spending 4+ hours per week pulling reports from Amazon", "No idea which campaigns are actually profitable after ad spend", "ACOS looks good but you're still losing money", "Wasting budget on keywords that will never convert", "Can't see the big picture across SP, SB, and SD"];
+  const benefits = ["See your TRUE profitability with TACOS (not just ACOS)", "Identify wasted spend in under 60 seconds", "Cross-campaign analytics in one dashboard", "Find your winning keywords and kill the losers", "No API setup. No developer. Just upload and go."];
+  const results = [{
+    metric: "4+",
+    unit: "hours",
+    description: "saved per week on reporting",
+    icon: Clock
+  }, {
+    metric: "23",
+    unit: "%",
+    description: "average reduction in wasted spend",
+    icon: TrendingUp
+  }, {
+    metric: "60",
+    unit: "sec",
+    description: "to find your profit leaks",
+    icon: Zap
+  }];
+  const steps = [{
+    step: "1",
+    title: "Download your bulk file",
+    desc: "30 seconds in Seller Central"
+  }, {
+    step: "2",
+    title: "Upload it to Lynx",
+    desc: "Drag, drop, done"
+  }, {
+    step: "3",
+    title: "See insights instantly",
+    desc: "TACOS, wasted spend, winners & losers"
+  }];
+  return <>
       <Helmet>
         <title>Lynx Media | Stop Losing Money on Amazon Ads</title>
         <meta name="description" content="Upload your Amazon bulk files. See your TRUE profitability in 60 seconds. No API required." />
@@ -128,12 +122,9 @@ const LandingPage = () => {
           <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
             <span className="text-2xl font-black">
               <span className="text-primary">LYNX</span>
-              <span className="text-muted-foreground font-medium text-sm ml-2 hidden sm:inline">MEDIA</span>
+              
             </span>
-            <Button 
-              onClick={() => navigate("/auth")}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
-            >
+            <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
               Get Started Free
             </Button>
           </div>
@@ -142,77 +133,90 @@ const LandingPage = () => {
         <main className="relative max-w-4xl mx-auto px-6 pt-32 pb-20">
           {/* Hero */}
           <section className="mb-24 text-center">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8"
-            >
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.5,
+            delay: 0.1
+          }} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8">
               <Zap className="w-4 h-4" />
               For Amazon Sellers & Agencies
             </motion.div>
             
             <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
-              <motion.span
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="block"
-              >
+              <motion.span initial={{
+              opacity: 0,
+              y: 30
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              duration: 0.6,
+              delay: 0.2
+            }} className="block">
                 Stop Guessing.
               </motion.span>
-              <motion.span 
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
-              >
+              <motion.span initial={{
+              opacity: 0,
+              y: 30
+            }} animate={{
+              opacity: 1,
+              y: 0
+            }} transition={{
+              duration: 0.6,
+              delay: 0.4
+            }} className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
                 Start Profiting.
               </motion.span>
             </h1>
             
-            <motion.p 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.6 }}
-              className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto"
-            >
+            <motion.p initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.5,
+            delay: 0.6
+          }} className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
               Upload your Amazon bulk file. Get cross-campaign analytics and TACOS insights in 
               <span className="text-foreground font-bold"> 60 seconds.</span>
               <br />
               <span className="text-primary font-semibold">No API. No setup. No BS.</span>
             </motion.p>
 
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
-              <Button 
-                onClick={() => navigate("/auth")}
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
-              >
+            <motion.div initial={{
+            opacity: 0,
+            y: 20
+          }} animate={{
+            opacity: 1,
+            y: 0
+          }} transition={{
+            duration: 0.5,
+            delay: 0.8
+          }} className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => navigate("/auth")} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]">
                 Analyze My Ads Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
-              <Button 
-                onClick={() => navigate("/dashboard")}
-                variant="outline"
-                size="lg"
-                className="text-lg px-10 py-7 rounded-xl border-border/50 hover:bg-muted"
-              >
+              <Button onClick={() => navigate("/dashboard")} variant="outline" size="lg" className="text-lg px-10 py-7 rounded-xl border-border/50 hover:bg-muted">
                 See Demo
               </Button>
             </motion.div>
 
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1 }}
-              className="text-muted-foreground text-sm mt-6"
-            >
+            <motion.p initial={{
+            opacity: 0
+          }} animate={{
+            opacity: 1
+          }} transition={{
+            duration: 0.5,
+            delay: 1
+          }} className="text-muted-foreground text-sm mt-6">
               ✓ Free to start &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds
             </motion.p>
           </section>
@@ -236,14 +240,12 @@ const LandingPage = () => {
             </div>
             
             <div className="space-y-4 max-w-2xl mx-auto">
-              {problems.map((problem, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
+              {problems.map((problem, i) => <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
                     <X className="w-4 h-4 text-destructive" />
                   </div>
                   <p className="text-foreground">{problem}</p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </section>
 
@@ -259,14 +261,12 @@ const LandingPage = () => {
             </div>
 
             <div className="space-y-4 max-w-2xl mx-auto">
-              {benefits.map((benefit, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
+              {benefits.map((benefit, i) => <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-primary/5 border border-primary/10">
                   <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
                     <Check className="w-4 h-4 text-primary" />
                   </div>
                   <p className="text-foreground font-medium">{benefit}</p>
-                </div>
-              ))}
+                </div>)}
             </div>
           </section>
 
@@ -277,18 +277,14 @@ const LandingPage = () => {
             </h2>
             
             <div className="grid sm:grid-cols-3 gap-6">
-              {steps.map((item, i) => (
-                <div key={i} className="relative p-6 rounded-2xl bg-card border border-border/50 text-center">
+              {steps.map((item, i) => <div key={i} className="relative p-6 rounded-2xl bg-card border border-border/50 text-center">
                   <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
                     {item.step}
                   </div>
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
                   <p className="text-muted-foreground text-sm">{item.desc}</p>
-                  {i < steps.length - 1 && (
-                    <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
-                  )}
-                </div>
-              ))}
+                  {i < steps.length - 1 && <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />}
+                </div>)}
             </div>
           </section>
 
@@ -354,11 +350,7 @@ const LandingPage = () => {
                 Get your first analysis free. See what you've been missing.
               </p>
 
-              <Button 
-                onClick={() => navigate("/auth")}
-                size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
-              >
+              <Button onClick={() => navigate("/auth")} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]">
                 Analyze My Ads Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
@@ -381,8 +373,6 @@ const LandingPage = () => {
           </div>
         </footer>
       </div>
-    </>
-  );
+    </>;
 };
-
 export default LandingPage;
