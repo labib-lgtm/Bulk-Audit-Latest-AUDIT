@@ -138,54 +138,46 @@ const Auth = () => {
       setIsLoading(false);
     }
   };
-  return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:60px_60px]" />
-      
-      {/* Glow Effects */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[150px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary/5 rounded-full blur-[120px]" />
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col items-center justify-center p-6 relative overflow-hidden">
+      {/* Subtle Glow Effect */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/8 rounded-full blur-[180px]" />
 
-      <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
-        <div className="flex items-center justify-center gap-4 mb-8">
-          
-          <div className="flex flex-col items-start">
-            <span className="text-3xl font-black tracking-tight text-foreground">LYNX</span>
-            
-          </div>
-        </div>
-
-        <div className="bg-card/50 border border-border rounded-2xl p-8 backdrop-blur-sm">
+      <div className="relative z-10 w-full max-w-sm">
+        <div className="bg-card/80 border border-border/50 rounded-3xl p-8 backdrop-blur-md shadow-2xl shadow-primary/5">
           {/* Logo at top of box */}
-          <div className="flex justify-center mb-6">
-            <img src={lynxLogoAuth} alt="Lynx Media" className="h-12 w-auto" />
+          <div className="flex justify-center mb-8">
+            <img src={lynxLogoAuth} alt="Lynx Media" className="h-14 w-auto" />
           </div>
           
-          <h1 className="text-2xl font-bold text-foreground text-center mb-2">
+          <h1 className="text-2xl font-bold text-foreground text-center mb-1">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
-          <p className="text-muted-foreground text-center mb-6">
+          <p className="text-sm text-muted-foreground text-center mb-8">
             {isLogin ? 'Sign in to access your dashboards' : 'Sign up to get started'}
           </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 Email
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input id="email" type="email" value={email} onChange={e => {
-                setEmail(e.target.value);
-                if (errors.email) setErrors(prev => ({
-                  ...prev,
-                  email: undefined
-                }));
-              }} placeholder="you@example.com" className={`w-full pl-10 pr-4 py-3 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${errors.email ? 'border-destructive' : 'border-border'}`} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input 
+                  id="email" 
+                  type="email" 
+                  value={email} 
+                  onChange={e => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors(prev => ({ ...prev, email: undefined }));
+                  }} 
+                  placeholder="you@example.com" 
+                  className={`w-full pl-11 pr-4 py-3.5 bg-muted/50 border rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm ${errors.email ? 'border-destructive' : 'border-border/50'}`} 
+                />
               </div>
-              {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email}</p>}
+              {errors.email && <p className="mt-1.5 text-xs text-destructive">{errors.email}</p>}
             </div>
 
             {/* Password Field */}
@@ -194,62 +186,82 @@ const Auth = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input id="password" type={showPassword ? 'text' : 'password'} value={password} onChange={e => {
-                setPassword(e.target.value);
-                if (errors.password) setErrors(prev => ({
-                  ...prev,
-                  password: undefined
-                }));
-              }} placeholder="••••••••" className={`w-full pl-10 pr-12 py-3 bg-input border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${errors.password ? 'border-destructive' : 'border-border'}`} />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input 
+                  id="password" 
+                  type={showPassword ? 'text' : 'password'} 
+                  value={password} 
+                  onChange={e => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors(prev => ({ ...prev, password: undefined }));
+                  }} 
+                  placeholder="••••••••" 
+                  className={`w-full pl-11 pr-12 py-3.5 bg-muted/50 border rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all text-sm ${errors.password ? 'border-destructive' : 'border-border/50'}`} 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowPassword(!showPassword)} 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password}</p>}
+              {errors.password && <p className="mt-1.5 text-xs text-destructive">{errors.password}</p>}
               
               {/* Password Requirements - Only show during signup */}
-              {!isLogin && password.length > 0 && <div className="mt-3 p-3 bg-muted/50 rounded-lg border border-border">
+              {!isLogin && password.length > 0 && (
+                <div className="mt-3 p-3 bg-muted/30 rounded-xl border border-border/30">
                   <p className="text-xs font-medium text-muted-foreground mb-2">Password requirements:</p>
-                  <div className="grid grid-cols-1 gap-1">
+                  <div className="grid grid-cols-1 gap-1.5">
                     {passwordRequirements.map((req, index) => {
-                  const isMet = req.regex.test(password);
-                  return <div key={index} className="flex items-center gap-2">
-                          {isMet ? <Check className="w-3.5 h-3.5 text-primary" /> : <X className="w-3.5 h-3.5 text-muted-foreground" />}
-                          <span className={`text-xs ${isMet ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      const isMet = req.regex.test(password);
+                      return (
+                        <div key={index} className="flex items-center gap-2">
+                          {isMet ? <Check className="w-3.5 h-3.5 text-primary" /> : <X className="w-3.5 h-3.5 text-muted-foreground/50" />}
+                          <span className={`text-xs ${isMet ? 'text-foreground' : 'text-muted-foreground/70'}`}>
                             {req.label}
                           </span>
-                        </div>;
-                })}
+                        </div>
+                      );
+                    })}
                   </div>
-                </div>}
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}
-            <button type="submit" disabled={isLoading} className="w-full py-3 px-4 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-[#cff028] text-black">
-              {isLoading ? <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
+            <button 
+              type="submit" 
+              disabled={isLoading} 
+              className="w-full py-3.5 px-4 font-semibold rounded-xl transition-all shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 bg-primary text-primary-foreground mt-2"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
                   {isLogin ? 'Signing in...' : 'Creating account...'}
-                </> : isLogin ? 'Sign In' : 'Create Account'}
+                </>
+              ) : (
+                isLogin ? 'Sign In' : 'Create Account'
+              )}
             </button>
           </form>
 
           {/* Toggle Login/Signup */}
-          <p className="mt-6 text-center text-muted-foreground">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-            <button onClick={() => {
-            setIsLogin(!isLogin);
-            setErrors({});
-          }} className="transition-colors font-bold text-[#cff028]">
+            <button 
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setErrors({});
+              }} 
+              className="transition-colors font-semibold text-primary hover:underline"
+            >
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
         </div>
-
-        <p className="text-xs text-muted-foreground text-center mt-6">
-          Your data is secure and encrypted.
-        </p>
       </div>
-    </div>;
+    </div>
+  );
 };
 export default Auth;
