@@ -1,5 +1,6 @@
 
 import React from 'react';
+import lynxLogoWhite from '@/assets/lynx-logo-white.png';
 import { 
   PieChart, 
   LayoutGrid, 
@@ -87,21 +88,8 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
         
         {/* Logo Area */}
         <div className="flex items-center justify-between h-20 px-6 border-b border-sidebar-border">
-          <div className="flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 w-10 h-10 rounded-xl bg-sidebar-primary blur-lg opacity-40" />
-              <div className="relative w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
-                <Shield className="w-5 h-5 fill-current text-sidebar-primary-foreground" strokeWidth={2.5} />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-lg font-heading font-bold tracking-tight text-sidebar-foreground leading-none">
-                LYNX
-              </span>
-              <span className="text-sm font-heading font-bold tracking-tight text-sidebar-primary leading-none">
-                MEDIA
-              </span>
-            </div>
+          <div className="flex items-center">
+            <img src={lynxLogoWhite} alt="Lynx Media" className="h-10 w-auto" />
           </div>
           <button 
             onClick={() => setIsMobileMenuOpen(false)} 
