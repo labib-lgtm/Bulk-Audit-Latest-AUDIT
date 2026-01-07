@@ -5,7 +5,6 @@ import { Mail, Lock, Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import lynxLogoAuth from '@/assets/lynx-logo-auth.png';
-
 const emailSchema = z.string().email('Please enter a valid email address');
 
 // Stronger password requirements
@@ -227,7 +226,7 @@ const Auth = () => {
             </div>
 
             {/* Submit Button */}
-            <button type="submit" disabled={isLoading} className="w-full py-3 px-4 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-primary-foreground font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-[#cff028]">
               {isLoading ? <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   {isLogin ? 'Signing in...' : 'Creating account...'}
@@ -241,7 +240,7 @@ const Auth = () => {
             <button onClick={() => {
             setIsLogin(!isLogin);
             setErrors({});
-          }} className="text-primary font-medium hover:text-primary/80 transition-colors">
+          }} className="transition-colors font-bold text-[#cff028]">
               {isLogin ? 'Sign up' : 'Sign in'}
             </button>
           </p>
