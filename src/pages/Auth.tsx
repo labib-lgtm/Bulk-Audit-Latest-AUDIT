@@ -4,6 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Mail, Lock, Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
 import { z } from 'zod';
 import { toast } from 'sonner';
+import lynxLogoAuth from '@/assets/lynx-logo-auth.png';
+
 const emailSchema = z.string().email('Please enter a valid email address');
 
 // Stronger password requirements
@@ -156,6 +158,11 @@ const Auth = () => {
         </div>
 
         <div className="bg-card/50 border border-border rounded-2xl p-8 backdrop-blur-sm">
+          {/* Logo at top of box */}
+          <div className="flex justify-center mb-6">
+            <img src={lynxLogoAuth} alt="Lynx Media" className="h-12 w-auto" />
+          </div>
+          
           <h1 className="text-2xl font-bold text-foreground text-center mb-2">
             {isLogin ? 'Welcome Back' : 'Create Account'}
           </h1>
