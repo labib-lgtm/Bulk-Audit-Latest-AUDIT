@@ -121,7 +121,7 @@ const LandingPage = () => {
         {/* Nav */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/10">
           <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <img src={lynxLogo} alt="Lynx Media" className="h-8 w-auto" />
+            <img alt="Lynx Media" src="/lovable-uploads/800abbfd-bcd1-4375-8093-7d5199c45706.png" className="h-8 w-auto object-contain" />
             <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
               Get Started Free
             </Button>
