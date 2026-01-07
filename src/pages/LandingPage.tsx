@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Helmet } from "react-helmet-async";
 import { ArrowRight, Check, X, Zap, Shield, Clock, TrendingUp } from "lucide-react";
+import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 
@@ -120,10 +121,7 @@ const LandingPage = () => {
         {/* Nav */}
         <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/10">
           <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <span className="text-2xl font-black">
-              <span className="text-primary">LYNX</span>
-              
-            </span>
+            <img src={lynxLogo} alt="Lynx Media" className="h-8 w-auto" />
             <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold">
               Get Started Free
             </Button>
