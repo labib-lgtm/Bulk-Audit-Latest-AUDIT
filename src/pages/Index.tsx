@@ -6,6 +6,7 @@ import { processBulkFile, processBusinessReport } from '../services/dataProcesso
 import { generateMockData } from '../services/mockData';
 import { DashboardData, AppSettings, ProductGoal } from '../types';
 import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle } from 'lucide-react';
+import lynxLogoWhite from '@/assets/lynx-logo-white.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 const EMPTY_DATA: DashboardData = {
@@ -158,17 +159,8 @@ const Index = () => {
 
         <div className="relative z-10 max-w-2xl w-full text-center">
           {/* Logo */}
-          <div className="flex items-center justify-center gap-4 mb-10 animate-fade-in">
-            <div className="relative">
-              <div className="absolute inset-0 w-16 h-16 rounded-2xl bg-primary blur-xl opacity-50" />
-              <div className="relative w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-2xl">
-                
-              </div>
-            </div>
-            <div className="flex flex-col items-start">
-              
-              
-            </div>
+          <div className="flex items-center justify-center mb-10 animate-fade-in">
+            <img src={lynxLogoWhite} alt="Lynx Media" className="h-16 w-auto" />
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground mb-3 animate-fade-in" style={{
