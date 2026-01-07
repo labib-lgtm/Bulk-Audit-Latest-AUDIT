@@ -220,12 +220,7 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           >
             <Menu size={22} />
           </button>
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-              <Shield className="w-4 h-4 text-primary-foreground fill-current" />
-            </div>
-            <span className="font-heading font-bold text-foreground">LYNX MEDIA</span>
-          </div>
+          <img src={lynxLogoWhite} alt="Lynx Media" className="h-8 w-auto" />
           <div className="w-10" />
         </div>
 
