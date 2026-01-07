@@ -226,7 +226,7 @@ const Auth = () => {
             </div>
 
             {/* Submit Button */}
-            <button type="submit" disabled={isLoading} className="w-full py-3 px-4 text-primary-foreground font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-[#cff028]">
+            <button type="submit" disabled={isLoading} className="w-full py-3 px-4 font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,255,0,0.2)] hover:shadow-[0_0_30px_rgba(178,255,0,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 bg-[#cff028] text-black">
               {isLoading ? <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   {isLogin ? 'Signing in...' : 'Creating account...'}
