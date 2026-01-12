@@ -56,19 +56,27 @@ const Index = () => {
 
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>, type: 'bulk' | 'business') => {
     const file = event.target.files?.[0];
-    if (!file) return;
+    console.log('File upload triggered:', type, file?.name);
+    if (!file) {
+      console.log('No file selected');
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
       if (type === 'bulk') {
+        console.log('Processing bulk file...');
         const parsed = await processBulkFile(file);
+        console.log('Bulk file parsed successfully');
         setPendingData(prev => ({
           ...prev,
           ...parsed
         }));
         setBulkFileUploaded(true);
       } else {
+        console.log('Processing business report...');
         const businessReport = await processBusinessReport(file);
+        console.log('Business report parsed successfully');
         setPendingData(prev => ({
           ...prev,
           businessReport
@@ -80,6 +88,8 @@ const Index = () => {
       setError('Failed to parse file. Please ensure it is a valid Amazon Bulk Operations or Business Report file.');
     } finally {
       setIsLoading(false);
+      // Reset input value so same file can be selected again
+      event.target.value = '';
     }
   }, []);
 
