@@ -222,19 +222,25 @@ const Index = () => {
         }}>
             {/* Bulk Ops Upload */}
             <div className="relative">
-              <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${bulkFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
-                <input type="file" accept=".xlsx,.xls" onChange={e => handleFileUpload(e, 'bulk')} className="hidden" disabled={isLoading} />
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${bulkFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+              <label className={`group flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${bulkFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+                <input 
+                  type="file" 
+                  accept=".xlsx,.xls" 
+                  onChange={e => handleFileUpload(e, 'bulk')} 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                  disabled={isLoading} 
+                />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 pointer-events-none ${bulkFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
                   <Upload className={`w-7 h-7 transition-colors ${bulkFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
                 </div>
-                <span className="font-heading font-bold text-foreground">Bulk Operations File</span>
-                <span className="text-sm text-muted-foreground mt-1">Campaigns, Targets, Keywords</span>
-                {bulkFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
+                <span className="font-heading font-bold text-foreground pointer-events-none">Bulk Operations File</span>
+                <span className="text-sm text-muted-foreground mt-1 pointer-events-none">Campaigns, Targets, Keywords</span>
+                {bulkFileUploaded && <span className="text-xs text-primary mt-2 font-medium pointer-events-none">✓ Uploaded</span>}
               </label>
               {bulkFileUploaded && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleRemoveFile('bulk'); }}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all"
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all z-20"
                   title="Remove file"
                 >
                   <X size={14} />
@@ -244,19 +250,25 @@ const Index = () => {
 
             {/* Business Report Upload */}
             <div className="relative">
-              <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${businessFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
-                <input type="file" accept=".xlsx,.xls,.csv" onChange={e => handleFileUpload(e, 'business')} className="hidden" disabled={isLoading} />
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${businessFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+              <label className={`group flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${businessFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+                <input 
+                  type="file" 
+                  accept=".xlsx,.xls,.csv" 
+                  onChange={e => handleFileUpload(e, 'business')} 
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                  disabled={isLoading} 
+                />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 pointer-events-none ${businessFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
                   <FileSpreadsheet className={`w-7 h-7 transition-colors ${businessFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
                 </div>
-                <span className="font-heading font-bold text-foreground">Business Report</span>
-                <span className="text-sm text-muted-foreground mt-1">By Child ASIN (Optional)</span>
-                {businessFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
+                <span className="font-heading font-bold text-foreground pointer-events-none">Business Report</span>
+                <span className="text-sm text-muted-foreground mt-1 pointer-events-none">By Child ASIN (Optional)</span>
+                {businessFileUploaded && <span className="text-xs text-primary mt-2 font-medium pointer-events-none">✓ Uploaded</span>}
               </label>
               {businessFileUploaded && (
                 <button
                   onClick={(e) => { e.stopPropagation(); handleRemoveFile('business'); }}
-                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all"
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all z-20"
                   title="Remove file"
                 >
                   <X size={14} />
