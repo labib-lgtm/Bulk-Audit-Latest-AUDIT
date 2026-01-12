@@ -18,7 +18,8 @@ import {
   Package,
   LogOut,
   Users,
-  Crown
+  Crown,
+  Upload
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -28,6 +29,7 @@ interface LayoutProps {
   currentView: string;
   setCurrentView: (view: string) => void;
   children: React.ReactNode;
+  onReupload?: () => void;
 }
 
 const NAV_ITEMS = [
@@ -47,7 +49,7 @@ const ADMIN_NAV_ITEMS = [
   { id: 'team', label: 'Team Management', icon: Users },
 ];
 
-export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children }) => {
+export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children, onReupload }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const { user, signOut } = useAuth();
   const { isAdmin, role, hasAccess, isLoading } = useUserRole();
@@ -175,6 +177,19 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           )}
         </nav>
         
+        {/* Re-upload Button */}
+        {onReupload && (
+          <div className="px-3 pb-3">
+            <button
+              onClick={onReupload}
+              className="flex items-center justify-center gap-2 w-full px-4 py-2.5 text-sm font-medium rounded-xl border border-sidebar-border text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all"
+            >
+              <Upload size={16} />
+              Upload New Data
+            </button>
+          </div>
+        )}
+
         {/* User / Footer */}
         <div className="p-3 border-t border-sidebar-border">
           <div className="flex items-center gap-3 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border/50">

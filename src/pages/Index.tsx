@@ -5,7 +5,7 @@ import { TeamManagement } from '../views/TeamManagement';
 import { processBulkFile, processBusinessReport } from '../services/dataProcessor';
 import { generateMockData } from '../services/mockData';
 import { DashboardData, AppSettings, ProductGoal } from '../types';
-import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle } from 'lucide-react';
+import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle, X } from 'lucide-react';
 import lynxLogoWhite from '@/assets/lynx-logo-white.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -91,6 +91,26 @@ const Index = () => {
       });
     }
   }, [bulkFileUploaded, pendingData]);
+
+  const handleRemoveFile = useCallback((type: 'bulk' | 'business') => {
+    if (type === 'bulk') {
+      const { businessReport, ...rest } = pendingData;
+      // Remove all bulk data, keep business report if exists
+      setPendingData(businessReport ? { businessReport } : {});
+      setBulkFileUploaded(false);
+    } else {
+      const { businessReport, ...rest } = pendingData;
+      setPendingData(rest);
+      setBusinessFileUploaded(false);
+    }
+  }, [pendingData]);
+
+  const handleReupload = useCallback(() => {
+    setDashboardData(null);
+    setPendingData({});
+    setBulkFileUploaded(false);
+    setBusinessFileUploaded(false);
+  }, []);
   const handleLoadDemo = useCallback(() => {
     setIsLoading(true);
     setTimeout(() => {
@@ -191,26 +211,48 @@ const Index = () => {
           animationDelay: '0.3s'
         }}>
             {/* Bulk Ops Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${bulkFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
-              <input type="file" accept=".xlsx,.xls" onChange={e => handleFileUpload(e, 'bulk')} className="hidden" disabled={isLoading} />
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${bulkFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
-                <Upload className={`w-7 h-7 transition-colors ${bulkFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
-              </div>
-              <span className="font-heading font-bold text-foreground">Bulk Operations File</span>
-              <span className="text-sm text-muted-foreground mt-1">Campaigns, Targets, Keywords</span>
-              {bulkFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
-            </label>
+            <div className="relative">
+              <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${bulkFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+                <input type="file" accept=".xlsx,.xls" onChange={e => handleFileUpload(e, 'bulk')} className="hidden" disabled={isLoading} />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${bulkFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+                  <Upload className={`w-7 h-7 transition-colors ${bulkFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
+                </div>
+                <span className="font-heading font-bold text-foreground">Bulk Operations File</span>
+                <span className="text-sm text-muted-foreground mt-1">Campaigns, Targets, Keywords</span>
+                {bulkFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
+              </label>
+              {bulkFileUploaded && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleRemoveFile('bulk'); }}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all"
+                  title="Remove file"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
 
             {/* Business Report Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${businessFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
-              <input type="file" accept=".xlsx,.xls,.csv" onChange={e => handleFileUpload(e, 'business')} className="hidden" disabled={isLoading} />
-              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${businessFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
-                <FileSpreadsheet className={`w-7 h-7 transition-colors ${businessFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
-              </div>
-              <span className="font-heading font-bold text-foreground">Business Report</span>
-              <span className="text-sm text-muted-foreground mt-1">By Child ASIN (Optional)</span>
-              {businessFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
-            </label>
+            <div className="relative">
+              <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${businessFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+                <input type="file" accept=".xlsx,.xls,.csv" onChange={e => handleFileUpload(e, 'business')} className="hidden" disabled={isLoading} />
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${businessFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+                  <FileSpreadsheet className={`w-7 h-7 transition-colors ${businessFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
+                </div>
+                <span className="font-heading font-bold text-foreground">Business Report</span>
+                <span className="text-sm text-muted-foreground mt-1">By Child ASIN (Optional)</span>
+                {businessFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
+              </label>
+              {businessFileUploaded && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleRemoveFile('business'); }}
+                  className="absolute top-2 right-2 w-7 h-7 rounded-full bg-destructive/20 hover:bg-destructive/40 flex items-center justify-center text-destructive transition-all"
+                  title="Remove file"
+                >
+                  <X size={14} />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Proceed Button - shows when bulk file is uploaded */}
@@ -253,7 +295,7 @@ const Index = () => {
         </div>
       </div>;
   }
-  return <Layout currentView={currentView} setCurrentView={setCurrentView}>
+  return <Layout currentView={currentView} setCurrentView={setCurrentView} onReupload={handleReupload}>
       {renderView()}
     </Layout>;
 };
