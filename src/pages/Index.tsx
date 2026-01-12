@@ -45,11 +45,15 @@ const Index = () => {
     isLoading: roleLoading
   } = useUserRole();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [pendingData, setPendingData] = useState<Partial<DashboardData>>({});
+  const [bulkFileUploaded, setBulkFileUploaded] = useState(false);
+  const [businessFileUploaded, setBusinessFileUploaded] = useState(false);
   const [currentView, setCurrentView] = useState('executive');
   const [settings, setSettings] = useState<AppSettings>(DEFAULT_SETTINGS);
   const [productGoals, setProductGoals] = useState<Record<string, ProductGoal>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const handleFileUpload = useCallback(async (event: React.ChangeEvent<HTMLInputElement>, type: 'bulk' | 'business') => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -58,22 +62,18 @@ const Index = () => {
     try {
       if (type === 'bulk') {
         const parsed = await processBulkFile(file);
-        setDashboardData(prev => {
-          const base = prev || EMPTY_DATA;
-          return {
-            ...base,
-            ...parsed
-          };
-        });
+        setPendingData(prev => ({
+          ...prev,
+          ...parsed
+        }));
+        setBulkFileUploaded(true);
       } else {
         const businessReport = await processBusinessReport(file);
-        setDashboardData(prev => {
-          const base = prev || EMPTY_DATA;
-          return {
-            ...base,
-            businessReport
-          };
-        });
+        setPendingData(prev => ({
+          ...prev,
+          businessReport
+        }));
+        setBusinessFileUploaded(true);
       }
     } catch (err) {
       console.error('Error parsing file:', err);
@@ -82,6 +82,15 @@ const Index = () => {
       setIsLoading(false);
     }
   }, []);
+
+  const handleProceedToDashboard = useCallback(() => {
+    if (bulkFileUploaded) {
+      setDashboardData({
+        ...EMPTY_DATA,
+        ...pendingData
+      });
+    }
+  }, [bulkFileUploaded, pendingData]);
   const handleLoadDemo = useCallback(() => {
     setIsLoading(true);
     setTimeout(() => {
@@ -182,25 +191,45 @@ const Index = () => {
           animationDelay: '0.3s'
         }}>
             {/* Bulk Ops Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${bulkFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
               <input type="file" accept=".xlsx,.xls" onChange={e => handleFileUpload(e, 'bulk')} className="hidden" disabled={isLoading} />
-              <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
-                <Upload className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${bulkFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+                <Upload className={`w-7 h-7 transition-colors ${bulkFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
               </div>
               <span className="font-heading font-bold text-foreground">Bulk Operations File</span>
               <span className="text-sm text-muted-foreground mt-1">Campaigns, Targets, Keywords</span>
+              {bulkFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
             </label>
 
             {/* Business Report Upload */}
-            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
+            <label className={`group relative flex flex-col items-center justify-center p-8 rounded-2xl border-2 border-dashed cursor-pointer transition-all duration-300 ${businessFileUploaded ? 'border-primary bg-primary/10' : isLoading ? 'opacity-50 cursor-wait' : 'border-border hover:border-primary hover:bg-primary/5 hover:shadow-[0_0_60px_-15px_hsl(var(--primary)/0.3)]'}`}>
               <input type="file" accept=".xlsx,.xls,.csv" onChange={e => handleFileUpload(e, 'business')} className="hidden" disabled={isLoading} />
-              <div className="w-14 h-14 rounded-2xl bg-muted flex items-center justify-center mb-4 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
-                <FileSpreadsheet className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300 ${businessFileUploaded ? 'bg-primary/20 scale-110' : 'bg-muted group-hover:bg-primary/10 group-hover:scale-110'}`}>
+                <FileSpreadsheet className={`w-7 h-7 transition-colors ${businessFileUploaded ? 'text-primary' : 'text-muted-foreground group-hover:text-primary'}`} />
               </div>
               <span className="font-heading font-bold text-foreground">Business Report</span>
               <span className="text-sm text-muted-foreground mt-1">By Child ASIN (Optional)</span>
+              {businessFileUploaded && <span className="text-xs text-primary mt-2 font-medium">✓ Uploaded</span>}
             </label>
           </div>
+
+          {/* Proceed Button - shows when bulk file is uploaded */}
+          {bulkFileUploaded && (
+            <div className="mb-8 animate-fade-in">
+              <button 
+                onClick={handleProceedToDashboard} 
+                disabled={isLoading} 
+                className="flex items-center justify-center gap-3 w-full px-8 py-5 bg-primary text-primary-foreground font-heading font-bold text-lg rounded-2xl btn-glow transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+              >
+                <Zap size={20} /> {businessFileUploaded ? 'View Dashboard' : 'Continue with Bulk File Only'}
+              </button>
+              {!businessFileUploaded && (
+                <p className="text-xs text-muted-foreground mt-3">
+                  You can also add the Business Report for enhanced analytics
+                </p>
+              )}
+            </div>
+          )}
 
           <div className="flex items-center gap-4 mb-8 animate-fade-in" style={{
           animationDelay: '0.4s'
