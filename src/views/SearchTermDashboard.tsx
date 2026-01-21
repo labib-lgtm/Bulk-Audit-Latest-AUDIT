@@ -410,14 +410,14 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             </div>
                         </div>
                         <DataTable data={ngramData} columns={[
-                            { key: 'gram', header: 'N-Gram Phrase', render: r => <span className="font-bold text-foreground bg-muted px-2 py-1 rounded-md">{r.gram}</span>, sortable: true },
-                            { key: 'count', header: 'Frequency', align: 'right', sortable: true, render: r => formatInt(r.count) },
-                            { key: 'spend', header: 'Spend', align: 'right', sortable: true, render: r => formatCurrency(r.spend) },
-                            { key: 'sales', header: 'Sales', align: 'right', sortable: true, render: r => formatCurrency(r.sales) },
-                            { key: 'acos', header: 'ACOS', align: 'right', sortable: true, render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span> },
-                            { key: 'orders', header: 'Orders', align: 'right', sortable: true },
-                            { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc) },
-                            { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
+                            { key: 'gram', header: 'N-Gram Phrase', render: (r: any) => <span className="font-bold text-foreground bg-muted px-2 py-1 rounded-md">{r.gram}</span>, sortable: true },
+                            { key: 'count', header: 'Frequency', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.count) },
+                            { key: 'spend', header: 'Spend', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.spend) },
+                            { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
+                            { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.acos > 0.4 ? 'text-rose-500 font-bold' : ''}>{formatPct(r.acos)}</span> },
+                            { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
+                            { key: 'cpc', header: 'CPC', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.cpc) },
+                            { key: 'cvr', header: 'CVR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.cvr) },
                         ]} initialSortKey="spend" fileName="Lynx_NGrams" />
                     </div>
                 )}
