@@ -449,22 +449,22 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                              <div className="space-y-8">
                                  {/* Summary Cards */}
                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                     <div className="p-6 rounded-2xl border bg-indigo-50 border-indigo-200">
-                                         <h4 className="text-lg font-heading font-bold mb-4 text-indigo-900">Branded Overview</h4>
+                                     <div className="p-6 rounded-2xl border bg-indigo-950/50 border-indigo-800/50">
+                                         <h4 className="text-lg font-heading font-bold mb-4 text-indigo-400">Branded Overview</h4>
                                          <div className="grid grid-cols-2 gap-y-4">
-                                             <div><p className="text-xs uppercase font-bold opacity-60">Spend</p><p className="text-2xl font-bold">{formatCompactCurrency(brandData.branded.spend)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">Sales</p><p className="text-2xl font-bold">{formatCompactCurrency(brandData.branded.sales)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">ROAS</p><p className="text-2xl font-bold">{formatNum(brandData.branded.roas)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">ACOS</p><p className="text-2xl font-bold">{formatPct(brandData.branded.acos)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-indigo-400/60">Spend</p><p className="text-2xl font-bold text-foreground">{formatCompactCurrency(brandData.branded.spend)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-indigo-400/60">Sales</p><p className="text-2xl font-bold text-foreground">{formatCompactCurrency(brandData.branded.sales)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-indigo-400/60">ROAS</p><p className="text-2xl font-bold text-foreground">{formatNum(brandData.branded.roas)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-indigo-400/60">ACOS</p><p className="text-2xl font-bold text-foreground">{formatPct(brandData.branded.acos)}</p></div>
                                          </div>
                                      </div>
-                                     <div className="p-6 rounded-2xl border bg-emerald-50 border-emerald-200">
-                                         <h4 className="text-lg font-heading font-bold mb-4 text-emerald-900">Non-Branded Overview</h4>
+                                     <div className="p-6 rounded-2xl border bg-emerald-950/50 border-emerald-800/50">
+                                         <h4 className="text-lg font-heading font-bold mb-4 text-emerald-400">Non-Branded Overview</h4>
                                          <div className="grid grid-cols-2 gap-y-4">
-                                             <div><p className="text-xs uppercase font-bold opacity-60">Spend</p><p className="text-2xl font-bold">{formatCompactCurrency(brandData.nonBranded.spend)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">Sales</p><p className="text-2xl font-bold">{formatCompactCurrency(brandData.nonBranded.sales)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">ROAS</p><p className="text-2xl font-bold">{formatNum(brandData.nonBranded.roas)}</p></div>
-                                             <div><p className="text-xs uppercase font-bold opacity-60">ACOS</p><p className="text-2xl font-bold">{formatPct(brandData.nonBranded.acos)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-emerald-400/60">Spend</p><p className="text-2xl font-bold text-foreground">{formatCompactCurrency(brandData.nonBranded.spend)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-emerald-400/60">Sales</p><p className="text-2xl font-bold text-foreground">{formatCompactCurrency(brandData.nonBranded.sales)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-emerald-400/60">ROAS</p><p className="text-2xl font-bold text-foreground">{formatNum(brandData.nonBranded.roas)}</p></div>
+                                             <div><p className="text-xs uppercase font-bold text-emerald-400/60">ACOS</p><p className="text-2xl font-bold text-foreground">{formatPct(brandData.nonBranded.acos)}</p></div>
                                          </div>
                                      </div>
                                  </div>
