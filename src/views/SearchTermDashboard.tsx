@@ -386,9 +386,14 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             { key: 'term', header: 'High Performing Search Term', render: (r: any) => <span className="font-bold text-foreground">{r.term}</span>, sortable: true },
                             { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
                             { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
+                            { key: 'spend', header: 'Spend', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.spend) },
                             { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-emerald-500">{formatPct(r.acos)}</span> },
+                            { key: 'roas', header: 'ROAS', align: 'right' as const, sortable: true, render: (r: any) => formatNum(r.roas) },
                             { key: 'cvr', header: 'CVR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.cvr) },
                             { key: 'clicks', header: 'Clicks', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.clicks) },
+                            { key: 'impressions', header: 'Impressions', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.impressions) },
+                            { key: 'ctr', header: 'CTR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.ctr) },
+                            { key: 'cpc', header: 'CPC', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.cpc) },
                         ]} initialSortKey="orders" fileName="Lynx_Harvesting_Candidates" />
                     </div>
                 )}
