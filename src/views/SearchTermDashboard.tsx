@@ -369,14 +369,14 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                 {/* 1.5 HARVESTING TAB */}
                 {currentTab === 'harvesting' && (
                     <div className="space-y-6">
-                        <div className="bg-emerald-50 border border-emerald-200 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="bg-emerald-950/50 border border-emerald-800/50 p-6 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div>
-                                <h3 className="text-emerald-900 font-bold text-lg mb-2 flex items-center gap-2">
+                                <h3 className="text-emerald-400 font-bold text-lg mb-2 flex items-center gap-2">
                                     <Sprout className="w-5 h-5" />
                                     Search Term Harvesting
                                 </h3>
-                                <p className="text-emerald-800 text-sm mb-4 sm:mb-0">
-                                    The following search terms have generated <strong>2+ orders</strong> with healthy ACOS but are <strong>not</strong> targeted as Exact Match yet. 
+                                <p className="text-emerald-300/80 text-sm mb-4 sm:mb-0">
+                                    The following search terms have generated <strong className="text-emerald-400">2+ orders</strong> with healthy ACOS but are <strong className="text-emerald-400">not</strong> targeted as Exact Match yet. 
                                     Create new Manual Exact targets for these to scale performance.
                                 </p>
                             </div>
@@ -386,7 +386,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             { key: 'term', header: 'High Performing Search Term', render: (r: any) => <span className="font-bold text-foreground">{r.term}</span>, sortable: true },
                             { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
                             { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
-                            { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-emerald-600">{formatPct(r.acos)}</span> },
+                            { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className="font-bold text-emerald-500">{formatPct(r.acos)}</span> },
                             { key: 'cvr', header: 'CVR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.cvr) },
                             { key: 'clicks', header: 'Clicks', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.clicks) },
                         ]} initialSortKey="orders" fileName="Lynx_Harvesting_Candidates" />
