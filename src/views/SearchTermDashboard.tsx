@@ -396,6 +396,10 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             { key: 'impressions', header: 'Impressions', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.impressions) },
                             { key: 'ctr', header: 'CTR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.ctr) },
                             { key: 'cpc', header: 'CPC', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.cpc) },
+                            { key: 'isExact', header: 'EXACT', align: 'center' as const, render: (r: any) => r.isExact ? <CheckIcon /> : <CrossIcon /> },
+                            { key: 'isPhrase', header: 'PHRASE', align: 'center' as const, render: (r: any) => r.isPhrase ? <CheckIcon /> : <CrossIcon /> },
+                            { key: 'isBroad', header: 'BROAD', align: 'center' as const, render: (r: any) => r.isBroad ? <CheckIcon /> : <CrossIcon /> },
+                            { key: 'isAuto', header: 'AUTO/PAT', align: 'center' as const, render: (r: any) => r.isAuto ? <CheckIcon /> : <CrossIcon /> },
                         ]} initialSortKey="orders" fileName="Lynx_Harvesting_Candidates" />
                     </div>
                 )}
