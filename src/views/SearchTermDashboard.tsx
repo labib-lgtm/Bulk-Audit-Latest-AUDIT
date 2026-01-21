@@ -94,7 +94,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
         const map = new Map<string, any>();
         
         aggregatedTerms.forEach(term => {
-             const words = term.term.toLowerCase().split(/\s+/).map(s => s.replace(/[^a-z0-9]/g, ''));
+             const words = term.term.toLowerCase().split(/\s+/).map((s: string) => s.replace(/[^a-z0-9]/g, ''));
              if (words.length < ngramSize) return;
 
              const grams = new Set<string>();
@@ -105,7 +105,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
              grams.forEach(gram => {
                  if (!gram) return;
                  if (!map.has(gram)) {
-                     map.set(gram, { gram, count: 0, spend: 0, sales: 0, orders: 0, clicks: 0 });
+                     map.set(gram, { gram, count: 0, spend: 0, sales: 0, orders: 0, clicks: 0, impressions: 0 });
                  }
                  const entry = map.get(gram);
                  entry.count += 1;
@@ -113,6 +113,7 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                  entry.sales += term.sales;
                  entry.orders += term.orders;
                  entry.clicks += term.clicks;
+                 entry.impressions += term.impressions;
              });
         });
 
@@ -121,7 +122,8 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
             acos: safeDiv(x.spend, x.sales),
             roas: safeDiv(x.sales, x.spend),
             cpc: safeDiv(x.spend, x.clicks),
-            cvr: safeDiv(x.orders, x.clicks)
+            cvr: safeDiv(x.orders, x.clicks),
+            ctr: safeDiv(x.clicks, x.impressions)
         })).sort((a, b) => b.spend - a.spend);
     }, [aggregatedTerms, ngramSize]);
 
@@ -415,9 +417,13 @@ export const SearchTermDashboard: React.FC<{ data: DashboardData, targetType: 'S
                             { key: 'spend', header: 'Spend', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.spend) },
                             { key: 'sales', header: 'Sales', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.sales) },
                             { key: 'acos', header: 'ACOS', align: 'right' as const, sortable: true, render: (r: any) => <span className={r.acos > 0.4 ? 'text-rose-500 font-bold' : ''}>{formatPct(r.acos)}</span> },
+                            { key: 'roas', header: 'ROAS', align: 'right' as const, sortable: true, render: (r: any) => formatNum(r.roas) },
                             { key: 'orders', header: 'Orders', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.orders) },
+                            { key: 'clicks', header: 'Clicks', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.clicks) },
+                            { key: 'impressions', header: 'Impressions', align: 'right' as const, sortable: true, render: (r: any) => formatInt(r.impressions) },
                             { key: 'cpc', header: 'CPC', align: 'right' as const, sortable: true, render: (r: any) => formatCurrency(r.cpc) },
                             { key: 'cvr', header: 'CVR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.cvr) },
+                            { key: 'ctr', header: 'CTR', align: 'right' as const, sortable: true, render: (r: any) => formatPct(r.ctr) },
                         ]} initialSortKey="spend" fileName="Lynx_NGrams" />
                     </div>
                 )}
