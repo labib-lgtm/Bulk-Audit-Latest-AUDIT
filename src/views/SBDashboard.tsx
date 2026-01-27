@@ -184,17 +184,20 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
 
   const formatCompactNum = (val: number) => new Intl.NumberFormat('en-US', { notation: "compact", maximumFractionDigits: 1 }).format(val);
   
-  const metrics = [
+  const metricsRow1 = [
     { title: 'Spend', value: formatCurrency(stats.spend), typeLabel: 'TOTAL' as const },
-    { title: 'Sales', value: formatCurrency(stats.sales), typeLabel: 'TOTAL' as const },
-    { title: 'ROAS', value: formatNum(safeDiv(stats.sales, stats.spend)), typeLabel: 'AVERAGE' as const },
-    { title: 'ACoS', value: formatPct(safeDiv(stats.spend, stats.sales)), typeLabel: 'AVERAGE' as const },
-    { title: 'Orders', value: formatInt(stats.orders), typeLabel: 'TOTAL' as const },
     { title: 'Impressions', value: formatCompactNum(stats.impressions), typeLabel: 'TOTAL' as const },
     { title: 'Clicks', value: formatInt(stats.clicks), typeLabel: 'TOTAL' as const },
-    { title: 'CTR', value: formatPct(safeDiv(stats.clicks, stats.impressions)), typeLabel: 'AVERAGE' as const },
-    { title: 'CPC', value: formatCurrency(safeDiv(stats.spend, stats.clicks)), typeLabel: 'AVERAGE' as const },
-    { title: 'CVR', value: formatPct(safeDiv(stats.orders, stats.clicks)), typeLabel: 'AVERAGE' as const },
+    { title: 'Cost-Per-Click (CPC)', value: formatCurrency(safeDiv(stats.spend, stats.clicks)), typeLabel: 'AVERAGE' as const },
+    { title: 'Clickthrough Rate (CTR)', value: formatPct(safeDiv(stats.clicks, stats.impressions)), typeLabel: 'AVERAGE' as const },
+  ];
+
+  const metricsRow2 = [
+    { title: 'Sales', value: formatCurrency(stats.sales), typeLabel: 'TOTAL' as const },
+    { title: 'Orders', value: formatInt(stats.orders), typeLabel: 'TOTAL' as const },
+    { title: 'Advertising Cost of Sales (ACoS)', value: formatPct(safeDiv(stats.spend, stats.sales)), typeLabel: 'AVERAGE' as const },
+    { title: 'Return on Ad Spend (ROAS)', value: formatNum(safeDiv(stats.sales, stats.spend)), typeLabel: 'AVERAGE' as const },
+    { title: 'Conversion Rate (CVR)', value: formatPct(safeDiv(stats.orders, stats.clicks)), typeLabel: 'AVERAGE' as const },
   ];
 
   return (
@@ -215,11 +218,18 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
            </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3 sm:gap-4">
-           {metrics.map((m) => (
-             <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
-           ))}
-       </div>
+        <div className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            {metricsRow1.map((m) => (
+              <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+            ))}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            {metricsRow2.map((m) => (
+              <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+            ))}
+          </div>
+        </div>
        
         <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
            <button onClick={() => setView('campaigns')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'campaigns' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><LayoutGrid size={16} /> Campaign Summary</button>
