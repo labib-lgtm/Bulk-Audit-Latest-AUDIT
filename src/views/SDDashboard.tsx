@@ -114,12 +114,17 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
             </div>
         </div>
 
-         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+         <div className="grid grid-cols-2 sm:grid-cols-5 lg:grid-cols-10 gap-3 sm:gap-4">
              <MetricCard title="Spend" value={formatCurrency(stats.spend)} typeLabel="TOTAL" />
              <MetricCard title="Sales" value={formatCurrency(stats.sales)} typeLabel="TOTAL" />
              <MetricCard title="ROAS" value={formatNum(safeDiv(stats.sales, stats.spend))} typeLabel="AVERAGE" />
+             <MetricCard title="ACoS" value={formatPct(safeDiv(stats.spend, stats.sales))} typeLabel="AVERAGE" />
              <MetricCard title="Orders" value={formatInt(stats.orders)} typeLabel="TOTAL" />
+             <MetricCard title="Impressions" value={formatCompactNum(stats.impressions)} typeLabel="TOTAL" />
+             <MetricCard title="Clicks" value={formatInt(stats.clicks)} typeLabel="TOTAL" />
              <MetricCard title="CTR" value={formatPct(safeDiv(stats.clicks, stats.impressions))} typeLabel="AVERAGE" />
+             <MetricCard title="CPC" value={formatCurrency(safeDiv(stats.spend, stats.clicks))} typeLabel="AVERAGE" />
+             <MetricCard title="CVR" value={formatPct(safeDiv(stats.orders, stats.clicks))} typeLabel="AVERAGE" />
          </div>
 
          <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
