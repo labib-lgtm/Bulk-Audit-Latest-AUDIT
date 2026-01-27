@@ -40,8 +40,13 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       acc.impressions += c.impressions;
       acc.clicks += c.clicks;
       acc.orders += c.orders;
+      acc.units += c.units;
+      acc.viewableImpressions += c.viewableImpressions;
+      acc.viewSales += c.viewSales;
+      acc.viewOrders += c.viewOrders;
+      acc.viewUnits += c.viewUnits;
       return acc;
-    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0 });
+    }, { spend: 0, sales: 0, orders: 0, units: 0, impressions: 0, clicks: 0, viewableImpressions: 0, viewSales: 0, viewOrders: 0, viewUnits: 0 });
   }, [data.sdCampaigns]);
 
    const campaigns = useMemo(() => filteredCampaigns.map(c => ({
@@ -125,9 +130,20 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
              <MetricCard title="Sales" value={formatCurrency(stats.sales)} typeLabel="TOTAL" />
              <MetricCard title="Orders" value={formatInt(stats.orders)} typeLabel="TOTAL" />
+             <MetricCard title="Units" value={formatInt(stats.units)} typeLabel="TOTAL" />
              <MetricCard title="Advertising Cost of Sales (ACoS)" value={formatPct(safeDiv(stats.spend, stats.sales))} typeLabel="AVERAGE" />
              <MetricCard title="Return on Ad Spend (ROAS)" value={formatNum(safeDiv(stats.sales, stats.spend))} typeLabel="AVERAGE" />
+           </div>
+           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
              <MetricCard title="Conversion Rate (CVR)" value={formatPct(safeDiv(stats.orders, stats.clicks))} typeLabel="AVERAGE" />
+             <MetricCard title="Avg Order Value (AOV)" value={formatCurrency(safeDiv(stats.sales, stats.orders))} typeLabel="AVERAGE" />
+             <MetricCard title="Cost Per Order (CPO)" value={formatCurrency(safeDiv(stats.spend, stats.orders))} typeLabel="AVERAGE" />
+             <MetricCard title="Viewable Impressions" value={formatCompactNum(stats.viewableImpressions)} typeLabel="TOTAL" />
+             <MetricCard title="View-through Sales" value={formatCurrency(stats.viewSales)} typeLabel="TOTAL" />
+           </div>
+           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+             <MetricCard title="View-through Orders" value={formatInt(stats.viewOrders)} typeLabel="TOTAL" />
+             <MetricCard title="View-through Units" value={formatInt(stats.viewUnits)} typeLabel="TOTAL" />
            </div>
          </div>
 

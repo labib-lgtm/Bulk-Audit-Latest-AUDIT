@@ -57,10 +57,11 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       acc.spend += c.spend;
       acc.sales += c.sales;
       acc.orders += c.orders;
+      acc.units += c.units;
       acc.impressions += c.impressions;
       acc.clicks += c.clicks;
       return acc;
-    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0 });
+    }, { spend: 0, sales: 0, orders: 0, units: 0, impressions: 0, clicks: 0 });
   }, [data.sbCampaigns]);
 
   const campaignTableData = useMemo(() => filteredCampaigns.map(c => ({
@@ -195,9 +196,15 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
   const metricsRow2 = [
     { title: 'Sales', value: formatCurrency(stats.sales), typeLabel: 'TOTAL' as const },
     { title: 'Orders', value: formatInt(stats.orders), typeLabel: 'TOTAL' as const },
+    { title: 'Units', value: formatInt(stats.units), typeLabel: 'TOTAL' as const },
     { title: 'Advertising Cost of Sales (ACoS)', value: formatPct(safeDiv(stats.spend, stats.sales)), typeLabel: 'AVERAGE' as const },
     { title: 'Return on Ad Spend (ROAS)', value: formatNum(safeDiv(stats.sales, stats.spend)), typeLabel: 'AVERAGE' as const },
+  ];
+
+  const metricsRow3 = [
     { title: 'Conversion Rate (CVR)', value: formatPct(safeDiv(stats.orders, stats.clicks)), typeLabel: 'AVERAGE' as const },
+    { title: 'Avg Order Value (AOV)', value: formatCurrency(safeDiv(stats.sales, stats.orders)), typeLabel: 'AVERAGE' as const },
+    { title: 'Cost Per Order (CPO)', value: formatCurrency(safeDiv(stats.spend, stats.orders)), typeLabel: 'AVERAGE' as const },
   ];
 
   return (
@@ -226,6 +233,11 @@ export const SBDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
             {metricsRow2.map((m) => (
+              <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+            ))}
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+            {metricsRow3.map((m) => (
               <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
             ))}
           </div>
