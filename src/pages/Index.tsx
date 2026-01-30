@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Layout } from '../components/Layout';
-import { ExecutiveDashboard, PortfolioDashboard, AsinAuditDashboard, SPDashboard, SBDashboard, SDDashboard, SearchTermDashboard, DiagnosticsDashboard, SettingsDashboard } from '../views/Dashboards';
+import { ExecutiveDashboard, PortfolioDashboard, AsinAuditDashboard, SPDashboard, SBDashboard, SDDashboard, SearchTermDashboard, DiagnosticsDashboard, SettingsDashboard, CannibalizationDashboard } from '../views/Dashboards';
 import { TeamManagement } from '../views/TeamManagement';
 import { processBulkFile, processBusinessReport } from '../services/dataProcessor';
 import { generateMockData } from '../services/mockData';
@@ -151,6 +151,8 @@ const Index = () => {
         return <SearchTermDashboard data={dashboardData} targetType="SP" />;
       case 'sb-search-terms':
         return <SearchTermDashboard data={dashboardData} targetType="SB" />;
+      case 'cannibalization':
+        return <CannibalizationDashboard data={dashboardData} currencySymbol={settings.currencySymbol} />;
       case 'diagnostics':
         return <DiagnosticsDashboard data={dashboardData} settings={settings} productGoals={productGoals} />;
       case 'settings':

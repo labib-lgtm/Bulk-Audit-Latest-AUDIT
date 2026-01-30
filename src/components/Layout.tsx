@@ -41,6 +41,7 @@ const NAV_ITEMS = [
   { id: 'sd', label: 'Sponsored Display', icon: Target },
   { id: 'search-terms', label: 'SP Search Terms', icon: Search },
   { id: 'sb-search-terms', label: 'SB Search Terms', icon: ScanSearch },
+  { id: 'cannibalization', label: 'Cannibalization', icon: Layers },
   { id: 'diagnostics', label: 'Global Diagnostics', icon: AlertTriangle },
   { id: 'settings', label: 'Settings', icon: Settings },
 ];
