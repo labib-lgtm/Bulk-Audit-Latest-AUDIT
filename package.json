@@ -9,12 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^1.34.0",
+    "lovable-tagger": "^1.1.13",
     "lucide-react": "^0.560.0",
-    "recharts": "^3.5.1",
     "react": "^19.2.1",
     "react-dom": "^19.2.3",
-    "xlsx": "latest",
-    "@google/genai": "^1.34.0"
+    "recharts": "^3.5.1",
+    "xlsx": "latest"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
