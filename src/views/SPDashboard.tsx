@@ -197,17 +197,24 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
     })).sort((a, b) => b.spend - a.spend);
   }, [data.spPlacements, visibleCampaignIds]);
 
-  const metrics = [
+  const metricsRow1 = [
     { title: 'Spend', value: formatCurrency(stats.spend), typeLabel: 'TOTAL' as const },
     { title: 'Impressions', value: formatInt(stats.impressions), typeLabel: 'TOTAL' as const },
     { title: 'Clicks', value: formatInt(stats.clicks), typeLabel: 'TOTAL' as const },
     { title: 'Cost-per-click (CPC)', value: formatCurrency(stats.cpc), typeLabel: 'AVERAGE' as const },
     { title: 'Clickthrough rate (CTR)', value: formatPct(stats.ctr), typeLabel: 'AVERAGE' as const },
+  ];
+  const metricsRow2 = [
     { title: 'Sales', value: formatCurrency(stats.sales), typeLabel: 'TOTAL' as const },
     { title: 'Orders', value: formatInt(stats.orders), typeLabel: 'TOTAL' as const },
     { title: 'Advertising cost of sales (ACOS)', value: formatPct(stats.acos), typeLabel: 'AVERAGE' as const },
     { title: 'Return on ad spend (ROAS)', value: formatNum(stats.roas), typeLabel: 'AVERAGE' as const },
     { title: 'Conversion Rate (CVR)', value: formatPct(stats.cvr), typeLabel: 'AVERAGE' as const },
+  ];
+  const metricsRow3 = [
+    { title: 'Units', value: formatInt(stats.units), typeLabel: 'TOTAL' as const },
+    { title: 'Avg Order Value (AOV)', value: formatCurrency(stats.aov), typeLabel: 'AVERAGE' as const },
+    { title: 'Cost Per Order (CPO)', value: formatCurrency(stats.cpo), typeLabel: 'AVERAGE' as const },
   ];
 
   return (
