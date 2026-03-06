@@ -42,8 +42,9 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       acc.orders += (c.orders || 0);
       acc.impressions += (c.impressions || 0);
       acc.clicks += (c.clicks || 0);
+      acc.units += (c.units || 0);
       return acc;
-    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0 });
+    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0, units: 0 });
 
     return {
       ...s,
@@ -51,7 +52,9 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       roas: safeDiv(s.sales, s.spend),
       ctr: safeDiv(s.clicks, s.impressions),
       cpc: safeDiv(s.spend, s.clicks),
-      cvr: safeDiv(s.orders, s.clicks)
+      cvr: safeDiv(s.orders, s.clicks),
+      aov: safeDiv(s.sales, s.orders),
+      cpo: safeDiv(s.spend, s.orders),
     };
   }, [data.spCampaigns]);
 
@@ -194,17 +197,24 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
     })).sort((a, b) => b.spend - a.spend);
   }, [data.spPlacements, visibleCampaignIds]);
 
-  const metrics = [
+  const metricsRow1 = [
     { title: 'Spend', value: formatCurrency(stats.spend), typeLabel: 'TOTAL' as const },
     { title: 'Impressions', value: formatInt(stats.impressions), typeLabel: 'TOTAL' as const },
     { title: 'Clicks', value: formatInt(stats.clicks), typeLabel: 'TOTAL' as const },
     { title: 'Cost-per-click (CPC)', value: formatCurrency(stats.cpc), typeLabel: 'AVERAGE' as const },
     { title: 'Clickthrough rate (CTR)', value: formatPct(stats.ctr), typeLabel: 'AVERAGE' as const },
+  ];
+  const metricsRow2 = [
     { title: 'Sales', value: formatCurrency(stats.sales), typeLabel: 'TOTAL' as const },
     { title: 'Orders', value: formatInt(stats.orders), typeLabel: 'TOTAL' as const },
     { title: 'Advertising cost of sales (ACOS)', value: formatPct(stats.acos), typeLabel: 'AVERAGE' as const },
     { title: 'Return on ad spend (ROAS)', value: formatNum(stats.roas), typeLabel: 'AVERAGE' as const },
     { title: 'Conversion Rate (CVR)', value: formatPct(stats.cvr), typeLabel: 'AVERAGE' as const },
+  ];
+  const metricsRow3 = [
+    { title: 'Units', value: formatInt(stats.units), typeLabel: 'TOTAL' as const },
+    { title: 'Avg Order Value (AOV)', value: formatCurrency(stats.aov), typeLabel: 'AVERAGE' as const },
+    { title: 'Cost Per Order (CPO)', value: formatCurrency(stats.cpo), typeLabel: 'AVERAGE' as const },
   ];
 
   return (
@@ -225,7 +235,17 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-          {metrics.map((m) => (
+          {metricsRow1.map((m) => (
+            <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+          ))}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {metricsRow2.map((m) => (
+            <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
+          ))}
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+          {metricsRow3.map((m) => (
             <MetricCard key={m.title} title={m.title} value={m.value} typeLabel={m.typeLabel} isSelected={selectedMetric === m.title} onClick={() => setSelectedMetric(m.title)} />
           ))}
       </div>
