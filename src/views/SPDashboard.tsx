@@ -42,8 +42,9 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       acc.orders += (c.orders || 0);
       acc.impressions += (c.impressions || 0);
       acc.clicks += (c.clicks || 0);
+      acc.units += (c.units || 0);
       return acc;
-    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0 });
+    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0, units: 0 });
 
     return {
       ...s,
@@ -51,7 +52,9 @@ export const SPDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       roas: safeDiv(s.sales, s.spend),
       ctr: safeDiv(s.clicks, s.impressions),
       cpc: safeDiv(s.spend, s.clicks),
-      cvr: safeDiv(s.orders, s.clicks)
+      cvr: safeDiv(s.orders, s.clicks),
+      aov: safeDiv(s.sales, s.orders),
+      cpo: safeDiv(s.spend, s.orders),
     };
   }, [data.spCampaigns]);
 
