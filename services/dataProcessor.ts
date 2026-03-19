@@ -92,13 +92,13 @@ const findHeaderRowAndGetData = (sheet: XLSX.WorkSheet, requiredHeaders: string[
 };
 
 // IMPROVED: Robust Auto-Currency Detection Engine
-const detectCurrencyFromWorkbook = (workbook: XLSX.Workbook): Currency => {
+const detectCurrencyFromWorkbook = (workbook: XLSX.WorkBook): Currency => {
     // Scan up to 3 sheets for currency clues
     const sheetsToScan = workbook.SheetNames.slice(0, 3);
     
     for (const sheetName of sheetsToScan) {
         const sheet = workbook.Sheets[sheetName];
-        const aoa = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, range: 0, nrows: 10 });
+        const aoa = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, range: 0 });
         
         for (const row of aoa) {
             if (!Array.isArray(row)) continue;
