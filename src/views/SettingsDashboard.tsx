@@ -1,8 +1,9 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { DashboardData, AppSettings, ProductGoal } from '../types';
+import { DashboardData, AppSettings, ProductGoal, AttributionModel, Currency, CURRENCY_SYMBOLS } from '../types';
 import { SectionHeader, DataTable } from '../components/Widgets';
-import { Settings, Save, RefreshCw, DollarSign, Target, AlertTriangle, Layers, Search, Rocket, Ban } from 'lucide-react';
+// Fix: Added missing icon imports from lucide-react
+import { Settings, Save, DollarSign, Target, Globe, Rocket, Ban, Scale, AlertTriangle, Search } from 'lucide-react';
 
 interface SettingsProps {
     data: DashboardData;
@@ -10,12 +11,11 @@ interface SettingsProps {
     onUpdateSettings: (s: AppSettings) => void;
     productGoals?: Record<string, ProductGoal>;
     onUpdateProductGoals?: (goals: Record<string, ProductGoal>) => void;
+    userRole?: string;
 }
 
 const safeDiv = (n: number, d: number) => (d === 0 ? 0 : n / d);
-const formatPct = (val: number) => `${(val * 100).toFixed(1)}%`;
 
-// Helper Component to handle local state and prevent focus loss on table re-renders
 const SmartInput: React.FC<{ 
     value: number | string; 
     placeholder?: string;
@@ -24,8 +24,6 @@ const SmartInput: React.FC<{
 }> = ({ value, placeholder, onCommit, className }) => {
     const [localValue, setLocalValue] = useState<string>(value.toString());
 
-    // Sync with external prop changes only if not currently focused (simplified approach)
-    // or just rely on initial mount. Here we sync when prop changes significantly to avoid stale data.
     useEffect(() => {
         setLocalValue(value.toString());
     }, [value]);
@@ -38,7 +36,7 @@ const SmartInput: React.FC<{
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
-            e.currentTarget.blur(); // Triggers handleBlur
+            e.currentTarget.blur(); 
         }
     };
 
@@ -66,11 +64,9 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
     const [productSearch, setProductSearch] = useState('');
     const [saved, setSaved] = useState(false);
 
-    // Prepare ASIN List for Table (Aggregates Business Report + Ad Data)
     const productList = useMemo(() => {
         const map = new Map<string, any>();
         
-        // 1. From Business Report (Preferred for Titles)
         data.businessReport.forEach(r => {
             map.set(r.childAsin, {
                 asin: r.childAsin,
@@ -80,7 +76,6 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
             });
         });
 
-        // 2. From SP Ads (To capture products with ads but no business report entry if any)
         data.spSkus.forEach(s => {
             if (!s.asin) return;
             if (!map.has(s.asin)) {
@@ -88,10 +83,9 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
             }
             const p = map.get(s.asin);
             p.spend += s.spend;
-            if (p.sales === 0) p.sales += s.sales; // Fallback to ad sales if biz report missing
+            if (p.sales === 0) p.sales += s.sales; 
         });
 
-        // 3. Convert to array and enrich
         let products = Array.from(map.values()).map(p => {
             const goal = productGoals[p.asin];
             return {
@@ -102,18 +96,23 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
             };
         });
 
-        // 4. Filter
         if (productSearch) {
             const term = productSearch.toLowerCase();
             products = products.filter(p => p.asin.toLowerCase().includes(term) || p.title.toLowerCase().includes(term));
         }
 
-        // 5. Sort by Sales descending
         return products.sort((a,b) => b.sales - a.sales);
     }, [data, productGoals, productSearch]);
 
-    const handleChange = (field: keyof AppSettings, value: string | number) => {
-        setLocalSettings(prev => ({ ...prev, [field]: value }));
+    const handleChange = (field: keyof AppSettings, value: any) => {
+        setLocalSettings(prev => {
+            const next = { ...prev, [field]: value };
+            // Auto-update symbol if code changed
+            if (field === 'currencyCode') {
+                next.currencySymbol = CURRENCY_SYMBOLS[value as Currency] || '$';
+            }
+            return next;
+        });
         setSaved(false);
     };
 
@@ -126,12 +125,11 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
         if (field === 'targetAcos') {
             const numVal = parseFloat(val);
             if (isNaN(numVal) || val === '') {
-                delete newGoals[asin]; // Revert to global if cleared
+                delete newGoals[asin]; 
             } else {
                 newGoals[asin] = { ...existing, targetAcos: numVal / 100 };
             }
         } else if (field === 'strategy') {
-             // Optional: Preset ACOS based on strategy
              let presetAcos = existing.targetAcos;
              if (val === 'Launch') presetAcos = 0.60;
              if (val === 'Profit') presetAcos = 0.30;
@@ -156,150 +154,177 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                 <SectionHeader title="Strategy Configuration" description="Configure global profitability thresholds and individual product goals." />
                 <button 
                     onClick={handleSave}
-                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:bg-brand-500 transition-all shadow-lg"
+                    className="flex items-center gap-2 px-8 py-3 rounded-xl text-sm font-bold bg-black dark:bg-white text-white dark:text-black hover:bg-brand-500 hover:text-black dark:hover:bg-brand-400 transition-all shadow-lg"
                 >
                     {saved ? <span className="flex items-center gap-2">Settings Saved!</span> : <><Save size={16} /> Save Changes</>}
                 </button>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* 1. Global Goals */}
-                <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm h-full">
-                    <div className="px-6 py-4 bg-muted border-b border-border flex items-center justify-between">
-                        <h3 className="font-bold text-foreground flex items-center gap-2"><Target size={18} className="text-brand-600"/> Global Account Goals</h3>
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm h-full">
+                    <div className="px-6 py-4 bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 flex items-center justify-between">
+                        <h3 className="font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2"><Target size={18} className="text-brand-600 dark:text-brand-400"/> Global Account Goals</h3>
                     </div>
                     <div className="p-6 space-y-6">
-                        <div>
-                            <label className="block text-sm font-bold text-foreground mb-2">Default Target ACOS (%)</label>
-                            <p className="text-xs text-muted-foreground mb-3">Fallback target for products without specific overrides.</p>
-                            <div className="relative max-w-xs">
-                                <input 
-                                    type="number" 
-                                    step="0.01" 
-                                    min="0.01" 
-                                    max="1.00"
-                                    value={localSettings.targetAcos}
-                                    onChange={(e) => handleChange('targetAcos', parseFloat(e.target.value))}
-                                    className="w-full pl-4 pr-12 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
-                                />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">%</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-zinc-300 mb-2">Default Target ACOS (%)</label>
+                                <div className="relative">
+                                    <input 
+                                        type="number" step="0.01" 
+                                        value={localSettings.targetAcos * 100}
+                                        onChange={(e) => handleChange('targetAcos', parseFloat(e.target.value) / 100)}
+                                        className="w-full pl-4 pr-12 py-2.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900 dark:text-white"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 font-bold">%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 dark:text-zinc-300 mb-2">Break-Even ACOS (%)</label>
+                                <div className="relative">
+                                    <input 
+                                        type="number" step="0.01" 
+                                        value={localSettings.breakEvenAcos * 100}
+                                        onChange={(e) => handleChange('breakEvenAcos', parseFloat(e.target.value) / 100)}
+                                        className="w-full pl-4 pr-12 py-2.5 bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-slate-900 dark:text-white"
+                                    />
+                                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-zinc-500 font-bold">%</span>
+                                </div>
                             </div>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-foreground mb-2">Break-Even ACOS (%)</label>
-                            <div className="relative max-w-xs">
-                                <input 
-                                    type="number" step="0.01" min="0.01" max="1.00"
-                                    value={localSettings.breakEvenAcos}
-                                    onChange={(e) => handleChange('breakEvenAcos', parseFloat(e.target.value))}
-                                    className="w-full pl-4 pr-12 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
-                                />
-                                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">%</span>
-                            </div>
+
+                        {/* Marketplace Currency Selector */}
+                        <div className="pt-6 border-t border-slate-100 dark:border-zinc-800">
+                             <label className="block text-sm font-bold text-slate-700 dark:text-zinc-300 mb-3 flex items-center gap-2">
+                                <Globe size={16} className="text-indigo-500" /> Marketplace & Currency
+                             </label>
+                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                {Object.values(Currency).map(curr => (
+                                    <button
+                                        key={curr}
+                                        onClick={() => handleChange('currencyCode', curr)}
+                                        className={`px-3 py-2 rounded-lg border text-[10px] font-black transition-all ${
+                                            localSettings.currencyCode === curr
+                                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-md scale-105' 
+                                            : 'bg-white dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border-slate-200 dark:border-zinc-700 hover:border-indigo-300'
+                                        }`}
+                                    >
+                                        {curr} ({CURRENCY_SYMBOLS[curr]})
+                                    </button>
+                                ))}
+                             </div>
+                             <p className="text-[10px] text-slate-400 mt-2 italic">Currency is usually auto-detected from file headers but can be manually corrected here.</p>
+                        </div>
+
+                        <div className="pt-6 border-t border-slate-100 dark:border-zinc-800">
+                             <label className="block text-sm font-bold text-slate-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
+                                <Scale size={16} className="text-violet-500" /> Attribution Model
+                             </label>
+                             <div className="flex bg-slate-100 dark:bg-zinc-800 p-1 rounded-xl w-full">
+                                {(['Standard', 'Conservative', 'Aggressive'] as AttributionModel[]).map(m => (
+                                    <button
+                                        key={m}
+                                        onClick={() => handleChange('attributionModel', m)}
+                                        className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${localSettings.attributionModel === m ? 'bg-white dark:bg-zinc-900 text-black dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        {m}
+                                    </button>
+                                ))}
+                             </div>
+                             <p className="text-[10px] text-slate-400 mt-2">Adjusts how SB/SD sales are weighted relative to SP. Standard = 100%.</p>
                         </div>
                     </div>
                 </div>
 
-                {/* 2. Audit Thresholds */}
-                <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm h-full">
-                    <div className="px-6 py-4 bg-muted border-b border-border flex items-center justify-between">
-                        <h3 className="font-bold text-foreground flex items-center gap-2"><AlertTriangle size={18} className="text-amber-500"/> Audit Thresholds</h3>
-                    </div>
-                    <div className="p-6 space-y-6">
-                        <div>
-                            <label className="block text-sm font-bold text-foreground mb-2">Wasted Spend Threshold</label>
-                            <div className="relative max-w-xs">
-                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground font-bold">{localSettings.currencySymbol}</span>
-                                <input 
-                                    type="number" step="1"
-                                    value={localSettings.minSpendThreshold}
-                                    onChange={(e) => handleChange('minSpendThreshold', parseInt(e.target.value))}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
-                                />
-                            </div>
+                <div className="space-y-6">
+                    {/* Waste Thresholds */}
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+                        <div className="px-6 py-4 bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800">
+                            <h3 className="font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2"><AlertTriangle size={18} className="text-rose-500"/> Waste Thresholds</h3>
                         </div>
-                        <div>
-                            <label className="block text-sm font-bold text-foreground mb-2">Click Threshold (No Sales)</label>
-                            <div className="relative max-w-xs">
-                                <input 
-                                    type="number" step="1"
-                                    value={localSettings.minClickThreshold}
-                                    onChange={(e) => handleChange('minClickThreshold', parseInt(e.target.value))}
-                                    className="w-full pl-4 pr-4 py-2.5 bg-card border border-border rounded-xl focus:border-brand-500 focus:ring-0 font-bold text-foreground"
-                                />
+                        <div className="p-6 space-y-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Min Spend for "Bleeder" Flag</span>
+                                <div className="relative w-32">
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">{localSettings.currencySymbol}</span>
+                                    <input 
+                                        type="number" 
+                                        value={localSettings.minSpendThreshold}
+                                        onChange={(e) => handleChange('minSpendThreshold', parseFloat(e.target.value))}
+                                        className="w-full pl-7 pr-3 py-2 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-sm font-bold text-right"
+                                    />
+                                </div>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm font-medium text-slate-600 dark:text-zinc-400">Min Clicks for Stat. Significance</span>
+                                <div className="w-32">
+                                    <input 
+                                        type="number" 
+                                        value={localSettings.minClickThreshold}
+                                        onChange={(e) => handleChange('minClickThreshold', parseInt(e.target.value))}
+                                        className="w-full px-3 py-2 bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 rounded-lg text-sm font-bold text-right"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* 3. Product Strategy Table */}
-            <div className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm">
-                <div className="px-6 py-4 bg-muted border-b border-border flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h3 className="font-bold text-foreground flex items-center gap-2">
-                            <Layers size={18} className="text-indigo-500"/> Product-Level Strategy Overrides
-                        </h3>
-                        <p className="text-xs text-muted-foreground mt-1">Set aggressive targets for launches or conservative targets for profit cows.</p>
-                    </div>
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 overflow-hidden shadow-sm">
+                <div className="px-6 py-4 bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <h3 className="font-bold text-slate-800 dark:text-zinc-100 flex items-center gap-2"><Rocket size={18} className="text-brand-600 dark:text-brand-400"/> Individual Product Strategy</h3>
                     <div className="relative w-full sm:w-64">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
                         <input 
                             type="text" 
                             placeholder="Search ASIN or Title..." 
                             value={productSearch}
                             onChange={(e) => setProductSearch(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-lg bg-card text-foreground focus:ring-brand-500 focus:border-brand-500"
+                            className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800"
                         />
                     </div>
                 </div>
-                <div className="p-4">
+                <div className="p-0">
                     <DataTable 
                         data={productList}
                         columns={[
-                            { key: 'title', header: 'Product', sortable: true, render: (r: any) => (
-                                <div>
-                                    <div className="font-bold text-foreground text-xs truncate max-w-[250px]">{r.title}</div>
-                                    <div className="text-[10px] text-muted-foreground font-mono">{r.asin}</div>
-                                </div>
-                            )},
-                            { key: 'sales', header: 'Total Sales', align: 'right', sortable: true, render: (r: any) => `$${r.sales.toLocaleString()}` },
-                            { key: 'spend', header: 'Ad Spend', align: 'right', sortable: true, render: (r: any) => `$${r.spend.toLocaleString()}` },
-                            { key: 'acos', header: 'Real ACOS', align: 'right', sortable: true, render: (r: any) => (
-                                <span className={`font-bold ${r.acos > (r.currentGoal || localSettings.targetAcos) ? 'text-rose-500' : 'text-emerald-600'}`}>{formatPct(r.acos)}</span>
-                            )},
-                            { key: 'strategy', header: 'Strategy', render: (r: any) => (
-                                <div className="flex gap-1">
-                                    {['Launch', 'Profit', 'Liquidate'].map(s => (
+                            { key: 'asin', header: 'ASIN', render: (r: any) => <span className="font-mono text-[10px] font-bold text-slate-500">{r.asin}</span>, sortable: true },
+                            { key: 'title', header: 'Product Name', sortable: true, render: (r: any) => <span className="text-xs truncate max-w-[200px] block font-bold text-slate-800 dark:text-zinc-100">{r.title}</span> },
+                            { key: 'sales', header: 'Total Sales', align: 'right', sortable: true, render: (r: any) => `${localSettings.currencySymbol}${r.sales.toLocaleString()}` },
+                            { key: 'acos', header: 'Ad ACOS', align: 'right', sortable: true, render: (r: any) => <span className={r.acos > 0.4 ? 'text-rose-500' : 'text-slate-600'}>{safeDiv(r.spend, r.sales) > 0 ? (safeDiv(r.spend, r.sales) * 100).toFixed(1) + '%' : '-'}</span> },
+                            { key: 'strategy', header: 'Strategy Preset', align: 'center', render: (r: any) => (
+                                <div className="flex items-center gap-1">
+                                    {(['Launch', 'Profit', 'Liquidate'] as const).map(s => (
                                         <button 
                                             key={s}
                                             onClick={() => handleProductGoalChange(r.asin, s, 'strategy')}
-                                            title={s}
-                                            className={`p-1.5 rounded-md border text-[10px] font-bold uppercase transition-all ${
-                                                r.currentGoal && r.strategy === s 
-                                                ? (s === 'Launch' ? 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30' : s === 'Profit' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' : 'bg-rose-500/20 text-rose-400 border-rose-500/30')
-                                                : 'bg-muted text-muted-foreground border-border hover:border-foreground/30'
-                                            }`}
+                                            className={`px-2 py-1 rounded text-[9px] font-black uppercase border transition-all ${r.strategy === s ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-400 border-slate-200 hover:border-slate-400'}`}
                                         >
-                                            {s === 'Launch' && <Rocket size={12}/>}
-                                            {s === 'Profit' && <DollarSign size={12}/>}
-                                            {s === 'Liquidate' && <Ban size={12}/>}
+                                            {s}
                                         </button>
                                     ))}
                                 </div>
                             )},
-                            { key: 'currentGoal', header: 'Target ACOS %', align: 'right', render: (r: any) => (
-                                <div className="flex justify-end">
-                                    <div className="relative w-24">
-                                        <SmartInput 
-                                            value={r.currentGoal ? (r.currentGoal * 100) : ''}
-                                            placeholder={(localSettings.targetAcos * 100).toFixed(0)}
-                                            onCommit={(val) => handleProductGoalChange(r.asin, val, 'targetAcos')}
-                                            className={`w-full text-right pr-6 pl-2 py-1.5 text-xs font-bold border rounded-lg focus:ring-2 focus:ring-brand-500 outline-none ${r.currentGoal ? 'border-brand-500 bg-brand-500/10 text-foreground' : 'border-border bg-muted text-muted-foreground'}`}
-                                        />
-                                        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground text-[10px] font-bold">%</span>
-                                    </div>
+                            { key: 'currentGoal', header: 'Target ACOS (%)', align: 'right', render: (r: any) => (
+                                <div className="relative w-24 ml-auto group">
+                                    <SmartInput 
+                                        value={r.currentGoal ? Math.round(r.currentGoal * 100) : ''}
+                                        placeholder={(localSettings.targetAcos * 100).toString()}
+                                        onCommit={(val) => handleProductGoalChange(r.asin, val, 'targetAcos')}
+                                        className="w-full pl-3 pr-6 py-1 text-right text-xs font-black bg-slate-50 dark:bg-zinc-800 border border-slate-100 dark:border-zinc-700 rounded outline-none focus:border-brand-500 transition-all"
+                                    />
+                                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold">%</span>
                                 </div>
+                            )},
+                            { key: 'actions', header: '', align: 'right', render: (r: any) => r.currentGoal && (
+                                <button 
+                                    onClick={() => handleProductGoalChange(r.asin, '', 'targetAcos')}
+                                    className="p-1.5 text-slate-300 hover:text-rose-500 transition-colors"
+                                    title="Reset to Global"
+                                >
+                                    <Ban size={14} />
+                                </button>
                             )}
                         ]}
                         initialSortKey="sales"
@@ -307,5 +332,5 @@ export const SettingsDashboard: React.FC<SettingsProps> = ({
                 </div>
             </div>
         </div>
-    )
+    );
 };
