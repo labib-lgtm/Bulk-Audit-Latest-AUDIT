@@ -8,7 +8,7 @@ import { DashboardData } from '../types';
 import { MetricCard, SectionHeader, DataTable } from '../components/Widgets';
 import { LayoutGrid, Target, PieChart as PieIcon, Monitor, Search } from 'lucide-react';
 
-const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCurrency = (val: number, sym: string) => `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const formatPct = (val: number) => {
   if (isNaN(val) || !isFinite(val)) return '0%';
   return `${(val * 100).toFixed(1)}%`;
@@ -23,7 +23,7 @@ const TACTIC_COLORS: Record<string, string> = {
     'Audiences': '#06b6d4'
 };
 
-export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
+export const SDDashboard: React.FC<{ data: DashboardData; currencySymbol: string }> = ({ data, currencySymbol }) => {
   const [view, setView] = useState<'campaigns' | 'targets' | 'tactics'>('campaigns');
   const [searchTerm, setSearchTerm] = useState('');
   const normSearch = searchTerm.toLowerCase().trim();
@@ -40,13 +40,8 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
       acc.impressions += c.impressions;
       acc.clicks += c.clicks;
       acc.orders += c.orders;
-      acc.units += c.units;
-      acc.viewableImpressions += c.viewableImpressions;
-      acc.viewSales += c.viewSales;
-      acc.viewOrders += c.viewOrders;
-      acc.viewUnits += c.viewUnits;
       return acc;
-    }, { spend: 0, sales: 0, orders: 0, units: 0, impressions: 0, clicks: 0, viewableImpressions: 0, viewSales: 0, viewOrders: 0, viewUnits: 0 });
+    }, { spend: 0, sales: 0, orders: 0, impressions: 0, clicks: 0 });
   }, [data.sdCampaigns]);
 
    const campaigns = useMemo(() => filteredCampaigns.map(c => ({
@@ -107,53 +102,32 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
             <SectionHeader title="Sponsored Display" description="Retargeting and audience-based campaigns." />
             <div className="flex items-center gap-3 w-full lg:w-auto">
              <div className="relative w-full">
-                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
-                 <input 
-                   type="text" 
-                   placeholder={view === 'campaigns' ? "Search Campaigns..." : "Search Targets..."}
-                   className="pl-10 pr-4 py-2.5 bg-card border border-border rounded-xl text-sm font-bold text-foreground focus:border-brand-500 focus:ring-0 transition-all shadow-sm w-full sm:w-64"
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                 />
-              </div>
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input 
+                  type="text" 
+                  placeholder={view === 'campaigns' ? "Search Campaigns..." : "Search Targets..."}
+                  className="pl-10 pr-4 py-2.5 bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl text-sm font-bold focus:border-brand-500 focus:ring-0 transition-all shadow-sm w-full sm:w-64 text-slate-900 dark:text-white"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+             </div>
             </div>
         </div>
 
-         <div className="space-y-3 sm:space-y-4">
-           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-             <MetricCard title="Spend" value={formatCurrency(stats.spend)} typeLabel="TOTAL" />
-             <MetricCard title="Impressions" value={formatCompactNum(stats.impressions)} typeLabel="TOTAL" />
-             <MetricCard title="Clicks" value={formatInt(stats.clicks)} typeLabel="TOTAL" />
-             <MetricCard title="Cost-Per-Click (CPC)" value={formatCurrency(safeDiv(stats.spend, stats.clicks))} typeLabel="AVERAGE" />
-             <MetricCard title="Clickthrough Rate (CTR)" value={formatPct(safeDiv(stats.clicks, stats.impressions))} typeLabel="AVERAGE" />
-           </div>
-           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-             <MetricCard title="Sales" value={formatCurrency(stats.sales)} typeLabel="TOTAL" />
-             <MetricCard title="Orders" value={formatInt(stats.orders)} typeLabel="TOTAL" />
-             <MetricCard title="Units" value={formatInt(stats.units)} typeLabel="TOTAL" />
-             <MetricCard title="Advertising Cost of Sales (ACoS)" value={formatPct(safeDiv(stats.spend, stats.sales))} typeLabel="AVERAGE" />
-             <MetricCard title="Return on Ad Spend (ROAS)" value={formatNum(safeDiv(stats.sales, stats.spend))} typeLabel="AVERAGE" />
-           </div>
-           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-             <MetricCard title="Conversion Rate (CVR)" value={formatPct(safeDiv(stats.orders, stats.clicks))} typeLabel="AVERAGE" />
-             <MetricCard title="Avg Order Value (AOV)" value={formatCurrency(safeDiv(stats.sales, stats.orders))} typeLabel="AVERAGE" />
-             <MetricCard title="Cost Per Order (CPO)" value={formatCurrency(safeDiv(stats.spend, stats.orders))} typeLabel="AVERAGE" />
-             <MetricCard title="Viewable Impressions" value={formatCompactNum(stats.viewableImpressions)} typeLabel="TOTAL" />
-             <MetricCard title="View-through Sales" value={formatCurrency(stats.viewSales)} typeLabel="TOTAL" />
-           </div>
-           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-             <MetricCard title="View-through Orders" value={formatInt(stats.viewOrders)} typeLabel="TOTAL" />
-             <MetricCard title="View-through Units" value={formatInt(stats.viewUnits)} typeLabel="TOTAL" />
-           </div>
+         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+             <MetricCard title="Spend" value={formatCurrency(stats.spend, currencySymbol)} />
+             <MetricCard title="Sales" value={formatCurrency(stats.sales, currencySymbol)} />
+             <MetricCard title="ROAS" value={formatNum(safeDiv(stats.sales, stats.spend))} />
+             <MetricCard title="Impressions" value={formatCompactNum(stats.impressions)} />
          </div>
 
-         <div className="flex flex-wrap gap-2 p-1.5 bg-muted rounded-2xl w-full sm:w-fit border border-border">
-            <button onClick={() => setView('campaigns')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'campaigns' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><LayoutGrid size={16} /> Campaign Summary</button>
-            <button onClick={() => setView('targets')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'targets' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><Target size={16} /> Target Analysis</button>
-            <button onClick={() => setView('tactics')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'tactics' ? 'bg-card text-brand-600 shadow-md' : 'text-muted-foreground'}`}><PieIcon size={16} /> Tactic Analysis</button>
+         <div className="flex flex-wrap gap-2 p-1.5 bg-slate-100 dark:bg-zinc-800 rounded-2xl w-full sm:w-fit border border-slate-200 dark:border-zinc-700">
+            <button onClick={() => setView('campaigns')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'campaigns' ? 'bg-white dark:bg-zinc-900 text-brand-600 dark:text-brand-400 shadow-md' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'}`}><LayoutGrid size={16} /> Campaign Summary</button>
+            <button onClick={() => setView('targets')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'targets' ? 'bg-white dark:bg-zinc-900 text-brand-600 dark:text-brand-400 shadow-md' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'}`}><Target size={16} /> Target Analysis</button>
+            <button onClick={() => setView('tactics')} className={`flex items-center gap-2 px-4 py-2.5 sm:px-5 text-sm font-bold rounded-xl transition-all ${view === 'tactics' ? 'bg-white dark:bg-zinc-900 text-brand-600 dark:text-brand-400 shadow-md' : 'text-slate-500 dark:text-zinc-400 hover:text-slate-800 dark:hover:text-zinc-200'}`}><PieIcon size={16} /> Tactic Analysis</button>
          </div>
 
-         <div className="bg-muted/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-border/50">
+         <div className="bg-slate-50/50 dark:bg-zinc-900/50 p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/50 dark:border-zinc-800/50">
             {view === 'campaigns' && (
                 <DataTable data={campaigns} columns={[
                 { key: 'name', header: 'Campaign Name', sortable: true },
@@ -162,56 +136,56 @@ export const SDDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
                 { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatCompactNum(r.impressions) },
                 { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
                 { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: r => formatPct(r.ctr) },
-                { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
-                { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc) },
+                { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend, currencySymbol), align: 'right', sortable: true },
+                { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc, currencySymbol) },
                 { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: r => formatInt(r.orders) },
                 { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
-                { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
+                { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales, currencySymbol), align: 'right', sortable: true },
                 { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
                 { key: 'viewableImpressions', header: 'Viewable Impr.', render: r => formatCompactNum(r.viewableImpressions), align: 'right', sortable: true },
                 ]} initialSortKey="spend" />
             )}
             {view === 'targets' && (
-                 <DataTable data={allTargets} columns={[
-                     { key: 'expression', header: 'Targeting Expression', render: r => <span className="font-bold text-foreground">{r.expression}</span>, sortable: true },
-                     { key: 'tactic', header: 'Tactic', sortable: true },
-                     { key: 'campaignName', header: 'Campaign', sortable: true },
-                     { key: 'bid', header: 'Bid', render: r => formatCurrency(r.bid), align: 'right', sortable: true },
-                     { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatCompactNum(r.impressions) },
-                     { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
-                     { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: r => formatPct(r.ctr) },
-                     { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
-                     { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc) },
-                     { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: r => formatInt(r.orders) },
-                     { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
-                     { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
-                     { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
-                     { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
-                 ]} initialSortKey="spend" />
-             )}
-             {view === 'tactics' && (
-                 <div className="space-y-6">
-                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                         <div className="bg-card rounded-2xl border border-border p-6 flex flex-col items-center justify-center">
-                             <h4 className="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-4 w-full text-left">Spend by Tactic</h4>
-                             <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={tacticData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{tacticData.map((entry, index) => (<Cell key={`cell-${index}`} fill={TACTIC_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value)} contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: '8px', color: 'hsl(var(--foreground))' }} itemStyle={{ color: 'hsl(var(--foreground))' }} labelStyle={{ color: 'hsl(var(--foreground))' }} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
-                         </div>
-                         <div className="lg:col-span-2">
-                             <DataTable data={tacticData} columns={[
-                                 { key: 'type', header: 'Tactic', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: TACTIC_COLORS[r.type] }}></div><span className="font-bold text-foreground">{r.type}</span></div>), sortable: true },
-                                 { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend), align: 'right', sortable: true },
-                                 { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales), align: 'right', sortable: true },
-                                 { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
-                                 { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
-                                 { key: 'cpc', header: 'CPC', render: r => formatCurrency(r.cpc), align: 'right', sortable: true },
-                                 { key: 'cvr', header: 'CVR', render: r => formatPct(r.cvr), align: 'right', sortable: true },
-                                 { key: 'count', header: 'Count', align: 'right', sortable: true },
-                             ]} initialSortKey="spend" />
-                         </div>
-                     </div>
-                 </div>
-             )}
-          </div>
+                <DataTable data={allTargets} columns={[
+                    { key: 'expression', header: 'Targeting Expression', render: r => <span className="font-bold text-slate-900 dark:text-zinc-100">{r.expression}</span>, sortable: true },
+                    { key: 'tactic', header: 'Tactic', sortable: true },
+                    { key: 'campaignName', header: 'Campaign', sortable: true },
+                    { key: 'bid', header: 'Bid', render: r => formatCurrency(r.bid, currencySymbol), align: 'right', sortable: true },
+                    { key: 'impressions', header: 'Impressions', align: 'right', sortable: true, render: r => formatCompactNum(r.impressions) },
+                    { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: r => formatInt(r.clicks) },
+                    { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: r => formatPct(r.ctr) },
+                    { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend, currencySymbol), align: 'right', sortable: true },
+                    { key: 'cpc', header: 'CPC', align: 'right', sortable: true, render: r => formatCurrency(r.cpc, currencySymbol) },
+                    { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: r => formatInt(r.orders) },
+                    { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: r => formatPct(r.cvr) },
+                    { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales, currencySymbol), align: 'right', sortable: true },
+                    { key: 'roas', header: 'ROAS', render: r => formatNum(r.roas), align: 'right', sortable: true },
+                    { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+                ]} initialSortKey="spend" />
+            )}
+            {view === 'tactics' && (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 dark:border-zinc-800 p-6 flex flex-col items-center justify-center">
+                            <h4 className="text-sm font-bold text-slate-500 dark:text-zinc-400 uppercase tracking-widest mb-4 w-full text-left">Spend by Tactic</h4>
+                            <div className="w-full h-64"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={tacticData} cx="50%" cy="50%" innerRadius={60} outerRadius={80} paddingAngle={5} dataKey="spend" nameKey="type">{tacticData.map((entry, index) => (<Cell key={`cell-${index}`} fill={TACTIC_COLORS[entry.type] || '#ccc'} stroke="none" />))}</Pie><RechartsTooltip formatter={(value: number) => formatCurrency(value, currencySymbol)} /><Legend verticalAlign="bottom" height={36} iconType="circle" /></PieChart></ResponsiveContainer></div>
+                        </div>
+                        <div className="lg:col-span-2">
+                            <DataTable data={tacticData} columns={[
+                                { key: 'type', header: 'Tactic', render: r => (<div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{ backgroundColor: TACTIC_COLORS[r.type] }}></div><span className="font-bold text-slate-900 dark:text-zinc-100">{r.type}</span></div>), sortable: true },
+                                { key: 'spend', header: 'Spend', render: r => formatCurrency(r.spend, currencySymbol), align: 'right', sortable: true },
+                                { key: 'sales', header: 'Sales', render: r => formatCurrency(r.sales, currencySymbol), align: 'right', sortable: true },
+                                { key: 'spendShare', header: '% Spend', render: r => formatPct(r.spendShare), align: 'right', sortable: true },
+                                { key: 'acos', header: 'ACoS', render: r => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span>, align: 'right', sortable: true },
+                                { key: 'cpc', header: 'CPC', render: r => formatCurrency(r.cpc, currencySymbol), align: 'right', sortable: true },
+                                { key: 'cvr', header: 'CVR', render: r => formatPct(r.cvr), align: 'right', sortable: true },
+                                { key: 'count', header: 'Count', align: 'right', sortable: true },
+                            ]} initialSortKey="spend" />
+                        </div>
+                    </div>
+                </div>
+            )}
+         </div>
     </div>
   );
 };
