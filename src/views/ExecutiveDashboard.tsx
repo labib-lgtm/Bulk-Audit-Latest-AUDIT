@@ -1,15 +1,16 @@
 
 import React, { useMemo, useState } from 'react';
-import { DashboardData } from '../types';
-import { SectionHeader, DataTable, MetricCard } from '../components/Widgets';
-import { TrendingUp, Target, LayoutGrid, Video, PieChart, Layers, Shield, Globe, Tags, Search } from 'lucide-react';
+import { DashboardData, AppSettings, ATTRIBUTION_MULTIPLIERS } from '../types';
+import { SectionHeader, DataTable } from '../components/Widgets';
+import { TrendingUp, Target, LayoutGrid, Video, PieChart, Layers, Shield, Globe, Tags, Search, CheckCircle2, AlertCircle, Sparkles, Loader2, Scale, CalendarDays } from 'lucide-react';
+import { generateAccountInsights } from '../services/aiService';
 
-const formatCurrency = (val: number) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-const formatExactCurrency = (val: number) => `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-const formatCompactCurrency = (val: number) => {
-  if (Math.abs(val) >= 1000000) return `$${(val / 1000000).toFixed(1)}M`;
-  if (Math.abs(val) >= 1000) return `$${(val / 1000).toFixed(1)}K`;
-  return `$${val.toFixed(2)}`;
+const formatCurrency = (val: number, sym: string) => `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+const formatExactCurrency = (val: number, sym: string) => `${sym}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const formatCompactCurrency = (val: number, sym: string) => {
+  if (Math.abs(val) >= 1000000) return `${sym}${(val / 1000000).toFixed(1)}M`;
+  if (Math.abs(val) >= 1000) return `${sym}${(val / 1000).toFixed(1)}K`;
+  return `${sym}${val.toFixed(2)}`;
 };
 const formatCompactNum = (val: number) => {
   if (Math.abs(val) >= 1000000) return `${(val / 1000000).toFixed(1)}M`;
@@ -28,7 +29,6 @@ const formatInt = (val: number) => Math.round(val).toLocaleString();
 const formatNum = (val: number) => val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const safeDiv = (n: number, d: number) => (d === 0 ? 0 : n / d);
 
-// Helper to extract ASIN from target expression
 const extractAsin = (expr: string | undefined | null) => {
     if (!expr) return null;
     try {
@@ -40,25 +40,68 @@ const extractAsin = (expr: string | undefined | null) => {
 };
 
 const isEnabled = (state?: string) => {
-    if (!state) return true; // Default to enabled if missing/undefined
+    if (!state) return true;
     return state.toLowerCase() === 'enabled';
 };
 
-export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) => {
-  const [brandInput, setBrandInput] = useState('');
+interface BucketItem {
+  group: string;
+  order: number;
+  label: string;
+  key: string;
+  spend: number;
+  sales: number;
+  orders: number;
+  imps: number;
+  clicks: number;
+  targets: number;
+  isSummary?: boolean;
+  isTotal?: boolean;
+  acos?: number;
+  cvr?: number;
+  ctr?: number;
+  cpa?: number;
+  pctSales?: number;
+  pctSpend?: number;
+}
 
-  // 0. Pre-calc Own ASINs for Defensive vs Competitor logic
+export const ExecutiveDashboard: React.FC<{ data: DashboardData; previousData?: DashboardData | null; settings: AppSettings }> = ({ data, previousData, settings }) => {
+  const [brandInput, setBrandInput] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiInsight, setAiInsight] = useState<string | null>(null);
+  const { currencySymbol, targetAcos, attributionModel } = settings;
+  const multipliers = ATTRIBUTION_MULTIPLIERS[attributionModel || 'Standard'];
+
   const myAsins = useMemo(() => new Set(data.spSkus.map(s => (s.asin || '').toUpperCase()).filter(Boolean)), [data.spSkus]);
 
-  // 1. Aggregated Ad Metrics
+  const getDelta = (curr: number, prev: number | undefined, invertBetter: boolean = false) => {
+      if (prev === undefined || prev === 0) return null;
+      const delta = (curr - prev) / prev;
+      const isPositive = delta > 0;
+      const isGood = invertBetter ? !isPositive : isPositive;
+      
+      return (
+          <span className={`text-[10px] font-bold ml-1.5 px-1.5 py-0.5 rounded ${isGood ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'}`}>
+              {isPositive ? '▲' : '▼'} {Math.abs(delta * 100).toFixed(1)}%
+          </span>
+      );
+  };
+
   const adStats = useMemo(() => {
-    const allCampaigns = [...data.spCampaigns, ...data.sbCampaigns, ...data.sdCampaigns];
-    const totalSpend = allCampaigns.reduce((sum, c) => sum + (c.spend || 0), 0);
-    const totalSales = allCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0);
-    const totalOrders = allCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0);
-    const totalImpressions = allCampaigns.reduce((sum, c) => sum + (c.impressions || 0), 0);
-    const totalClicks = allCampaigns.reduce((sum, c) => sum + (c.clicks || 0), 0);
+    const spSales = data.spCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SP;
+    const spOrders = data.spCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SP;
+    const sbSales = data.sbCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SB;
+    const sbOrders = data.sbCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SB;
+    const sdSales = data.sdCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SD;
+    const sdOrders = data.sdCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SD;
+
+    const totalSpend = [...data.spCampaigns, ...data.sbCampaigns, ...data.sdCampaigns].reduce((sum, c) => sum + (c.spend || 0), 0);
+    const totalImpressions = [...data.spCampaigns, ...data.sbCampaigns, ...data.sdCampaigns].reduce((sum, c) => sum + (c.impressions || 0), 0);
+    const totalClicks = [...data.spCampaigns, ...data.sbCampaigns, ...data.sdCampaigns].reduce((sum, c) => sum + (c.clicks || 0), 0);
     
+    const totalSales = spSales + sbSales + sdSales;
+    const totalOrders = spOrders + sbOrders + sdOrders;
+
     return {
       spend: totalSpend,
       sales: totalSales,
@@ -71,11 +114,39 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
       cpc: safeDiv(totalSpend, totalClicks),
       cvr: safeDiv(totalOrders, totalClicks),
     };
-  }, [data]);
+  }, [data, multipliers]);
 
-  // 1.5 Channel Metrics & Detailed Breakdown
+  const prevAdStats = useMemo(() => {
+      if (!previousData) return null;
+      const spSales = previousData.spCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SP;
+      const spOrders = previousData.spCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SP;
+      const sbSales = previousData.sbCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SB;
+      const sbOrders = previousData.sbCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SB;
+      const sdSales = previousData.sdCampaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multipliers.SD;
+      const sdOrders = previousData.sdCampaigns.reduce((sum, c) => sum + (c.orders || 0), 0) * multipliers.SD;
+
+      const totalSpend = [...previousData.spCampaigns, ...previousData.sbCampaigns, ...previousData.sdCampaigns].reduce((sum, c) => sum + (c.spend || 0), 0);
+      const totalImpressions = [...previousData.spCampaigns, ...previousData.sbCampaigns, ...previousData.sdCampaigns].reduce((sum, c) => sum + (c.impressions || 0), 0);
+      const totalClicks = [...previousData.spCampaigns, ...previousData.sbCampaigns, ...previousData.sdCampaigns].reduce((sum, c) => sum + (c.clicks || 0), 0);
+      
+      const totalSales = spSales + sbSales + sdSales;
+      const totalOrders = spOrders + sbOrders + sdOrders;
+
+      return {
+        spend: totalSpend,
+        sales: totalSales,
+        orders: totalOrders,
+        impressions: totalImpressions,
+        clicks: totalClicks,
+        acos: safeDiv(totalSpend, totalSales),
+        roas: safeDiv(totalSales, totalSpend),
+        ctr: safeDiv(totalClicks, totalImpressions),
+        cpc: safeDiv(totalSpend, totalClicks),
+        cvr: safeDiv(totalOrders, totalClicks),
+      };
+  }, [previousData, multipliers]);
+
   const channelStats = useMemo(() => {
-    // --- SP Logic ---
     const spAgKwCount = new Map<string, number>();
     data.spKeywords.forEach(k => {
         if(isEnabled(k.state)) spAgKwCount.set(k.adGroupId, (spAgKwCount.get(k.adGroupId) || 0) + 1);
@@ -109,7 +180,6 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
         }
     });
 
-    // --- SB Logic ---
     const sbBreakdown = {
         exact: 0, phrase: 0, broad: 0,
         competitorPat: 0, defensivePat: 0,
@@ -120,7 +190,6 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
 
     const processSb = (item: any, isKw: boolean) => {
         if (!isEnabled(item.state)) return;
-
         sbBreakdown.count++;
         const format = sbCampMap.get(item.campaignId);
         if (format === 'Video') sbBreakdown.video++;
@@ -142,7 +211,6 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
     data.sbKeywords.forEach(k => processSb(k, true));
     data.sbTargets.forEach(t => processSb(t, false));
 
-    // --- SD Logic ---
     const sdBreakdown = {
         competitorPat: 0, defensivePat: 0, offsite: 0,
         count: 0
@@ -159,16 +227,15 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
         }
     });
 
-    // --- Totals ---
-    const calc = (campaigns: any[]) => {
+    const calc = (campaigns: any[], multiplier: number) => {
       const spend = campaigns.reduce((sum, c) => sum + (c.spend || 0), 0);
-      const sales = campaigns.reduce((sum, c) => sum + (c.sales || 0), 0);
+      const sales = campaigns.reduce((sum, c) => sum + (c.sales || 0), 0) * multiplier;
       return { spend, sales };
     };
 
-    const sp = calc(data.spCampaigns);
-    const sb = calc(data.sbCampaigns);
-    const sd = calc(data.sdCampaigns);
+    const sp = calc(data.spCampaigns, multipliers.SP);
+    const sb = calc(data.sbCampaigns, multipliers.SB);
+    const sd = calc(data.sdCampaigns, multipliers.SD);
     
     const totalSales = sp.sales + sb.sales + sd.sales;
     const div = totalSales || 1;
@@ -178,12 +245,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sp', 
             label: 'Sponsored Products', 
             icon: LayoutGrid,
-            bg: 'bg-primary/10',
-            border: 'border-primary/30',
-            text: 'text-primary',
-            iconColor: 'text-primary',
-            valueColor: 'text-foreground',
-            subColor: 'text-muted-foreground',
+            bg: 'bg-brand-50 dark:bg-brand-900/10',
+            border: 'border-brand-200 dark:border-brand-800',
+            text: 'text-brand-900 dark:text-brand-300',
+            iconColor: 'text-brand-600 dark:text-brand-400',
+            valueColor: 'text-brand-950 dark:text-white',
+            subColor: 'text-brand-800 dark:text-brand-400',
             ...sp, 
             roas: safeDiv(sp.sales, sp.spend), 
             share: safeDiv(sp.sales, div),
@@ -202,12 +269,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sb', 
             label: 'Sponsored Brands', 
             icon: Video,
-            bg: 'bg-blue-500/10',
-            border: 'border-blue-500/30',
-            text: 'text-blue-400',
-            iconColor: 'text-blue-400',
-            valueColor: 'text-foreground',
-            subColor: 'text-muted-foreground',
+            bg: 'bg-blue-50 dark:bg-blue-900/10',
+            border: 'border-blue-200 dark:border-blue-800',
+            text: 'text-blue-900 dark:text-blue-300',
+            iconColor: 'text-blue-600 dark:text-blue-400',
+            valueColor: 'text-blue-950 dark:text-white',
+            subColor: 'text-blue-800 dark:text-blue-400',
             ...sb, 
             roas: safeDiv(sb.sales, sb.spend), 
             share: safeDiv(sb.sales, div),
@@ -226,12 +293,12 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             key: 'sd', 
             label: 'Sponsored Display', 
             icon: Target,
-            bg: 'bg-fuchsia-500/10',
-            border: 'border-fuchsia-500/30',
-            text: 'text-fuchsia-400',
-            iconColor: 'text-fuchsia-400',
-            valueColor: 'text-foreground',
-            subColor: 'text-muted-foreground',
+            bg: 'bg-fuchsia-50 dark:bg-fuchsia-900/10',
+            border: 'border-fuchsia-200 dark:border-fuchsia-800',
+            text: 'text-fuchsia-900 dark:text-fuchsia-300',
+            iconColor: 'text-fuchsia-600 dark:text-fuchsia-400',
+            valueColor: 'text-fuchsia-950 dark:text-white',
+            subColor: 'text-fuchsia-800 dark:text-fuchsia-400',
             ...sd, 
             roas: safeDiv(sd.sales, sd.spend), 
             share: safeDiv(sd.sales, div),
@@ -243,90 +310,59 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
             ]
         }
     ];
-  }, [data, myAsins]);
+  }, [data, myAsins, multipliers]);
 
-  // 1.7 Branded vs Non-Branded Stats
   const brandStats = useMemo(() => {
       if (!brandInput.trim() || data.searchTerms.length === 0) return null;
-      
       const terms = brandInput.toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
       const stats = {
           branded: { spend: 0, sales: 0, orders: 0, clicks: 0, impressions: 0, count: 0 },
           nonBranded: { spend: 0, sales: 0, orders: 0, clicks: 0, impressions: 0, count: 0 }
       };
-
       data.searchTerms.forEach(st => {
           const term = (st.customerSearchTerm || st.searchTerm || '').toLowerCase();
           const isBranded = terms.some(t => term.includes(t));
           const bucket = isBranded ? stats.branded : stats.nonBranded;
-          
+          const mult = st.type === 'SB' ? multipliers.SB : multipliers.SP;
           bucket.spend += st.spend;
-          bucket.sales += st.sales;
-          bucket.orders += st.orders;
+          bucket.sales += st.sales * mult;
+          bucket.orders += st.orders * mult;
           bucket.clicks += st.clicks;
           bucket.impressions += st.impressions;
           bucket.count++;
       });
-
       const totalSpend = stats.branded.spend + stats.nonBranded.spend;
       const totalSales = stats.branded.sales + stats.nonBranded.sales;
-
       return {
-          branded: { 
-              ...stats.branded, 
-              acos: safeDiv(stats.branded.spend, stats.branded.sales),
-              roas: safeDiv(stats.branded.sales, stats.branded.spend),
-              cpc: safeDiv(stats.branded.spend, stats.branded.clicks),
-              spendShare: safeDiv(stats.branded.spend, totalSpend),
-              salesShare: safeDiv(stats.branded.sales, totalSales)
-          },
-          nonBranded: { 
-              ...stats.nonBranded, 
-              acos: safeDiv(stats.nonBranded.spend, stats.nonBranded.sales),
-              roas: safeDiv(stats.nonBranded.sales, stats.nonBranded.spend),
-              cpc: safeDiv(stats.nonBranded.spend, stats.nonBranded.clicks),
-              spendShare: safeDiv(stats.nonBranded.spend, totalSpend),
-              salesShare: safeDiv(stats.nonBranded.sales, totalSales)
-          },
-          totalSpend,
-          totalSales
+          branded: { ...stats.branded, acos: safeDiv(stats.branded.spend, stats.branded.sales), roas: safeDiv(stats.branded.sales, stats.branded.spend), cpc: safeDiv(stats.branded.spend, stats.branded.clicks), spendShare: safeDiv(stats.branded.spend, totalSpend), salesShare: safeDiv(stats.branded.sales, totalSales) },
+          nonBranded: { ...stats.nonBranded, acos: safeDiv(stats.nonBranded.spend, stats.nonBranded.sales), roas: safeDiv(stats.nonBranded.sales, stats.nonBranded.spend), cpc: safeDiv(stats.nonBranded.spend, stats.nonBranded.clicks), spendShare: safeDiv(stats.nonBranded.spend, totalSpend), salesShare: safeDiv(stats.nonBranded.sales, totalSales) },
+          totalSpend, totalSales
       };
-  }, [data.searchTerms, brandInput]);
+  }, [data.searchTerms, brandInput, multipliers]);
 
-  // 2. Business Report Metrics (Total/Organic)
   const bizStats = useMemo(() => {
     const br = data.businessReport || [];
-    const totalSales = br.reduce((acc, r) => acc + r.orderedProductSales, 0);
-    const totalUnits = br.reduce((acc, r) => acc + r.unitsOrdered, 0);
-    const totalOrders = br.reduce((acc, r) => acc + r.totalOrderItems, 0);
-    const totalSessions = br.reduce((acc, r) => acc + r.sessions, 0);
-    const totalPageViews = br.reduce((acc, r) => acc + r.pageViews, 0);
-    
     return { 
-        totalSales, 
-        totalUnits, 
-        totalOrders, 
-        totalSessions, 
-        totalPageViews 
+        totalSales: br.reduce((acc, r) => acc + r.orderedProductSales, 0), 
+        totalUnits: br.reduce((acc, r) => acc + r.unitsOrdered, 0), 
+        totalOrders: br.reduce((acc, r) => acc + r.totalOrderItems, 0), 
+        totalSessions: br.reduce((acc, r) => acc + r.sessions, 0), 
+        totalPageViews: br.reduce((acc, r) => acc + r.pageViews, 0) 
     };
   }, [data.businessReport]);
 
-  // 3. Derived KPIs for Matrix Table
   const kpis = {
-      // Row 1 (Total / Organic)
       tacos: safeDiv(adStats.spend, bizStats.totalSales),
       totalCvr: safeDiv(bizStats.totalOrders, bizStats.totalSessions),
       totalSales: bizStats.totalSales,
       totalOrders: bizStats.totalOrders,
-      orgOrders: bizStats.totalOrders - adStats.orders,
+      orgOrders: Math.max(0, bizStats.totalOrders - adStats.orders),
       sessions: bizStats.totalSessions,
       totalCpa: safeDiv(adStats.spend, bizStats.totalOrders),
       pageViews: bizStats.totalPageViews,
       sessionPct: safeDiv(bizStats.totalUnits, bizStats.totalSessions),
       units: bizStats.totalUnits,
       aov: safeDiv(bizStats.totalSales, bizStats.totalOrders),
-
-      // Row 2 (Ads)
       acos: adStats.acos,
       adCvr: adStats.cvr,
       adSales: adStats.sales,
@@ -340,241 +376,213 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
       impressions: adStats.impressions
   };
 
-  // 4. Detailed Breakdown Data (The new Table)
-  const breakdownData = useMemo(() => {
-      // Helpers & Maps
-      const adGroupKwCount = new Map<string, number>();
-      data.spKeywords.forEach(k => {
-          adGroupKwCount.set(k.adGroupId, (adGroupKwCount.get(k.adGroupId) || 0) + 1);
-      });
+  // Spend Pacing Calculations
+  const pacingData = useMemo(() => {
+      const totalBudget = data.portfolios.reduce((sum, p) => sum + (p.budgetAmount || 0), 0) || 5000; // Fallback
+      const daysInMonth = 30;
+      const daysElapsed = 20; // Assume 20 for demo or calculate from date range
+      const spend = adStats.spend;
+      const budgetPerDay = totalBudget / daysInMonth;
+      const expectedSpend = budgetPerDay * daysElapsed;
+      const pctBudgetUsed = safeDiv(spend, totalBudget);
+      const isOverpacing = spend > expectedSpend;
+      const projectedTotal = (spend / daysElapsed) * daysInMonth;
 
+      return { totalBudget, spend, expectedSpend, pctBudgetUsed, isOverpacing, projectedTotal, daysElapsed };
+  }, [data.portfolios, adStats.spend]);
+
+  const matrixCols = useMemo(() => [
+      { top: { l: 'TACOS', v: formatPct(kpis.tacos), alert: kpis.tacos > 0.15 }, bot: { l: 'ACOS', v: formatPct(kpis.acos), alert: kpis.acos > targetAcos, delta: getDelta(kpis.acos, prevAdStats?.acos, true) } },
+      { top: { l: 'Total Sales', v: formatCompactCurrency(kpis.totalSales, currencySymbol) }, bot: { l: 'Ad Sales', v: formatCompactCurrency(kpis.adSales, currencySymbol), delta: getDelta(kpis.adSales, prevAdStats?.sales) } },
+      { top: { l: 'Ad Revenue %', v: formatPct(kpis.adPct), alert: kpis.adPct > 0.6 }, bot: { l: 'Spend', v: formatCompactCurrency(kpis.spend, currencySymbol), delta: getDelta(kpis.spend, prevAdStats?.spend, true) } },
+      { top: { l: 'Total Orders', v: formatCompactNum(kpis.totalOrders) }, bot: { l: 'Ad Orders', v: formatCompactNum(kpis.adOrders), delta: getDelta(kpis.adOrders, prevAdStats?.orders) } },
+      { top: { l: 'Organic Orders', v: formatCompactNum(kpis.orgOrders) }, bot: { l: 'Clicks', v: formatCompactNum(kpis.clicks), delta: getDelta(kpis.clicks, prevAdStats?.clicks) } },
+      { top: { l: 'Sessions', v: formatCompactNum(kpis.sessions) }, bot: { l: 'Impressions', v: formatCompactNum(kpis.impressions), delta: getDelta(kpis.impressions, prevAdStats?.impressions) } },
+      { top: { l: 'Total CVR', v: formatPct(kpis.totalCvr) }, bot: { l: 'Ad CVR', v: formatPct(kpis.adCvr), delta: getDelta(kpis.adCvr, prevAdStats?.cvr) } },
+      { top: { l: 'Total CPA', v: formatCurrency(kpis.totalCpa, currencySymbol) }, bot: { l: 'Ad CPA', v: formatCurrency(kpis.adCpa, currencySymbol), delta: getDelta(kpis.adCpa, prevAdStats && prevAdStats.orders > 0 ? prevAdStats.spend / prevAdStats.orders : 0, true) } },
+      { top: { l: 'AOV', v: formatCurrency(kpis.aov, currencySymbol) }, bot: { l: 'CPC', v: formatExactCurrency(kpis.cpc, currencySymbol), delta: getDelta(kpis.cpc, prevAdStats?.cpc, true) } },
+      { top: { l: 'Page Views', v: formatCompactNum(kpis.pageViews) }, bot: { l: 'CTR', v: formatExactPct(kpis.ctr), delta: getDelta(kpis.ctr, prevAdStats?.ctr) } },
+      { top: { l: 'Unit Session %', v: formatPct(kpis.sessionPct) }, bot: { l: 'ROAS', v: formatNum(kpis.adSales / (kpis.spend || 1)), delta: getDelta(kpis.adSales / (kpis.spend || 1), prevAdStats?.roas) } }
+  ], [kpis, prevAdStats, currencySymbol, targetAcos]);
+
+  const handleGenerateInsights = async () => {
+      setAiLoading(true);
+      const summary = { adPerformance: { spend: adStats.spend, sales: adStats.sales, acos: adStats.acos, roas: adStats.roas }, channelBreakdown: { spSales: channelStats[0].sales, spRoas: channelStats[0].roas, sbSales: channelStats[1].sales, sbRoas: channelStats[1].roas, sdSales: channelStats[2].sales }, overallHealth: { tacos: kpis.tacos, conversionRate: kpis.totalCvr } };
+      const insight = await generateAccountInsights(summary);
+      setAiInsight(insight);
+      setAiLoading(false);
+  };
+
+  const breakdownData = useMemo(() => {
+      const adGroupKwCount = new Map<string, number>();
+      data.spKeywords.forEach(k => { adGroupKwCount.set(k.adGroupId, (adGroupKwCount.get(k.adGroupId) || 0) + 1); });
       const sbCampMap = new Map(data.sbCampaigns.map(c => [c.campaignId, c.adFormat]));
       const sdCampMap = new Map(data.sdCampaigns.map(c => [c.campaignId, c.tactic]));
-
-      const buckets: Record<string, any> = {
-          // SP
-          'SP SKW Exact': { group: 'SP', order: 1, label: '(SP) SKW Exact' },
-          'SP Exact': { group: 'SP', order: 2, label: '(SP) Exact' },
-          'SP Phrase': { group: 'SP', order: 3, label: '(SP) Phrase' },
-          'SP Broad': { group: 'SP', order: 4, label: '(SP) Broad' },
-          'SP Product Targeting': { group: 'SP', order: 5, label: '(SP) Product Targeting' },
-          'SP Category Targeting': { group: 'SP', order: 6, label: '(SP) Category Targeting' },
-          'SP Auto': { group: 'SP', order: 7, label: '(SP) Auto' },
-          
-          // HSA
-          '(HSA) Exact': { group: 'SB', order: 10, label: '(HSA) Exact' },
-          '(HSA) Phrase': { group: 'SB', order: 11, label: '(HSA) Phrase' },
-          '(HSA) Broad': { group: 'SB', order: 12, label: '(HSA) Broad' },
-          '(HSA) Product Targeting': { group: 'SB', order: 13, label: '(HSA) Product Targeting' },
-          '(HSA) Category Targeting': { group: 'SB', order: 14, label: '(HSA) Category Targeting' },
-          
-          // Store
-          '(Store) Exact': { group: 'SB', order: 20, label: '(Store) Exact' },
-          '(Store) Phrase': { group: 'SB', order: 21, label: '(Store) Phrase' },
-          '(Store) Broad': { group: 'SB', order: 22, label: '(Store) Broad' },
-          '(Store) Product Targeting': { group: 'SB', order: 23, label: '(Store) Product Targeting' },
-          '(Store) Category Targeting': { group: 'SB', order: 24, label: '(Store) Category Targeting' },
-          
-          // Vid
-          '(Vid) Exact': { group: 'SB', order: 30, label: '(Vid) Exact' },
-          '(Vid) Phrase': { group: 'SB', order: 31, label: '(Vid) Phrase' },
-          '(Vid) Broad': { group: 'SB', order: 32, label: '(Vid) Broad' },
-          '(Vid) Product Targeting': { group: 'SB', order: 33, label: '(Vid) Product Targeting' },
-          '(Vid) Category Targeting': { group: 'SB', order: 34, label: '(Vid) Category Targeting' },
-          
-          // SD
-          '(SD) PAT': { group: 'SD', order: 40, label: '(SD) PAT' },
-          '(SD) Audience': { group: 'SD', order: 41, label: '(SD) Audience' },
+      const buckets: Record<string, BucketItem> = {
+          'SP SKW Exact': { group: 'SP', order: 1, label: '(SP) SKW Exact', key: 'SP SKW Exact', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Exact': { group: 'SP', order: 2, label: '(SP) Exact', key: 'SP Exact', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Phrase': { group: 'SP', order: 3, label: '(SP) Phrase', key: 'SP Phrase', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Broad': { group: 'SP', order: 4, label: '(SP) Broad', key: 'SP Broad', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Product Targeting': { group: 'SP', order: 5, label: '(SP) Product Targeting', key: 'SP Product Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Category Targeting': { group: 'SP', order: 6, label: '(SP) Category Targeting', key: 'SP Category Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          'SP Auto': { group: 'SP', order: 7, label: '(SP) Auto', key: 'SP Auto', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(HSA) Exact': { group: 'SB', order: 10, label: '(HSA) Exact', key: '(HSA) Exact', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(HSA) Phrase': { group: 'SB', order: 11, label: '(HSA) Phrase', key: '(HSA) Phrase', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(HSA) Broad': { group: 'SB', order: 12, label: '(HSA) Broad', key: '(HSA) Broad', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(HSA) Product Targeting': { group: 'SB', order: 13, label: '(HSA) Product Targeting', key: '(HSA) Product Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(HSA) Category Targeting': { group: 'SB', order: 14, label: '(HSA) Category Targeting', key: '(HSA) Category Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Store) Exact': { group: 'SB', order: 20, label: '(Store) Exact', key: '(Store) Exact', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Store) Phrase': { group: 'SB', order: 21, label: '(Store) Phrase', key: '(Store) Phrase', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Store) Broad': { group: 'SB', order: 22, label: '(Store) Broad', key: '(Store) Broad', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Store) Product Targeting': { group: 'SB', order: 23, label: '(Store) Product Targeting', key: '(Store) Product Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Store) Category Targeting': { group: 'SB', order: 24, label: '(Store) Category Targeting', key: '(Store) Category Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Vid) Exact': { group: 'SB', order: 30, label: '(Vid) Exact', key: '(Vid) Exact', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Vid) Phrase': { group: 'SB', order: 31, label: '(Vid) Phrase', key: '(Vid) Phrase', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Vid) Broad': { group: 'SB', order: 32, label: '(Vid) Broad', key: '(Vid) Broad', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Vid) Product Targeting': { group: 'SB', order: 33, label: '(Vid) Product Targeting', key: '(Vid) Product Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(Vid) Category Targeting': { group: 'SB', order: 34, label: '(Vid) Category Targeting', key: '(Vid) Category Targeting', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(SD) PAT': { group: 'SD', order: 40, label: '(SD) PAT', key: '(SD) PAT', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
+          '(SD) Audience': { group: 'SD', order: 41, label: '(SD) Audience', key: '(SD) Audience', spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 },
       };
-
-      // Initialize stats
-      Object.keys(buckets).forEach(k => {
-          buckets[k] = { ...buckets[k], key: k, spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0 };
-      });
-
-      // --- Process SP ---
-      data.spKeywords.forEach(k => {
-          let key = '';
-          if (k.matchType === 'EXACT') {
-               key = (adGroupKwCount.get(k.adGroupId) === 1) ? 'SP SKW Exact' : 'SP Exact';
-          }
-          else if (k.matchType === 'PHRASE') key = 'SP Phrase';
-          else if (k.matchType === 'BROAD') key = 'SP Broad';
-          
-          if (key && buckets[key]) {
-              buckets[key].spend += k.spend;
-              buckets[key].sales += k.sales;
-              buckets[key].orders += k.orders;
-              buckets[key].imps += k.impressions;
-              buckets[key].clicks += k.clicks;
-              buckets[key].targets += 1;
-          }
-      });
-      data.spProductTargets.forEach(t => {
-          let key = '';
-          const expr = t.expression.toLowerCase();
-          if (expr.includes('producttype=')) key = 'SP Auto';
-          else if (expr.includes('asin=')) key = 'SP Product Targeting';
-          else if (expr.includes('category=')) key = 'SP Category Targeting';
-
-          if (key && buckets[key]) {
-              buckets[key].spend += t.spend;
-              buckets[key].sales += t.sales;
-              buckets[key].orders += t.orders;
-              buckets[key].imps += t.impressions;
-              buckets[key].clicks += t.clicks;
-              buckets[key].targets += 1;
-          }
-      });
-
-      // --- Process SB ---
-      const processSB = (item: any, isKeyword: boolean) => {
-          const fmt = sbCampMap.get(item.campaignId);
-          let prefix = '(HSA)';
-          if (fmt === 'Store Spotlight') prefix = '(Store)';
-          else if (fmt === 'Video') prefix = '(Vid)';
-          else prefix = '(HSA)'; 
-
-          let key = '';
-          if (isKeyword) {
-              const mt = item.matchType?.toUpperCase();
-              if (mt === 'EXACT') key = `${prefix} Exact`;
-              else if (mt === 'PHRASE') key = `${prefix} Phrase`;
-              else if (mt === 'BROAD') key = `${prefix} Broad`;
-          } else {
-              const expr = item.expression?.toLowerCase() || '';
-              if (expr.includes('category=')) key = `${prefix} Category Targeting`;
-              else key = `${prefix} Product Targeting`;
-          }
-
-          if (key && buckets[key]) {
-              buckets[key].spend += item.spend;
-              buckets[key].sales += item.sales;
-              buckets[key].orders += item.orders || 0;
-              buckets[key].imps += item.impressions;
-              buckets[key].clicks += item.clicks;
-              buckets[key].targets += 1;
-          }
-      };
+      const addMetrics = (key: string, item: any, mult: number) => { if (key && buckets[key]) { buckets[key].spend += item.spend; buckets[key].sales += item.sales * mult; buckets[key].orders += (item.orders || 0) * mult; buckets[key].imps += item.impressions; buckets[key].clicks += item.clicks; buckets[key].targets += 1; } };
+      data.spKeywords.forEach(k => { let key = ''; if (k.matchType === 'EXACT') key = (adGroupKwCount.get(k.adGroupId) === 1) ? 'SP SKW Exact' : 'SP Exact'; else if (k.matchType === 'PHRASE') key = 'SP Phrase'; else if (k.matchType === 'BROAD') key = 'SP Broad'; addMetrics(key, k, multipliers.SP); });
+      data.spProductTargets.forEach(t => { let key = ''; const expr = t.expression.toLowerCase(); if (expr.includes('producttype=')) key = 'SP Auto'; else if (expr.includes('asin=')) key = 'SP Product Targeting'; else if (expr.includes('category=')) key = 'SP Category Targeting'; addMetrics(key, t, multipliers.SP); });
+      const processSB = (item: any, isKeyword: boolean) => { const fmt = sbCampMap.get(item.campaignId); let prefix = '(HSA)'; if (fmt === 'Store Spotlight') prefix = '(Store)'; else if (fmt === 'Video') prefix = '(Vid)'; else prefix = '(HSA)'; let key = ''; if (isKeyword) { const mt = item.matchType?.toUpperCase(); if (mt === 'EXACT') key = `${prefix} Exact`; else if (mt === 'PHRASE') key = `${prefix} Phrase`; else if (mt === 'BROAD') key = `${prefix} Broad`; } else { const expr = item.expression?.toLowerCase() || ''; if (expr.includes('category=')) key = `${prefix} Category Targeting`; else key = `${prefix} Product Targeting`; } addMetrics(key, item, multipliers.SB); };
       data.sbKeywords.forEach(k => processSB(k, true));
       data.sbTargets.forEach(t => processSB(t, false));
-
-      // --- Process SD ---
-      data.sdTargets.forEach(t => {
-          const tactic = sdCampMap.get(t.campaignId);
-          const key = (tactic === 'T00030') ? '(SD) Audience' : '(SD) PAT';
-          if (key && buckets[key]) {
-              buckets[key].spend += t.spend;
-              buckets[key].sales += t.sales;
-              buckets[key].orders += t.orders;
-              buckets[key].imps += t.impressions;
-              buckets[key].clicks += t.clicks;
-              buckets[key].targets += 1;
-          }
-      });
-
-      const rows = Object.values(buckets).sort((a,b) => a.order - b.order);
-
-      const getSummary = (group: string, lbl: string) => {
-          const groupRows = rows.filter(r => r.group === group);
-          return groupRows.reduce((acc, r) => ({
-              ...acc,
-              spend: acc.spend + r.spend,
-              sales: acc.sales + r.sales,
-              orders: acc.orders + r.orders,
-              imps: acc.imps + r.imps,
-              clicks: acc.clicks + r.clicks,
-              targets: acc.targets + r.targets,
-          }), { label: lbl, group: group, key: `SUMMARY_${group}`, spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0, isSummary: true });
-      };
-
+      data.sdTargets.forEach(t => { const tactic = sdCampMap.get(t.campaignId); const key = (tactic === 'T00030') ? '(SD) Audience' : '(SD) PAT'; addMetrics(key, t, multipliers.SD); });
+      const rows: BucketItem[] = Object.values(buckets).sort((a,b) => a.order - b.order);
+      const getSummary = (group: string, lbl: string) => { const groupRows = rows.filter(r => r.group === group); return groupRows.reduce((acc, r) => ({ ...acc, spend: acc.spend + r.spend, sales: acc.sales + r.sales, orders: acc.orders + r.orders, imps: acc.imps + r.imps, clicks: acc.clicks + r.clicks, targets: acc.targets + r.targets, }), { label: lbl, group: group, key: `SUMMARY_${group}`, spend: 0, sales: 0, orders: 0, imps: 0, clicks: 0, targets: 0, isSummary: true, order: 999 } as BucketItem); };
       const spSum = getSummary('SP', 'SP');
       const sbSum = getSummary('SB', 'SB');
       const sdSum = getSummary('SD', 'SD');
-      
-      const total = {
-          label: 'Total',
-          group: 'TOTAL',
-          key: 'TOTAL_ALL',
-          spend: spSum.spend + sbSum.spend + sdSum.spend,
-          sales: spSum.sales + sbSum.sales + sdSum.sales,
-          orders: spSum.orders + sbSum.orders + sdSum.orders,
-          imps: spSum.imps + sbSum.imps + sdSum.imps,
-          clicks: spSum.clicks + sbSum.clicks + sdSum.clicks,
-          targets: spSum.targets + sbSum.targets + sdSum.targets,
-          isTotal: true
-      };
-
+      const total = { label: 'Total', group: 'TOTAL', key: 'TOTAL_ALL', spend: spSum.spend + sbSum.spend + sdSum.spend, sales: spSum.sales + sbSum.sales + sdSum.sales, orders: spSum.orders + sbSum.orders + sdSum.orders, imps: spSum.imps + spSum.imps + spSum.imps, clicks: spSum.clicks + sbSum.clicks + sbSum.clicks, targets: spSum.targets + sbSum.targets + sbSum.targets, isTotal: true, order: 1000 } as BucketItem;
       const grandSpend = total.spend || 1;
       const grandSales = total.sales || 1;
-
-      const calc = (r: any) => ({
-          ...r,
-          acos: safeDiv(r.spend, r.sales),
-          cvr: safeDiv(r.orders, r.clicks),
-          ctr: safeDiv(r.clicks, r.imps),
-          cpa: safeDiv(r.spend, r.orders),
-          pctSales: safeDiv(r.sales, grandSales),
-          pctSpend: safeDiv(r.spend, grandSpend)
-      });
-
-      return [
-          ...rows.filter(r => r.group === 'SP').map(calc),
-          calc(spSum),
-          ...rows.filter(r => r.group === 'SB').map(calc),
-          calc(sbSum),
-          ...rows.filter(r => r.group === 'SD').map(calc),
-          calc(sdSum),
-          calc(total)
-      ];
-  }, [data]);
-
-  // Matrix Definition
-  const matrixCols = [
-    { label: "Efficiency", top: { l: "TACOS", v: formatExactPct(kpis.tacos) }, bot: { l: "ACOS", v: formatExactPct(kpis.acos) } },
-    { label: "Conversion", top: { l: "TOTAL CVR", v: formatExactPct(kpis.totalCvr) }, bot: { l: "AD CVR", v: formatExactPct(kpis.adCvr) } },
-    { label: "Revenue", top: { l: "TOTAL SALES", v: formatCompactCurrency(kpis.totalSales) }, bot: { l: "AD SALES", v: formatCompactCurrency(kpis.adSales) } },
-    { label: "Volume", top: { l: "TOTAL ORDERS", v: formatInt(kpis.totalOrders) }, bot: { l: "AD ORDERS", v: formatInt(kpis.adOrders) } },
-    { label: "Contribution", top: { l: "ORG ORDERS", v: formatInt(kpis.orgOrders) }, bot: { l: "AD CONTRIBUTION %", v: formatPct(kpis.adPct) } },
-    { label: "Traffic", top: { l: "SESSIONS", v: formatInt(kpis.sessions) }, bot: { l: "CLICKS", v: formatCompactNum(kpis.clicks) } },
-    { label: "Acquisition", top: { l: "TOTAL CPA", v: formatExactCurrency(kpis.totalCpa) }, bot: { l: "AD CPA", v: formatExactCurrency(kpis.adCpa) } },
-    { label: "Cost", top: { l: "PAGE VIEWS", v: formatInt(kpis.pageViews) }, bot: { l: "SPEND", v: formatCompactCurrency(kpis.spend) } },
-    { label: "Engagement", top: { l: "SESSION %", v: formatPct(kpis.sessionPct) }, bot: { l: "CPC", v: formatExactCurrency(kpis.cpc) } },
-    { label: "Product", top: { l: "UNITS", v: formatInt(kpis.units) }, bot: { l: "CTR", v: formatExactPct(kpis.ctr) } },
-    { label: "Basket", top: { l: "AOV", v: formatExactCurrency(kpis.aov) }, bot: { l: "IMPRESSIONS", v: formatCompactNum(kpis.impressions) } },
-  ];
+      const calc = (r: BucketItem) => ({ ...r, acos: safeDiv(r.spend, r.sales), cvr: safeDiv(r.orders, r.clicks), ctr: safeDiv(r.clicks, r.imps), cpa: safeDiv(r.spend, r.orders), pctSales: safeDiv(r.sales, grandSales), pctSpend: safeDiv(r.spend, grandSpend) });
+      return [ ...rows.filter(r => r.group === 'SP').map(calc), calc(spSum), ...rows.filter(r => r.group === 'SB').map(calc), calc(sbSum), ...rows.filter(r => r.group === 'SD').map(calc), calc(sdSum), calc(total) ];
+  }, [data, multipliers]);
 
   return (
     <div className="space-y-8 animate-fadeIn pb-12">
-      <SectionHeader title="Executive Summary" description="High-level performance overview across all ad types." />
-
-      {/* 1. PERFORMANCE OVERVIEW MATRIX */}
-      <div className="rounded-xl shadow-sm border border-border overflow-hidden bg-card">
-          <div className="flex items-center justify-between px-6 py-4 bg-card border-b border-border">
-             <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-foreground">
-               <TrendingUp className="w-4 h-4 text-primary" />
-               Performance Overview
-             </h3>
-             <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground bg-muted px-2 py-1 rounded-md border border-border">Real-time</span>
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+          <SectionHeader title="Executive Summary" description="High-level performance overview across all ad types." />
+          <div className="flex items-center gap-3">
+              {attributionModel !== 'Standard' && (
+                  <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border ${attributionModel === 'Aggressive' ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-violet-100 text-violet-700 border-violet-200'}`}>
+                      <Scale size={14} /> {attributionModel} Model Active
+                  </div>
+              )}
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold border ${data.spCampaigns.length > 0 ? 'bg-brand-50 border-brand-200 text-brand-800 dark:bg-zinc-900 dark:border-zinc-700 dark:text-brand-400' : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-zinc-900 dark:border-zinc-800'}`}>
+                  {data.spCampaigns.length > 0 ? <CheckCircle2 size={14} /> : <AlertCircle size={14} />} Bulk Ads Data
+              </div>
           </div>
-          
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* AI Insights Card */}
+          <div className="lg:col-span-2 bg-gradient-to-r from-zinc-900 to-zinc-800 dark:from-zinc-900 dark:to-black rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-zinc-700 dark:border-zinc-800">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500 blur-3xl opacity-10 rounded-full pointer-events-none -mr-20 -mt-20"></div>
+              <div className="relative z-10 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-heading font-black flex items-center gap-2 text-brand-400">
+                          <Sparkles className="w-5 h-5 fill-current" /> AI ANALYST
+                      </h3>
+                      {!aiInsight && !aiLoading && (
+                          <button onClick={handleGenerateInsights} className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-xs font-bold transition-all flex items-center gap-2">GENERATE INSIGHTS</button>
+                      )}
+                  </div>
+                  <div className="flex-1">
+                      {aiLoading ? (
+                          <div className="flex items-center gap-3 text-sm font-medium text-slate-300 animate-pulse py-4">
+                              <Loader2 className="w-5 h-5 animate-spin text-brand-400" /> Analyzing performance...
+                          </div>
+                      ) : aiInsight ? (
+                          <div className="prose prose-invert prose-sm max-w-none">
+                              <div dangerouslySetInnerHTML={{ __html: aiInsight.replace(/\*\*(.*?)\*\*/g, '<strong class="text-brand-400">$1</strong>').replace(/\n/g, '<br/>') }} />
+                          </div>
+                      ) : (
+                          <p className="text-sm text-zinc-400 py-4">
+                              Strategic efficiency analysis. Click generate to analyze waste and growth opportunities instantly using AI.
+                          </p>
+                      )}
+                  </div>
+              </div>
+          </div>
+
+          {/* Spend Pacing Card */}
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-slate-200 dark:border-zinc-800 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-xs font-bold uppercase text-slate-400 tracking-widest flex items-center gap-2">
+                            <CalendarDays size={14} className="text-indigo-500" /> Monthly Pacing
+                        </h4>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${pacingData.isOverpacing ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                            {pacingData.isOverpacing ? 'Overpacing' : 'On Track'}
+                        </span>
+                    </div>
+
+                    <div className="mb-6">
+                        <div className="flex items-baseline gap-2 mb-1">
+                            <span className="text-3xl font-black text-slate-900 dark:text-white">{formatPct(pacingData.pctBudgetUsed)}</span>
+                            <span className="text-xs font-bold text-slate-400 uppercase">of Budget</span>
+                        </div>
+                        <div className="w-full h-3 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden relative">
+                             {/* Expected Spend Marker */}
+                            <div className="absolute top-0 bottom-0 border-r-2 border-indigo-400 z-10" style={{ left: `${(pacingData.daysElapsed / 30) * 100}%` }}></div>
+                            <div className={`h-full rounded-full transition-all duration-500 ${pacingData.isOverpacing ? 'bg-rose-500' : 'bg-brand-500'}`} style={{ width: `${pacingData.pctBudgetUsed * 100}%` }}></div>
+                        </div>
+                        <div className="flex justify-between mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-tighter">
+                            <span>$0</span>
+                            <span className="text-indigo-500">Day {pacingData.daysElapsed} Target</span>
+                            <span>{formatCompactCurrency(pacingData.totalBudget, currencySymbol)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="space-y-2 border-t border-slate-50 dark:border-zinc-800 pt-4">
+                    <div className="flex justify-between text-xs">
+                        <span className="text-slate-500 font-medium">Projected Spend:</span>
+                        <span className="font-bold text-slate-900 dark:text-white">{formatCurrency(pacingData.projectedTotal, currencySymbol)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs">
+                        <span className="text-slate-500 font-medium">Budget Difference:</span>
+                        <span className={`font-bold ${pacingData.projectedTotal > pacingData.totalBudget ? 'text-rose-600' : 'text-emerald-600'}`}>
+                            {pacingData.projectedTotal > pacingData.totalBudget ? '+' : ''}{formatCurrency(pacingData.projectedTotal - pacingData.totalBudget, currencySymbol)}
+                        </span>
+                    </div>
+                </div>
+          </div>
+      </div>
+
+      {/* PERFORMANCE OVERVIEW MATRIX */}
+      <div className="rounded-xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900">
+          <div className="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800">
+             <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 dark:text-zinc-100">
+               <TrendingUp className="w-4 h-4 text-brand-500" /> Performance Overview
+             </h3>
+             <div className="flex items-center gap-2">
+                 <span className="text-[10px] font-bold text-slate-400 dark:text-zinc-500">TARGET ACOS: {formatPct(targetAcos)}</span>
+             </div>
+          </div>
           <div className="overflow-x-auto custom-scrollbar">
              <div className="min-w-[1000px]">
-                 {/* Top Row: Total / Organic */}
-                 <div className="grid grid-cols-11 bg-muted text-foreground">
+                 <div className="grid grid-cols-11 bg-zinc-900 dark:bg-black text-white border-b border-zinc-800">
                      {matrixCols.map((col, idx) => (
-                        <div key={`top-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-border' : ''}`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-primary mb-1.5">{col.top.l}</span>
-                            <span className="text-base font-bold font-heading">{col.top.v}</span>
+                        <div key={`top-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-zinc-800' : ''}`}>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-400 mb-1.5">{col.top.l}</span>
+                            <span className={`text-base font-bold font-heading ${col.top.alert ? 'text-rose-400' : ''}`}>{col.top.v}</span>
                         </div>
                      ))}
                  </div>
-                 {/* Bottom Row: Ad Metrics */}
-                 <div className="grid grid-cols-11 bg-card text-foreground">
+                 <div className="grid grid-cols-11 bg-white dark:bg-zinc-900 text-slate-900 dark:text-zinc-100">
                      {matrixCols.map((col, idx) => (
-                        <div key={`bot-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-border' : ''}`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5">{col.bot.l}</span>
-                            <span className="text-base font-bold font-heading">{col.bot.v}</span>
+                        <div key={`bot-${idx}`} className={`flex flex-col items-center justify-center py-5 px-2 ${idx !== matrixCols.length - 1 ? 'border-r border-slate-100 dark:border-zinc-800' : ''}`}>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500 mb-1.5">{col.bot.l}</span>
+                            <div className="flex items-center gap-1">
+                                <span className={`text-base font-bold font-heading ${col.bot.alert ? 'text-rose-600' : ''}`}>{col.bot.v}</span>
+                                {col.bot.delta}
+                            </div>
                         </div>
                      ))}
                  </div>
@@ -582,202 +590,97 @@ export const ExecutiveDashboard: React.FC<{ data: DashboardData }> = ({ data }) 
           </div>
       </div>
 
-      {/* 2. CHANNEL PERFORMANCE WITH BREAKDOWN */}
+      {/* CHANNEL PERFORMANCE & TARGETS */}
       <div className="space-y-4">
-        <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-muted-foreground pl-1">
+        <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-slate-500 dark:text-zinc-400 pl-1">
              <PieChart className="w-4 h-4" /> Channel Performance & Targets
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
            {channelStats.map((channel) => {
                const Icon = channel.icon;
                return (
-                    <div key={channel.key} className={`rounded-2xl border ${channel.border} bg-card p-5 flex flex-col relative overflow-hidden h-full`}>
-                        {/* Header */}
-                        <div className="flex items-center gap-3 mb-4 z-10">
-                            <div className={`w-9 h-9 rounded-xl ${channel.bg} flex items-center justify-center ${channel.iconColor}`}>
-                                <Icon size={18} strokeWidth={2.5} />
-                            </div>
-                            <h4 className={`text-sm font-bold font-heading uppercase tracking-wide ${channel.text}`}>{channel.label}</h4>
-                            <div className={`ml-auto flex items-center gap-1 ${channel.bg} px-2.5 py-1 rounded-lg text-[10px] font-bold`}>
-                                <span className={channel.text}>{formatPct(channel.share)}</span> <span className="text-muted-foreground">SHARE</span>
-                            </div>
-                        </div>
-                        
-                        {/* Metrics Grid */}
-                        <div className="grid grid-cols-2 gap-4 z-10 mb-4 pb-4 border-b border-border">
-                            <div>
-                                <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Sales</p>
-                                <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatCompactCurrency(channel.sales)}</p>
-                            </div>
-                            <div className="text-right">
-                                <p className="text-[10px] uppercase font-bold text-muted-foreground mb-1">ROAS</p>
-                                <p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatNum(channel.roas)}</p>
-                            </div>
-                        </div>
-
-                        {/* Target Summary Table */}
-                        <div className="flex-1 z-10">
-                            <table className="w-full text-xs">
-                                <tbody>
-                                    {channel.details.map((detail, idx) => (
-                                        <tr key={idx} className={`${detail.h ? 'font-bold border-b border-border' : ''}`}>
-                                            <td className={`py-1.5 ${detail.h ? channel.text : 'text-foreground/80'} ${detail.h ? 'text-[11px] uppercase tracking-wider' : ''}`}>
-                                                {detail.h && <Target className="w-3 h-3 inline-block mr-1.5 mb-0.5" />}
-                                                {detail.l}
-                                            </td>
-                                            <td className={`py-1.5 text-right font-bold text-foreground`}>
-                                                {detail.v}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        {/* Footer */}
-                        <div className="mt-4 pt-3 border-t border-border flex items-center justify-between z-10">
-                            <span className="text-xs font-bold text-muted-foreground">Spend: {formatCurrency(channel.spend)}</span>
-                        </div>
+                   <div key={channel.key} className={`rounded-xl border ${channel.border} ${channel.bg} p-5 flex flex-col relative overflow-hidden h-full`}>
+                       <div className="flex items-center gap-3 mb-4 z-10">
+                           <div className={`w-8 h-8 rounded-lg bg-white/60 dark:bg-zinc-800/60 flex items-center justify-center ${channel.iconColor} shadow-sm`}>
+                               <Icon size={16} strokeWidth={2.5} />
+                           </div>
+                           <h4 className={`text-sm font-bold font-heading uppercase tracking-wide ${channel.text}`}>{channel.label}</h4>
+                           <div className="ml-auto flex items-center gap-1 bg-white/60 dark:bg-zinc-800/60 px-2 py-1 rounded text-[10px] font-bold shadow-sm">
+                               <span className={channel.subColor}>{formatPct(channel.share)}</span> SHARE
+                           </div>
+                       </div>
+                       <div className="grid grid-cols-2 gap-4 z-10 mb-4 pb-4 border-b border-black/5 dark:border-white/5">
+                           <div><p className={`text-[10px] uppercase font-bold ${channel.subColor} opacity-70 mb-1`}>Sales</p><p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatCompactCurrency(channel.sales, currencySymbol)}</p></div>
+                           <div className="text-right"><p className={`text-[10px] uppercase font-bold ${channel.subColor} opacity-70 mb-1`}>ROAS</p><p className={`text-2xl font-black ${channel.valueColor} tracking-tight`}>{formatNum(channel.roas)}</p></div>
+                       </div>
+                       <div className="flex-1 z-10">
+                           <table className="w-full text-xs">
+                               <tbody>
+                                   {channel.details.map((detail, idx) => (
+                                       <tr key={idx} className={`${detail.h ? 'font-bold border-b border-black/5 dark:border-white/5' : ''}`}>
+                                           <td className={`py-1 ${detail.h ? channel.text : channel.subColor} ${detail.h ? 'text-[11px] uppercase tracking-wider' : 'opacity-90'}`}>{detail.h && <Target className="w-3 h-3 inline-block mr-1 mb-0.5" />}{detail.l}</td>
+                                           <td className={`py-1 text-right font-bold ${channel.valueColor}`}>{detail.v}</td>
+                                       </tr>
+                                   ))}
+                               </tbody>
+                           </table>
+                       </div>
+                       <div className="mt-4 pt-3 border-t border-black/5 dark:border-white/5 flex items-center justify-between z-10">
+                           <span className={`text-xs font-bold ${channel.subColor}`}>Spend: {formatCurrency(channel.spend, currencySymbol)}</span>
+                       </div>
                    </div>
                );
            })}
         </div>
       </div>
 
-      {/* 3. DETAILED MATCH TYPE BREAKDOWN (Replaced with DataTable for Export) */}
+      {/* DETAILED BREAKDOWN */}
       <div className="space-y-2">
-          <div className="flex items-center gap-2 pl-1">
-               <Layers className="w-4 h-4 text-muted-foreground" />
-               <h3 className="text-sm font-bold font-heading uppercase tracking-wide text-muted-foreground">Detailed Performance Breakdown</h3>
-          </div>
-          <DataTable 
-            data={breakdownData}
-            initialSortKey="spend"
-            fileName="Lynx_Executive_Breakdown"
-            columns={[
-                { key: 'label', header: 'Match / Segment', render: (r: any) => (
-                    <span className={`font-bold ${r.isTotal ? 'text-foreground text-sm' : r.isSummary ? 'text-foreground' : 'text-muted-foreground'}`}>
-                        {r.label}
-                    </span>
-                )},
-                { key: 'spend', header: 'Spend', align: 'right', sortable: true, render: (r: any) => formatCurrency(r.spend) },
+          <div className="flex items-center gap-2 pl-1"><Layers className="w-4 h-4 text-slate-500 dark:text-zinc-400" /><h3 className="text-sm font-bold font-heading uppercase tracking-wide text-slate-500 dark:text-zinc-400">Detailed Performance Breakdown</h3></div>
+          <DataTable data={breakdownData} initialSortKey="spend" fileName="Lynx_Executive_Breakdown" columns={[
+                { key: 'label', header: 'Match / Segment', render: (r: any) => (<span className={`font-bold ${r.isTotal ? 'text-black dark:text-white text-sm' : r.isSummary ? 'text-slate-900 dark:text-zinc-200' : 'text-slate-600 dark:text-zinc-400'}`}>{r.label}</span>)},
+                { key: 'spend', header: 'Spend', align: 'right', sortable: true, render: (r: any) => formatCurrency(r.spend, currencySymbol) },
                 { key: 'orders', header: 'Orders', align: 'right', sortable: true, render: (r: any) => formatInt(r.orders) },
-                { key: 'sales', header: 'Sales', align: 'right', sortable: true, render: (r: any) => formatCompactCurrency(r.sales) },
+                { key: 'sales', header: 'Sales', align: 'right', sortable: true, render: (r: any) => formatCompactCurrency(r.sales, currencySymbol) },
                 { key: 'imps', header: 'Impressions', align: 'right', sortable: true, render: (r: any) => formatCompactNum(r.imps) },
-                { key: 'clicks', header: 'Clicks', align: 'right', sortable: true, render: (r: any) => formatCompactNum(r.clicks) },
-                { key: 'acos', header: 'ACOS', align: 'right', sortable: true, render: (r: any) => <span className={r.acos > 0.4 ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span> },
+                { key: 'acos', header: 'ACOS', align: 'right', sortable: true, render: (r: any) => <span className={r.acos > targetAcos ? 'text-rose-600 font-bold' : ''}>{formatPct(r.acos)}</span> },
                 { key: 'cvr', header: 'CVR', align: 'right', sortable: true, render: (r: any) => formatPct(r.cvr) },
                 { key: 'ctr', header: 'CTR', align: 'right', sortable: true, render: (r: any) => formatExactPct(r.ctr) },
                 { key: 'targets', header: 'Targets', align: 'right', sortable: true, render: (r: any) => formatInt(r.targets) },
-                { key: 'cpa', header: 'CPA', align: 'right', sortable: true, render: (r: any) => formatNum(r.cpa) },
                 { key: 'pctSales', header: '% Sales', align: 'right', sortable: true, render: (r: any) => formatPct(r.pctSales) },
                 { key: 'pctSpend', header: '% Spend', align: 'right', sortable: true, render: (r: any) => formatPct(r.pctSpend) },
-            ]}
-          />
+            ]} />
       </div>
 
-      {/* 4. BRANDED vs NON-BRANDED */}
-      <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-          <div className="px-6 py-4 bg-muted border-b border-border">
+      {/* BRANDED vs NON-BRANDED */}
+      <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="px-6 py-4 bg-slate-50 dark:bg-zinc-900 border-b border-slate-100 dark:border-zinc-800">
              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                 <div>
-                     <h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 text-foreground">
-                       <Tags className="w-4 h-4 text-foreground" /> Branded vs Non-Branded Analysis
-                     </h3>
-                     <p className="text-xs text-muted-foreground mt-1">Based on search term report data. Define your brand terms below.</p>
-                 </div>
-                 
-                 <div className="relative w-full sm:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={14} />
-                    <input 
-                        type="text" 
-                        placeholder="e.g. nike, adidas (comma separated)" 
-                        value={brandInput}
-                        onChange={(e) => setBrandInput(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 text-xs border border-border rounded-lg focus:ring-primary focus:border-primary bg-background text-foreground placeholder:text-muted-foreground"
-                    />
-                 </div>
+                 <div><h3 className="text-sm font-bold font-heading uppercase tracking-wide flex items-center gap-2 dark:text-zinc-100"><Tags className="w-4 h-4 text-slate-900 dark:text-zinc-100" /> Branded vs Non-Branded Analysis</h3><p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">Based on search term report data.</p></div>
+                 <div className="relative w-full sm:w-64"><Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} /><input type="text" placeholder="nike, adidas (comma separated)" value={brandInput} onChange={(e) => setBrandInput(e.target.value)} className="w-full pl-9 pr-4 py-2 text-xs border border-slate-200 dark:border-zinc-700 rounded-lg focus:ring-brand-500 focus:border-brand-500 bg-white dark:bg-zinc-800 text-black dark:text-white placeholder:text-slate-400"/></div>
              </div>
           </div>
-
           <div className="p-6">
               {brandStats ? (
                   <div className="space-y-6">
-                      {/* Summary Cards */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 flex justify-between items-center">
-                              <div>
-                                  <div className="text-xs font-bold text-indigo-800 uppercase tracking-wide mb-1">Branded Spend</div>
-                                  <div className="text-2xl font-black text-indigo-900">{formatCurrency(brandStats.branded.spend)}</div>
-                              </div>
-                              <div className="text-right">
-                                  <div className="text-xs font-bold text-indigo-600 mb-1">ROAS</div>
-                                  <div className="text-xl font-bold text-indigo-900">{formatNum(brandStats.branded.roas)}</div>
-                              </div>
-                          </div>
-                          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 flex justify-between items-center">
-                              <div>
-                                  <div className="text-xs font-bold text-emerald-800 uppercase tracking-wide mb-1">Non-Branded Spend</div>
-                                  <div className="text-2xl font-black text-emerald-900">{formatCurrency(brandStats.nonBranded.spend)}</div>
-                              </div>
-                              <div className="text-right">
-                                  <div className="text-xs font-bold text-emerald-600 mb-1">ROAS</div>
-                                  <div className="text-xl font-bold text-emerald-900">{formatNum(brandStats.nonBranded.roas)}</div>
-                              </div>
-                          </div>
+                          <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 dark:bg-indigo-900/20 dark:border-indigo-800 flex justify-between items-center"><div><div className="text-xs font-bold text-indigo-800 dark:text-indigo-300 uppercase tracking-wide mb-1">Branded Spend</div><div className="text-2xl font-black text-indigo-900 dark:text-white">{formatCurrency(brandStats.branded.spend, currencySymbol)}</div></div><div className="text-right"><div className="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1">ROAS</div><div className="text-xl font-bold text-indigo-900 dark:text-white">{formatNum(brandStats.branded.roas)}</div></div></div>
+                          <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800 flex justify-between items-center"><div><div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 uppercase tracking-wide mb-1">Non-Branded Spend</div><div className="text-2xl font-black text-emerald-900 dark:text-white">{formatCurrency(brandStats.nonBranded.spend, currencySymbol)}</div></div><div className="text-right"><div className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-1">ROAS</div><div className="text-xl font-bold text-emerald-900 dark:text-white">{formatNum(brandStats.nonBranded.roas)}</div></div></div>
                       </div>
-
-                      {/* Comparative Table */}
                       <div className="overflow-x-auto">
                           <table className="w-full text-xs">
-                              <thead>
-                                  <tr className="bg-muted text-muted-foreground uppercase tracking-wider font-bold border-b border-border">
-                                      <th className="py-3 px-4 text-left">Metric</th>
-                                      <th className="py-3 px-4 text-right text-indigo-400">Branded</th>
-                                      <th className="py-3 px-4 text-right text-emerald-400">Non-Branded</th>
-                                      <th className="py-3 px-4 text-right text-foreground">Total (Search Terms)</th>
-                                  </tr>
-                              </thead>
-                              <tbody className="divide-y divide-border text-foreground font-medium">
-                                  <tr>
-                                      <td className="py-3 px-4 font-bold">Spend</td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.spend)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.branded.spendShare)})</span></td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.spend)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.nonBranded.spendShare)})</span></td>
-                                      <td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSpend)}</td>
-                                  </tr>
-                                  <tr>
-                                      <td className="py-3 px-4 font-bold">Sales</td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.sales)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.branded.salesShare)})</span></td>
-                                      <td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.sales)} <span className="text-[10px] text-muted-foreground">({formatPct(brandStats.nonBranded.salesShare)})</span></td>
-                                      <td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSales)}</td>
-                                  </tr>
-                                  <tr>
-                                      <td className="py-3 px-4 font-bold">ACOS</td>
-                                      <td className="py-3 px-4 text-right font-bold text-indigo-400">{formatPct(brandStats.branded.acos)}</td>
-                                      <td className="py-3 px-4 text-right font-bold text-emerald-400">{formatPct(brandStats.nonBranded.acos)}</td>
-                                      <td className="py-3 px-4 text-right">{formatPct(safeDiv(brandStats.totalSpend, brandStats.totalSales))}</td>
-                                  </tr>
-                                  <tr>
-                                      <td className="py-3 px-4 font-bold">CPC</td>
-                                      <td className="py-3 px-4 text-right">{formatExactCurrency(brandStats.branded.cpc)}</td>
-                                      <td className="py-3 px-4 text-right">{formatExactCurrency(brandStats.nonBranded.cpc)}</td>
-                                      <td className="py-3 px-4 text-right">-</td>
-                                  </tr>
-                                  <tr>
-                                      <td className="py-3 px-4 font-bold">Orders</td>
-                                      <td className="py-3 px-4 text-right">{formatInt(brandStats.branded.orders)}</td>
-                                      <td className="py-3 px-4 text-right">{formatInt(brandStats.nonBranded.orders)}</td>
-                                      <td className="py-3 px-4 text-right font-bold">{formatInt(brandStats.branded.orders + brandStats.nonBranded.orders)}</td>
-                                  </tr>
+                              <thead><tr className="bg-slate-50 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 uppercase tracking-wider font-bold border-b border-slate-200 dark:border-zinc-700"><th className="py-3 px-4 text-left">Metric</th><th className="py-3 px-4 text-right text-indigo-700 dark:text-indigo-300">Branded</th><th className="py-3 px-4 text-right text-emerald-700 dark:text-emerald-300">Non-Branded</th><th className="py-3 px-4 text-right text-slate-700 dark:text-zinc-300">Total</th></tr></thead>
+                              <tbody className="divide-y divide-slate-100 dark:divide-zinc-800 text-slate-700 dark:text-zinc-100 font-medium">
+                                  <tr><td className="py-3 px-4 font-bold">Spend</td><td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.spend, currencySymbol)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.branded.spendShare)})</span></td><td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.spend, currencySymbol)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.nonBranded.spendShare)})</span></td><td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSpend, currencySymbol)}</td></tr>
+                                  <tr><td className="py-3 px-4 font-bold">Sales</td><td className="py-3 px-4 text-right">{formatCurrency(brandStats.branded.sales, currencySymbol)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.branded.salesShare)})</span></td><td className="py-3 px-4 text-right">{formatCurrency(brandStats.nonBranded.sales, currencySymbol)} <span className="text-[10px] text-slate-400">({formatPct(brandStats.nonBranded.salesShare)})</span></td><td className="py-3 px-4 text-right font-bold">{formatCurrency(brandStats.totalSales, currencySymbol)}</td></tr>
+                                  <tr><td className="py-3 px-4 font-bold">ROAS</td><td className="py-3 px-4 text-right">{formatNum(brandStats.branded.roas)}</td><td className="py-3 px-4 text-right">{formatNum(brandStats.nonBranded.roas)}</td><td className="py-3 px-4 text-right font-bold">{formatNum(safeDiv(brandStats.totalSales, brandStats.totalSpend))}</td></tr>
                               </tbody>
                           </table>
                       </div>
                   </div>
               ) : (
-                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground bg-muted/50 rounded-xl border border-dashed border-border">
-                      <Tags className="w-10 h-10 mb-3 opacity-20" />
-                      <p className="font-bold text-sm">Enter brand terms above to see the breakdown.</p>
-                      <p className="text-xs mt-1">We'll analyze your search term data instantly.</p>
+                  <div className="text-center py-12 bg-slate-50 dark:bg-zinc-800 rounded-xl border border-dashed border-slate-200 dark:border-zinc-700 text-slate-400 dark:text-zinc-500 font-medium">
+                      <p>Enter brand terms above to analyze traffic composition.</p>
                   </div>
               )}
           </div>

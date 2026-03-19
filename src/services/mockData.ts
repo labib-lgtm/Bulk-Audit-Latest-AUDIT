@@ -1,3 +1,4 @@
+
 import {
   DashboardData,
   Portfolio,
@@ -17,24 +18,41 @@ import {
   SDTarget,
   BusinessReportRow,
   SBAd,
-  SBPlacement
+  SBPlacement,
+  InventoryRow,
+  HourlyPerformanceRow,
+  ProductCost,
+  ProductGoal
 } from '../types';
 
 const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 const getRandomFloat = (min: number, max: number) => parseFloat((Math.random() * (max - min) + min).toFixed(2));
 
+// Realistic E-commerce terms for Word Cloud / N-Gram
+const ROOT_WORDS = ['Running', 'Walking', 'Gym', 'Training', 'Marathon', 'Trail', 'Hiking', 'Casual'];
+const MODIFIERS = ['Shoes', 'Sneakers', 'Boots', 'Socks', 'Gear', 'Equipment', 'Accessories'];
+const ADJECTIVES = ['Mens', 'Womens', 'Kids', 'Blue', 'Red', 'Black', 'White', 'Cheap', 'Best', 'Comfortable', 'Lightweight', 'Waterproof'];
+
+const generateSearchTerm = () => {
+    const adj = ADJECTIVES[getRandomInt(0, ADJECTIVES.length - 1)];
+    const root = ROOT_WORDS[getRandomInt(0, ROOT_WORDS.length - 1)];
+    const mod = MODIFIERS[getRandomInt(0, MODIFIERS.length - 1)];
+    return `${adj} ${root} ${mod}`.toLowerCase();
+};
+
 const generateMetrics = (budget: number) => {
-  const spend = getRandomFloat(0, budget * 30);
-  const impressions = Math.floor(spend * getRandomInt(800, 1500));
-  const clicks = Math.floor(impressions * getRandomFloat(0.002, 0.015));
-  const orders = Math.floor(clicks * getRandomFloat(0.05, 0.15));
-  const sales = orders * getRandomFloat(20, 50);
+  const spend = getRandomFloat(0, budget * 30); // Monthly spend approx
+  const impressions = Math.floor(spend * getRandomInt(800, 1500)); // CPM variance
+  const clicks = Math.floor(impressions * getRandomFloat(0.002, 0.015)); // CTR 0.2% - 1.5%
+  const orders = Math.floor(clicks * getRandomFloat(0.05, 0.15)); // CVR 5% - 15%
+  const sales = orders * getRandomFloat(20, 50); // AOV $20-$50
   const units = orders * getRandomInt(1, 2);
   
   return { spend, impressions, clicks, orders, sales, units };
 };
 
-export const generateMockData = (): DashboardData => {
+// Extended return type to include non-bulk state
+export const generateMockData = (): DashboardData & { mockCosts: Record<string, ProductCost>, mockGoals: Record<string, ProductGoal> } => {
   const portfolios: Portfolio[] = Array.from({ length: 5 }).map((_, i) => ({
     id: `PF-${i}`,
     name: `Portfolio ${i + 1} - ${['Launch', 'Core', 'Defensive', 'Category', 'Brand'][i]}`,
@@ -67,9 +85,16 @@ export const generateMockData = (): DashboardData => {
 
   const spPlacements: SPPlacement[] = [];
   spCampaigns.forEach(c => {
+    // Make TOS perform better for the Calculator demo
     const tosMetrics = generateMetrics(c.dailyBudget * 0.4);
+    tosMetrics.orders = Math.floor(tosMetrics.clicks * 0.15); // High CVR
+
     const ppMetrics = generateMetrics(c.dailyBudget * 0.3);
+    ppMetrics.orders = Math.floor(ppMetrics.clicks * 0.05); // Lower CVR
+
     const rosMetrics = generateMetrics(c.dailyBudget * 0.2);
+    
+    // Add Amazon Business metrics
     const abMetrics = generateMetrics(c.dailyBudget * 0.1);
     
     spPlacements.push({
@@ -96,15 +121,13 @@ export const generateMockData = (): DashboardData => {
       ...rosMetrics
     });
 
-    if (Math.random() > 0.5) {
-        spPlacements.push({
-            campaignId: c.campaignId,
-            campaignName: c.name,
-            placement: 'Amazon Business',
-            percentage: getRandomInt(0, 20),
-            ...abMetrics
-        });
-    }
+    spPlacements.push({
+      campaignId: c.campaignId,
+      campaignName: c.name,
+      placement: 'Amazon Business',
+      percentage: getRandomInt(0, 20),
+      ...abMetrics
+    });
   });
 
   const spAdGroups: SPAdGroup[] = Array.from({ length: 40 }).map((_, i) => {
@@ -120,17 +143,52 @@ export const generateMockData = (): DashboardData => {
     };
   });
 
+  const uniqueAsinsList = Array.from({ length: 15 }).map((_, i) => `B00${getRandomInt(10000, 99999)}`);
+
+  // Generate Mock Costs for Profitability
+  const mockCosts: Record<string, ProductCost> = {};
+  const mockGoals: Record<string, ProductGoal> = {};
+
+  uniqueAsinsList.forEach((asin, i) => {
+      // Assuming avg price is around 30-40 based on sales logic
+      const estimatedPrice = 35;
+      
+      mockCosts[asin] = {
+          asin,
+          cogs: getRandomFloat(8, 12), // ~$10 COGS
+          fbaFee: getRandomFloat(4, 7), // ~$5 FBA
+          referralFeePct: 0.15,
+          shipping: 0,
+          miscCost: 0
+      };
+
+      // Set some specific goals for a few items
+      if (i < 3) {
+          mockGoals[asin] = {
+              asin,
+              targetAcos: 0.50, // Launching
+              strategy: 'Launch'
+          };
+      } else if (i > 10) {
+          mockGoals[asin] = {
+              asin,
+              targetAcos: 0.25, // Profit
+              strategy: 'Profit'
+          };
+      }
+  });
+
   const spSkus: SPSku[] = Array.from({ length: 60 }).map((_, i) => {
     const adGroupId = `AG-${i % 40}`;
     const campaignId = `SP-${i % 20}`;
+    const asin = uniqueAsinsList[i % uniqueAsinsList.length];
     return {
       sku: `SKU-${getRandomInt(100, 999)}`,
-      asin: `B00${getRandomInt(10000, 99999)}`,
+      asin: asin,
       campaignId,
       adGroupId,
       state: i % 10 === 0 ? 'paused' : 'enabled',
-      eligibilityStatus: i % 15 === 0 ? 'Ineligible' : 'Eligible',
-      reasonForIneligibility: i % 15 === 0 ? 'Listing Suppressed' : undefined,
+      eligibilityStatus: 'Eligible',
       ...generateMetrics(10)
     };
   });
@@ -140,7 +198,7 @@ export const generateMockData = (): DashboardData => {
     const campaignId = `SP-${i % 20}`;
     return {
       keywordId: `KW-${i}`,
-      keywordText: `keyword ${i}`,
+      keywordText: generateSearchTerm(),
       matchType: ['BROAD', 'PHRASE', 'EXACT'][i % 3] as any,
       bid: getRandomFloat(0.5, 3.0),
       state: 'enabled',
@@ -153,36 +211,10 @@ export const generateMockData = (): DashboardData => {
   const spProductTargets: SPProductTargeting[] = Array.from({ length: 60 }).map((_, i) => {
     const adGroupId = `AG-${i % 40}`;
     const campaignId = `SP-${i % 20}`;
-    
-    const rand = Math.random();
-    let expression = '';
-    let resolvedExpression = '';
-
-    if (rand < 0.3) {
-        const asin = `B00${getRandomInt(50000, 99999)}`;
-        expression = `asin="${asin}"`;
-        resolvedExpression = expression;
-    } else if (rand < 0.5) {
-        expression = `category="12345"`;
-        resolvedExpression = expression;
-    } else if (rand < 0.625) {
-        expression = `productType="queryHighRelMatches"`;
-        resolvedExpression = expression;
-    } else if (rand < 0.75) {
-        expression = `productType="queryBroadRelMatches"`;
-        resolvedExpression = expression;
-    } else if (rand < 0.875) {
-        expression = `productType="asinSubstituteRelated"`;
-        resolvedExpression = expression;
-    } else {
-        expression = `productType="asinAccessoryRelated"`;
-        resolvedExpression = expression;
-    }
-
     return {
       targetId: `PT-${i}`,
-      expression: expression,
-      resolvedExpression: resolvedExpression,
+      expression: `asin="B00${getRandomInt(50000, 99999)}"`,
+      resolvedExpression: `asin="B00${getRandomInt(50000, 99999)}"`,
       bid: getRandomFloat(0.75, 4.0),
       state: 'enabled',
       campaignId,
@@ -203,7 +235,7 @@ export const generateMockData = (): DashboardData => {
       budget,
       budgetType: 'DAILY',
       state: 'enabled',
-      servingStatus: i === 2 ? 'REJECTED' : 'RUNNING',
+      servingStatus: 'RUNNING',
       adFormat: formats[i % 3],
       landingPageUrl: 'https://amazon.com/store',
       ...metrics
@@ -213,36 +245,12 @@ export const generateMockData = (): DashboardData => {
   const sbPlacements: SBPlacement[] = [];
   sbCampaigns.forEach(c => {
      const tosMetrics = generateMetrics(c.budget * 0.4);
-     const otherMetrics = generateMetrics(c.budget * 0.2);
-     const detailMetrics = generateMetrics(c.budget * 0.3);
-     const homeMetrics = generateMetrics(c.budget * 0.1);
-
      sbPlacements.push({
          campaignId: c.campaignId,
          placement: 'Top of Search',
          percentage: getRandomInt(0, 50),
          ...tosMetrics
      });
-     sbPlacements.push({
-        campaignId: c.campaignId,
-        placement: 'Other',
-        percentage: 0,
-        ...otherMetrics
-     });
-     sbPlacements.push({
-        campaignId: c.campaignId,
-        placement: 'Detail Page',
-        percentage: 0,
-        ...detailMetrics
-     });
-     if (Math.random() > 0.5) {
-       sbPlacements.push({
-          campaignId: c.campaignId,
-          placement: 'Home',
-          percentage: 0,
-          ...homeMetrics
-       });
-     }
   });
 
   const sbAds: SBAd[] = sbCampaigns.map((c, i) => {
@@ -254,9 +262,7 @@ export const generateMockData = (): DashboardData => {
           name: `Ad for ${c.name}`,
           headline: `Discover the best ${['Running', 'Kitchen', 'Tech'][i % 3]} Gear`,
           format: c.adFormat,
-          videoMediaIds: c.adFormat === 'Video' ? 'media-123' : undefined,
-          landingPageUrl: c.landingPageUrl,
-          brandLogoAssetId: 'logo-asset-123',
+          creativeAsins: [uniqueAsinsList[i % uniqueAsinsList.length]],
           ...metrics
       };
   });
@@ -265,8 +271,8 @@ export const generateMockData = (): DashboardData => {
       const campaign = sbCampaigns[i % 10];
       return {
           keywordId: `SBKW-${i}`,
-          keywordText: `brand keyword ${i}`,
-          matchType: ['BROAD', 'PHRASE', 'EXACT'][i % 3],
+          keywordText: generateSearchTerm(),
+          matchType: 'BROAD',
           bid: 1.5,
           campaignId: campaign.campaignId,
           adGroupId: `${campaign.campaignId}-AG1`,
@@ -288,12 +294,7 @@ export const generateMockData = (): DashboardData => {
       };
   });
 
-  const sbMagEntities: SBMAGEntity[] = sbCampaigns.map(c => ({
-    ...c,
-    adGroupId: `${c.campaignId}-AG1`,
-    adGroupName: 'Main Ad Group',
-    creativeHeadline: 'Best Products for You'
-  }));
+  const sbMagEntities: SBMAGEntity[] = [];
 
   const sdCampaigns: SDCampaign[] = Array.from({ length: 8 }).map((_, i) => {
     const budget = getRandomInt(30, 150);
@@ -327,32 +328,74 @@ export const generateMockData = (): DashboardData => {
       };
   });
 
-  const searchTerms: SearchTermData[] = Array.from({ length: 50 }).map((_, i) => {
-    const metrics = generateMetrics(10);
-    const matchType = ['EXACT', 'PHRASE', 'BROAD'][i % 3];
+  // Create a pool of high-volume "Root" terms to simulate cannibalization/overlap
+  const duplicateRoots = ['running shoes', 'gym accessories', 'wireless headphones', 'yoga mat'];
+
+  const searchTerms: SearchTermData[] = Array.from({ length: 150 }).map((_, i) => {
+    let term = generateSearchTerm();
+    let targeting = term; // Default targeting = term
+    let matchType = ['EXACT', 'PHRASE', 'BROAD'][i % 3];
+    
+    // Simulate Cannibalization (Overlap)
+    // For the first 30 rows, reuse the duplicateRoots
+    if (i < 30) {
+        const root = duplicateRoots[i % duplicateRoots.length];
+        term = root; // Same search term
+        
+        // Spread across different campaigns to simulate conflict
+        // e.g. Campaign 0 and Campaign 1 both target "running shoes"
+        const campIndex = i % 5; 
+        
+        // Vary match types to show full matrix
+        matchType = ['EXACT', 'PHRASE', 'BROAD', 'EXACT', 'PHRASE'][i % 5];
+        
+        // Sometimes targeting is the term, sometimes it's a slightly different keyword (Phrase/Broad match behavior)
+        if (matchType !== 'EXACT') {
+            targeting = `${root} for men`; 
+        } else {
+            targeting = root;
+        }
+    } else if (i < 50) {
+        // Simulate "Targeting View" grouping
+        // Different search terms triggering the SAME targeting
+        targeting = "mens running sneakers"; // A broad keyword
+        term = `${['blue', 'red', 'cheap', 'best'][i % 4]} mens running sneakers`;
+    }
+
+    const metrics = generateMetrics(15);
+    // Simulate some bleeders and winners
+    const isBleeder = i % 10 === 0;
+    const isWinner = i % 15 === 0;
+
+    // Ensure overlap terms have enough spend to show up
+    if (i < 30) {
+        metrics.spend += 50; 
+        metrics.clicks += 20;
+    }
+
     return {
-      searchTerm: `search query ${i}`,
-      customerSearchTerm: `actual query ${i}`,
-      targeting: matchType === 'EXACT' ? `actual query ${i}` : `keyword ${i}`,
+      searchTerm: term,
+      customerSearchTerm: term,
+      targeting: targeting,
       campaignName: `SP - Campaign ${i % 20}`,
       adGroupName: 'AG-1',
+      campaignId: `SP-${i % 20}`,
+      adGroupId: `AG-${i % 40}`,
       matchType: matchType,
       type: 'SP',
       ...metrics,
-      sales: i % 5 === 0 ? 0 : metrics.sales,
-      spend: i % 5 === 0 ? 50 : metrics.spend,
+      sales: isBleeder ? 0 : (isWinner ? metrics.spend * 5 : metrics.sales),
+      orders: isBleeder ? 0 : (isWinner ? Math.floor(metrics.clicks * 0.3) : metrics.orders),
+      clicks: isBleeder ? getRandomInt(20, 50) : metrics.clicks,
+      spend: isBleeder ? getRandomFloat(30, 80) : metrics.spend
     };
   });
 
   const businessReport: BusinessReportRow[] = [];
-  const uniqueAsins = Array.from(new Set(spSkus.map(s => s.asin)));
   
-  uniqueAsins.forEach(asin => {
-      const refSku = spSkus.find(s => s.asin === asin);
-      const basePrice = refSku && refSku.orders > 0 ? refSku.sales / refSku.orders : getRandomFloat(20, 100);
-      
+  uniqueAsinsList.forEach(asin => {
       const unitsOrdered = getRandomInt(50, 500);
-      const orderedProductSales = unitsOrdered * basePrice;
+      const orderedProductSales = unitsOrdered * getRandomFloat(30, 45); // Aligns with estimated price
       const sessions = Math.floor(unitsOrdered / getRandomFloat(0.05, 0.20));
       
       businessReport.push({
@@ -369,6 +412,71 @@ export const generateMockData = (): DashboardData => {
           totalOrderItems: unitsOrdered
       });
   });
+
+  // Generate Inventory (Ensure some are Low Stock)
+  const inventory: InventoryRow[] = uniqueAsinsList.map((asin, i) => {
+      // 20% chance of being low stock
+      const isLowStock = i < 3; 
+      const salesVelocity = businessReport.find(b => b.childAsin === asin)?.unitsOrdered || 10;
+      const weeklySales = salesVelocity / 4;
+      
+      return {
+          sku: `SKU-${asin}`,
+          fnsku: `FNSKU-${asin}`,
+          asin: asin,
+          productName: `Mock Product ${asin}`,
+          condition: 'New',
+          price: 35.99,
+          mfnListingExists: false,
+          mfnFulfillableQuantity: 0,
+          afnListingExists: true,
+          afnWarehouseQuantity: 0,
+          // If low stock, set qty to cover 1 week. Else 8 weeks.
+          afnFulfillableQuantity: isLowStock ? Math.floor(weeklySales * 1) : Math.floor(weeklySales * 8),
+          afnUnsellableQuantity: 0,
+          afnReservedQuantity: 0,
+          afnTotalQuantity: 0,
+          perUnitVolume: 0.1,
+          afnInboundWorkingQuantity: 0,
+          afnInboundShippedQuantity: 0,
+          afnInboundReceivingQuantity: 0
+      };
+  });
+
+  // Generate Hourly Report (Dayparting Curve) with Campaign Context
+  const hourlyReport: HourlyPerformanceRow[] = [];
+  const date = '2023-10-01';
+  
+  // Create granular hourly data for top 5 campaigns
+  const activeCampaigns = spCampaigns.slice(0, 5); 
+
+  for (let hour = 0; hour < 24; hour++) {
+      // Curve: Low 0-6, Rising 7-10, Stable 11-16, Peak 17-21, Drop 22-23
+      let multiplier = 1;
+      if (hour < 6) multiplier = 0.2;
+      else if (hour < 10) multiplier = 0.8;
+      else if (hour < 17) multiplier = 1.0;
+      else if (hour < 22) multiplier = 1.5; // Peak
+      else multiplier = 0.5;
+
+      // Distribute across a few campaigns to allow filtering
+      activeCampaigns.forEach((camp, idx) => {
+          // Add some randomness per campaign so they don't look identical
+          const campMult = multiplier * (0.8 + Math.random() * 0.4);
+          const baseSpend = (20 + (idx * 5)) * campMult; // Vary base spend by campaign
+
+          hourlyReport.push({
+              date,
+              hour,
+              campaignName: camp.name,
+              spend: baseSpend * getRandomFloat(0.8, 1.2),
+              sales: baseSpend * (campMult > 1 ? 4 : 2) * getRandomFloat(0.8, 1.2), // Better ROAS during peak
+              clicks: Math.floor(baseSpend / 1.5),
+              impressions: Math.floor(baseSpend * 100),
+              orders: Math.floor((baseSpend * (campMult > 1 ? 4 : 2)) / 30)
+          });
+      });
+  }
 
   return {
     portfolios,
@@ -388,5 +496,9 @@ export const generateMockData = (): DashboardData => {
     sdTargets,
     searchTerms,
     businessReport,
+    inventory,
+    hourlyReport,
+    mockCosts,
+    mockGoals
   };
 };

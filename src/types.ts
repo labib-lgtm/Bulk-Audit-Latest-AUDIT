@@ -1,8 +1,33 @@
+
 export enum Currency {
   USD = 'USD',
   GBP = 'GBP',
   EUR = 'EUR',
+  CAD = 'CAD',
+  AUD = 'AUD',
+  JPY = 'JPY',
+  INR = 'INR',
 }
+
+export const CURRENCY_SYMBOLS: Record<Currency, string> = {
+  [Currency.USD]: '$',
+  [Currency.GBP]: '£',
+  [Currency.EUR]: '€',
+  [Currency.CAD]: '$',
+  [Currency.AUD]: '$',
+  [Currency.JPY]: '¥',
+  [Currency.INR]: '₹',
+};
+
+export type UserRole = 'Admin' | 'Editor' | 'Viewer';
+
+export type AttributionModel = 'Conservative' | 'Standard' | 'Aggressive';
+
+export const ATTRIBUTION_MULTIPLIERS: Record<AttributionModel, { SP: number, SB: number, SD: number }> = {
+    'Standard': { SP: 1.0, SB: 1.0, SD: 1.0 },
+    'Conservative': { SP: 0.9, SB: 0.8, SD: 0.4 }, 
+    'Aggressive': { SP: 1.1, SB: 1.2, SD: 1.0 }     
+};
 
 export interface AppSettings {
   targetAcos: number;
@@ -10,6 +35,25 @@ export interface AppSettings {
   minSpendThreshold: number; 
   minClickThreshold: number; 
   currencySymbol: string;
+  currencyCode: Currency;
+  attributionModel: AttributionModel;
+}
+
+export interface ProductCost {
+  asin: string;
+  sku?: string; 
+  cogs: number; 
+  fbaFee: number; 
+  referralFeePct: number; 
+  shipping?: number; 
+  miscCost?: number; 
+}
+
+export interface ProfitSettings {
+  defaultReferralFee: number; 
+  returnsProvision: number; 
+  taxProvision: number; 
+  lastUpdated: number; 
 }
 
 export interface ProductGoal {
@@ -51,6 +95,38 @@ export interface BusinessReportRow {
   unitsOrdered: number;
   orderedProductSales: number;
   totalOrderItems: number;
+}
+
+export interface InventoryRow {
+  sku: string;
+  fnsku: string;
+  asin: string;
+  productName: string;
+  condition: string;
+  price: number;
+  mfnListingExists: boolean;
+  mfnFulfillableQuantity: number;
+  afnListingExists: boolean;
+  afnWarehouseQuantity: number;
+  afnFulfillableQuantity: number;
+  afnUnsellableQuantity: number;
+  afnReservedQuantity: number;
+  afnTotalQuantity: number;
+  perUnitVolume: number;
+  afnInboundWorkingQuantity: number;
+  afnInboundShippedQuantity: number;
+  afnInboundReceivingQuantity: number;
+}
+
+export interface HourlyPerformanceRow {
+  date: string;
+  hour: number; 
+  campaignName?: string; 
+  impressions: number;
+  clicks: number;
+  spend: number;
+  sales: number;
+  orders: number;
 }
 
 export interface SPCampaign extends PerformanceMetrics {
@@ -230,4 +306,7 @@ export interface DashboardData {
   sdTargets: SDTarget[];
   searchTerms: SearchTermData[];
   businessReport: BusinessReportRow[]; 
+  inventory?: InventoryRow[];
+  hourlyReport?: HourlyPerformanceRow[];
+  detectedCurrency?: Currency;
 }

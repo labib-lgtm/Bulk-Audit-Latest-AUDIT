@@ -1,7 +1,8 @@
+
 import * as XLSX from 'xlsx';
 import { 
   DashboardData, Portfolio, SPCampaign, SPAdGroup, SPSku, SPKeyword, SPProductTargeting, 
-  SBCampaign, SDCampaign, SearchTermData, Currency, SPPlacement, SBKeyword, SBTarget, SDTarget, BusinessReportRow, SBAd
+  SBCampaign, SDCampaign, SearchTermData, Currency, SPPlacement, SBKeyword, SBTarget, SDTarget, BusinessReportRow, SBAd, InventoryRow, HourlyPerformanceRow
 } from '../types';
 
 // Helper to safely parse numbers
@@ -14,7 +15,7 @@ const parseNum = (val: any): number => {
   return 0;
 };
 
-// Helper to safely parse percentage strings (e.g. "12%")
+// Helper to safely parse percentage strings
 const parsePct = (val: any): number => {
     if (typeof val === 'number') return val;
     if (typeof val === 'string') {
@@ -24,7 +25,6 @@ const parsePct = (val: any): number => {
     return 0;
 };
 
-// Helper to safely parse dates
 const parseDate = (val: any): string => {
     if (!val) return '';
     return String(val);
@@ -35,7 +35,19 @@ const getVal = (row: any, possibleKeys: string[]): any => {
   for (const targetKey of possibleKeys) {
     if (row[targetKey] !== undefined) return row[targetKey];
   }
+  
   const rowKeys = Object.keys(row);
+  
+  // Dynamic check for Spend/Sales with currency suffixes like "Spend(GBP)"
+  if (possibleKeys.includes('Spend')) {
+     const spendKey = rowKeys.find(k => k.toLowerCase().startsWith('spend') && !k.toLowerCase().includes('share'));
+     if (spendKey) return row[spendKey];
+  }
+  if (possibleKeys.includes('Sales')) {
+     const salesKey = rowKeys.find(k => k.toLowerCase().includes('sales') && !k.toLowerCase().includes('percentage'));
+     if (salesKey) return row[salesKey];
+  }
+
   for (const targetKey of possibleKeys) {
     const cleanTarget = targetKey.trim().toLowerCase();
     const matchingKey = rowKeys.find(k => {
@@ -49,9 +61,8 @@ const getVal = (row: any, possibleKeys: string[]): any => {
   return undefined;
 };
 
-// Helper to normalize state to 'enabled', 'paused', 'archived'
 const normalizeState = (val: any): string => {
-    if (!val) return 'enabled'; // Default to enabled if missing
+    if (!val) return 'enabled';
     return String(val).toLowerCase();
 };
 
@@ -80,10 +91,37 @@ const findHeaderRowAndGetData = (sheet: XLSX.WorkSheet, requiredHeaders: string[
     return XLSX.utils.sheet_to_json(sheet, { range: 0 });
 };
 
+// IMPROVED: Robust Auto-Currency Detection Engine
+const detectCurrencyFromWorkbook = (workbook: XLSX.WorkBook): Currency => {
+    // Scan up to 3 sheets for currency clues
+    const sheetsToScan = workbook.SheetNames.slice(0, 3);
+    
+    for (const sheetName of sheetsToScan) {
+        const sheet = workbook.Sheets[sheetName];
+        const aoa = XLSX.utils.sheet_to_json<string[]>(sheet, { header: 1, range: 0 });
+        
+        for (const row of aoa) {
+            if (!Array.isArray(row)) continue;
+            const rowStr = row.join(' ').toLowerCase();
+            
+            // Check for explicit Amazon Bulk File currency strings
+            if (rowStr.includes('(gbp)') || rowStr.includes('£')) return Currency.GBP;
+            if (rowStr.includes('(eur)') || rowStr.includes('€')) return Currency.EUR;
+            if (rowStr.includes('(cad)')) return Currency.CAD;
+            if (rowStr.includes('(aud)')) return Currency.AUD;
+            if (rowStr.includes('(jpy)') || rowStr.includes('¥')) return Currency.JPY;
+            if (rowStr.includes('(inr)') || rowStr.includes('₹')) return Currency.INR;
+            if (rowStr.includes('(usd)') || rowStr.includes('$')) return Currency.USD;
+        }
+    }
+    
+    return Currency.USD; // Default fallback
+};
+
 const normalizePlacementName = (raw: string): string => {
   const lower = raw.toLowerCase().trim();
-  if (lower.includes('top of search')) return 'Top of Search';
-  if (lower.includes('product page') || lower.includes('detail page')) return 'Detail Page';
+  if (lower.includes('top of search')) return 'Top of Search (First Page)';
+  if (lower.includes('product page') || lower.includes('detail page')) return 'Product Pages';
   if (lower.includes('rest of search')) return 'Rest of Search';
   if (lower.includes('home')) return 'Home';
   if (lower.includes('other')) return 'Other';
@@ -95,11 +133,77 @@ const getMetrics = (row: any) => {
   return {
     impressions: parseNum(getVal(row, ['Impressions', 'Imps'])),
     clicks: parseNum(getVal(row, ['Clicks'])),
-    spend: parseNum(getVal(row, ['Spend', 'Cost', 'Spend(USD)', 'Spend (USD)'])),
-    sales: parseNum(getVal(row, ['Sales', '7 Day Total Sales', '14 Day Total Sales', '30 Day Total Sales', 'Total Sales', '14 Day Total Sales (USD)'])),
-    orders: parseNum(getVal(row, ['Orders', '7 Day Total Orders', '14 Day Total Orders', '30 Day Total Orders', 'Total Orders'])),
-    units: parseNum(getVal(row, ['Units', '7 Day Total Units', '14 Day Total Units', 'Total Units']))
+    spend: parseNum(getVal(row, ['Spend', 'Cost'])),
+    sales: parseNum(getVal(row, ['Sales', 'Total Sales', '7 Day Total Sales'])),
+    orders: parseNum(getVal(row, ['Orders', '7 Day Total Orders'])),
+    units: parseNum(getVal(row, ['Units', '7 Day Total Units']))
   };
+};
+
+export const processHourlyReport = async (file: File): Promise<HourlyPerformanceRow[]> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = e.target?.result;
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = findHeaderRowAndGetData(sheet, ['Date', 'Hour', 'Spend']);
+                const processedRows: HourlyPerformanceRow[] = rows.map(r => ({
+                    date: String(getVal(r, ['Date'])),
+                    hour: parseNum(getVal(r, ['Hour of Day', 'Start Time', 'Time'])),
+                    campaignName: String(getVal(r, ['Campaign Name', 'Campaign'])), 
+                    impressions: parseNum(getVal(r, ['Impressions'])),
+                    clicks: parseNum(getVal(r, ['Clicks'])),
+                    spend: parseNum(getVal(r, ['Spend'])),
+                    sales: parseNum(getVal(r, ['Sales'])),
+                    orders: parseNum(getVal(r, ['Orders'])),
+                })).filter(r => r.date);
+                resolve(processedRows);
+            } catch (err) {
+                reject(err);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
+};
+
+export const processInventoryReport = async (file: File): Promise<InventoryRow[]> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = e.target?.result;
+                const workbook = XLSX.read(data, { type: 'array' });
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const rows = findHeaderRowAndGetData(sheet, ['sku', 'asin', 'afn-fulfillable-quantity']);
+                const processedRows: InventoryRow[] = rows.map(r => ({
+                    sku: String(getVal(r, ['sku', 'SKU']) || ''),
+                    fnsku: String(getVal(r, ['fnsku']) || ''),
+                    asin: String(getVal(r, ['asin', 'ASIN']) || ''),
+                    productName: String(getVal(r, ['product-name', 'Product Name']) || ''),
+                    condition: String(getVal(r, ['condition']) || ''),
+                    price: parseNum(getVal(r, ['your-price', 'Price'])),
+                    mfnListingExists: String(getVal(r, ['mfn-listing-exists'])).toLowerCase() === 'yes',
+                    mfnFulfillableQuantity: parseNum(getVal(r, ['mfn-fulfillable-quantity'])),
+                    afnListingExists: String(getVal(r, ['afn-listing-exists'])).toLowerCase() === 'yes',
+                    afnWarehouseQuantity: parseNum(getVal(r, ['afn-warehouse-quantity'])),
+                    afnFulfillableQuantity: parseNum(getVal(r, ['afn-fulfillable-quantity', 'Available'])),
+                    afnUnsellableQuantity: parseNum(getVal(r, ['afn-unsellable-quantity'])),
+                    afnReservedQuantity: parseNum(getVal(r, ['afn-reserved-quantity'])),
+                    afnTotalQuantity: parseNum(getVal(r, ['afn-total-quantity'])),
+                    perUnitVolume: parseNum(getVal(r, ['per-unit-volume'])),
+                    afnInboundWorkingQuantity: parseNum(getVal(r, ['afn-inbound-working-quantity'])),
+                    afnInboundShippedQuantity: parseNum(getVal(r, ['afn-inbound-shipped-quantity'])),
+                    afnInboundReceivingQuantity: parseNum(getVal(r, ['afn-inbound-receiving-quantity'])),
+                })).filter(r => r.sku && r.asin);
+                resolve(processedRows);
+            } catch (err) {
+                reject(err);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    });
 };
 
 export const processBusinessReport = async (file: File): Promise<BusinessReportRow[]> => {
@@ -115,18 +219,17 @@ export const processBusinessReport = async (file: File): Promise<BusinessReportR
                     childAsin: String(getVal(r, ['(Child) ASIN', 'Child ASIN', 'ASIN']) || '').trim(),
                     parentAsin: String(getVal(r, ['(Parent) ASIN', 'Parent ASIN']) || '').trim(),
                     title: String(getVal(r, ['Title']) || ''),
-                    sessions: parseNum(getVal(r, ['Sessions', 'Sessions - Total', 'Session'])),
-                    sessionPercentage: parsePct(getVal(r, ['Session Percentage', 'Session percentage'])),
-                    pageViews: parseNum(getVal(r, ['Page Views', 'Page views', 'Page Views - Total', 'Page View'])),
+                    sessions: parseNum(getVal(r, ['Sessions', 'Sessions - Total'])),
+                    sessionPercentage: parsePct(getVal(r, ['Session Percentage'])),
+                    pageViews: parseNum(getVal(r, ['Page Views', 'Page views'])),
                     pageViewsPercentage: parsePct(getVal(r, ['Page Views Percentage'])),
                     buyBoxPercentage: parsePct(getVal(r, ['Buy Box Percentage', 'Featured Offer (Buy Box) Percentage'])),
-                    unitsOrdered: parseNum(getVal(r, ['Units Ordered', 'Units ordered', 'Units Ordered - Total'])),
-                    orderedProductSales: parseNum(getVal(r, ['Ordered Product Sales', 'Ordered product sales', 'Ordered Product Sales - Total'])),
+                    unitsOrdered: parseNum(getVal(r, ['Units Ordered', 'Units ordered'])),
+                    orderedProductSales: parseNum(getVal(r, ['Ordered Product Sales', 'Ordered product sales'])),
                     totalOrderItems: parseNum(getVal(r, ['Total Order Items']))
                 })).filter(r => r.childAsin && r.childAsin.length > 0);
                 resolve(processedRows);
             } catch (err) {
-                console.error("Error parsing business report", err);
                 reject(err);
             }
         };
@@ -141,27 +244,16 @@ export const processBulkFile = async (file: File): Promise<DashboardData> => {
       try {
         const data = e.target?.result;
         const workbook = XLSX.read(data, { type: 'array' });
+        
+        // Auto-Detect Marketplace based on Sheet deep-scan
+        const detectedCurrency = detectCurrencyFromWorkbook(workbook);
+        
         const dashboardData: DashboardData = {
           portfolios: [], spCampaigns: [], spPlacements: [], spAdGroups: [], spSkus: [], spKeywords: [], spProductTargets: [],
           sbCampaigns: [], sbPlacements: [], sbAds: [], sbKeywords: [], sbTargets: [], sbMagEntities: [],
-          sdCampaigns: [], sdTargets: [], searchTerms: [], businessReport: []
+          sdCampaigns: [], sdTargets: [], searchTerms: [], businessReport: [], inventory: [], hourlyReport: [],
+          detectedCurrency
         };
-
-        const portfolioSheet = workbook.Sheets['Portfolios'];
-        if (portfolioSheet) {
-          const rows = XLSX.utils.sheet_to_json<any>(portfolioSheet);
-          dashboardData.portfolios = rows.map(r => ({
-            id: String(getVal(r, ['Portfolio ID', 'Portfolio Id'])),
-            name: getVal(r, ['Portfolio Name']),
-            budgetAmount: parseNum(getVal(r, ['Budget Amount'])),
-            currency: getVal(r, ['Budget Currency Code']) as Currency || Currency.USD,
-            budgetPolicy: getVal(r, ['Budget Policy']) as any,
-            startDate: parseDate(getVal(r, ['Budget Start Date'])),
-            endDate: parseDate(getVal(r, ['Budget End Date'])),
-            state: normalizeState(getVal(r, ['State'])) as any,
-            inBudget: String(getVal(r, ['In Budget'])).toLowerCase() === 'true'
-          }));
-        }
 
         const spSheetName = workbook.SheetNames.find(n => n.toLowerCase().includes('sponsored products'));
         const spSheet = spSheetName ? workbook.Sheets[spSheetName] : null;
@@ -172,152 +264,81 @@ export const processBulkFile = async (file: File): Promise<DashboardData> => {
                 if (entity && entity.trim() === 'Campaign') return true;
                 const campaignId = getVal(r, ['Campaign ID', 'Campaign Id']);
                 const adGroupId = getVal(r, ['Ad Group ID', 'Ad Group Id']);
-                const name = getVal(r, ['Campaign Name', 'Campaign']);
-                return campaignId && !adGroupId && name;
-            }).map(r => {
-              const metrics = getMetrics(r);
-              const campaignId = String(getVal(r, ['Campaign ID', 'Campaign Id']));
-              return {
-                campaignId: campaignId,
-                name: getVal(r, ['Campaign Name', 'Campaign']) || `Campaign ${campaignId}`, 
-                portfolioId: getVal(r, ['Portfolio ID', 'Portfolio Id']) ? String(getVal(r, ['Portfolio ID', 'Portfolio Id'])) : null,
+                return campaignId && !adGroupId;
+            }).map(r => ({
+                campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
+                name: getVal(r, ['Campaign Name', 'Campaign']) || `Campaign ${getVal(r, ['Campaign ID'])}`, 
+                portfolioId: getVal(r, ['Portfolio ID']) ? String(getVal(r, ['Portfolio ID'])) : null,
                 startDate: parseDate(getVal(r, ['Start Date'])),
                 endDate: parseDate(getVal(r, ['End Date'])),
                 state: normalizeState(getVal(r, ['State'])),
                 dailyBudget: parseNum(getVal(r, ['Daily Budget'])),
                 targetingType: getVal(r, ['Targeting Type']) as any,
                 biddingStrategy: getVal(r, ['Bidding Strategy']) as any,
-                placement: getVal(r, ['Placement']),
-                percentage: parseNum(getVal(r, ['Percentage'])),
-                status: getVal(r, ['Campaign State']),
-                ...metrics
-              };
-            });
+                status: String(getVal(r, ['Campaign State']) || 'Running'),
+                ...getMetrics(r)
+            }));
 
           dashboardData.spPlacements = rows.filter(r => {
                const entity = String(getVal(r, ['Entity']) || '').trim();
-               const placement = String(getVal(r, ['Placement', 'Placement Type', 'Placement Name']) || '').trim();
-               const keyword = getVal(r, ['Keyword Text']);
-               const sku = getVal(r, ['SKU']);
-               const target = getVal(r, ['Product Targeting Expression']);
-               const isPlacementEntity = entity === 'Bidding Adjustment' || entity === 'Placement';
-               const hasPlacementValue = placement.length > 2;
-               return (isPlacementEntity || hasPlacementValue) && !keyword && !sku && !target;
-            }).map(r => {
-              const metrics = getMetrics(r);
-              const campaignId = String(getVal(r, ['Campaign ID', 'Campaign Id']));
-              const rawPlacement = String(getVal(r, ['Placement', 'Placement Type', 'Placement Name']) || '').trim();
-              return {
-                 campaignId: campaignId,
-                 placement: normalizePlacementName(rawPlacement),
+               const placement = String(getVal(r, ['Placement', 'Placement Type']) || '').trim();
+               return (entity === 'Bidding Adjustment' || placement.length > 2) && !getVal(r, ['Keyword Text']) && !getVal(r, ['SKU']);
+            }).map(r => ({
+                 campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
+                 placement: normalizePlacementName(String(getVal(r, ['Placement', 'Placement Type']) || '')),
                  percentage: parseNum(getVal(r, ['Percentage'])),
-                 ...metrics
-              };
-            }).filter(p => p.placement.length > 0 && p.campaignId.length > 0);
-
-          const placementCampaignIds = new Set(dashboardData.spPlacements.map(p => p.campaignId));
-          const knownCampaignIds = new Set(dashboardData.spCampaigns.map(c => c.campaignId));
-          placementCampaignIds.forEach(id => {
-              if (id && !knownCampaignIds.has(id)) {
-                  dashboardData.spCampaigns.push({
-                      campaignId: id,
-                      name: `Campaign ${id} (From Placement Data)`,
-                      portfolioId: null,
-                      startDate: '',
-                      state: 'enabled',
-                      dailyBudget: 0,
-                      targetingType: 'MANUAL',
-                      biddingStrategy: 'Fixed Bids',
-                      status: 'Running',
-                      impressions: 0, clicks: 0, spend: 0, sales: 0, orders: 0, units: 0
-                  });
-              }
-          });
+                 ...getMetrics(r)
+            }));
 
           dashboardData.spAdGroups = rows.filter(r => {
                 const entity = getVal(r, ['Entity']);
-                const adGroupId = getVal(r, ['Ad Group ID', 'Ad Group Id']);
-                const keywordText = getVal(r, ['Keyword Text']);
-                const sku = getVal(r, ['SKU']);
                 if (entity && entity === 'Ad Group') return true;
-                return adGroupId && !keywordText && !sku;
-            }).map(r => {
-               const metrics = getMetrics(r);
-               return {
-                  adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                  campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                  name: getVal(r, ['Ad Group Name']) || `AG ${getVal(r, ['Ad Group ID', 'Ad Group Id'])}`,
-                  defaultBid: parseNum(getVal(r, ['Ad Group Default Bid'])),
-                  state: normalizeState(getVal(r, ['State'])),
-                  ...metrics
-               };
-            });
+                const adGroupId = getVal(r, ['Ad Group ID']);
+                const keywordText = getVal(r, ['Keyword Text']);
+                return adGroupId && !keywordText;
+            }).map(r => ({
+                adGroupId: String(getVal(r, ['Ad Group ID'])),
+                campaignId: String(getVal(r, ['Campaign ID'])),
+                name: getVal(r, ['Ad Group Name']) || `AG ${getVal(r, ['Ad Group ID'])}`,
+                defaultBid: parseNum(getVal(r, ['Ad Group Default Bid'])),
+                state: normalizeState(getVal(r, ['State'])),
+                ...getMetrics(r)
+            }));
 
-          dashboardData.spSkus = rows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 const sku = getVal(r, ['SKU']);
-                 if (entity && entity === 'Product Ad') return true;
-                 return sku && getVal(r, ['Ad Group ID', 'Ad Group Id']);
-            }).map(r => {
-               const metrics = getMetrics(r);
-               return {
-                  sku: getVal(r, ['SKU']),
-                  asin: String(getVal(r, ['ASIN']) || '').trim(),
-                  campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                  adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                  state: normalizeState(getVal(r, ['State'])),
-                  eligibilityStatus: getVal(r, ['Eligibility Status']) || 'Eligible',
-                  reasonForIneligibility: getVal(r, ['Reason for Ineligibility']),
-                  ...metrics
-               };
-            });
+          dashboardData.spSkus = rows.filter(r => getVal(r, ['Entity']) === 'Product Ad' || (getVal(r, ['SKU']) && getVal(r, ['Ad Group ID']))).map(r => ({
+                sku: String(getVal(r, ['SKU']) || ''),
+                asin: String(getVal(r, ['ASIN']) || '').trim(),
+                campaignId: String(getVal(r, ['Campaign ID'])),
+                adGroupId: String(getVal(r, ['Ad Group ID'])),
+                state: normalizeState(getVal(r, ['State'])),
+                eligibilityStatus: getVal(r, ['Eligibility Status']) || 'Eligible',
+                ...getMetrics(r)
+            }));
 
-          dashboardData.spKeywords = rows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 const keywordText = getVal(r, ['Keyword Text']);
-                 if (entity && entity === 'Keyword') return true;
-                 return keywordText && getVal(r, ['Match Type']);
-            }).map(r => {
-               const metrics = getMetrics(r);
-               return {
-                  keywordId: String(getVal(r, ['Keyword ID', 'Keyword Id'])),
-                  keywordText: getVal(r, ['Keyword Text']),
-                  matchType: String(getVal(r, ['Match Type']) || '').toUpperCase() as any,
-                  bid: parseNum(getVal(r, ['Bid'])),
-                  state: normalizeState(getVal(r, ['State'])),
-                  campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                  adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                  ...metrics
-               };
-            });
+          dashboardData.spKeywords = rows.filter(r => getVal(r, ['Entity']) === 'Keyword' || (getVal(r, ['Keyword Text']) && getVal(r, ['Match Type']))).map(r => ({
+                keywordId: String(getVal(r, ['Keyword ID', 'Keyword Id'])),
+                keywordText: getVal(r, ['Keyword Text']),
+                matchType: String(getVal(r, ['Match Type']) || '').toUpperCase() as any,
+                bid: parseNum(getVal(r, ['Bid'])),
+                state: normalizeState(getVal(r, ['State'])),
+                campaignId: String(getVal(r, ['Campaign ID'])),
+                adGroupId: String(getVal(r, ['Ad Group ID'])),
+                ...getMetrics(r)
+            }));
             
-           dashboardData.spProductTargets = rows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 const target = getVal(r, ['Product Targeting Expression']);
-                 if (entity && entity === 'Product Targeting') return true;
-                 return target;
-             }).map(r => {
-               const metrics = getMetrics(r);
-               return {
+           dashboardData.spProductTargets = rows.filter(r => getVal(r, ['Entity']) === 'Product Targeting' || getVal(r, ['Product Targeting Expression'])).map(r => ({
                  targetId: String(getVal(r, ['Product Targeting ID', 'Product Targeting Id'])),
                  expression: getVal(r, ['Product Targeting Expression']),
                  resolvedExpression: getVal(r, ['Resolved Product Targeting Expression']) || getVal(r, ['Product Targeting Expression']),
                  bid: parseNum(getVal(r, ['Bid'])),
                  state: normalizeState(getVal(r, ['State'])),
-                 campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                 adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                 ...metrics
-               };
-             });
+                 campaignId: String(getVal(r, ['Campaign ID'])),
+                 adGroupId: String(getVal(r, ['Ad Group ID'])),
+                 ...getMetrics(r)
+            }));
         }
 
-        const sbSheetNames = workbook.SheetNames.filter(n => {
-            const lower = n.toLowerCase();
-            if (lower.includes('search term') || lower.includes('search_term') || lower.includes('portfolio')) return false;
-            if (lower.includes('brand') || lower.includes('sb multi ad group') || lower.includes('multi ad group')) return true;
-            return false;
-        });
-        
+        const sbSheetNames = workbook.SheetNames.filter(n => n.toLowerCase().includes('brand') || n.toLowerCase().includes('collection'));
         let allSbRows: any[] = [];
         sbSheetNames.forEach(name => {
             const sheet = workbook.Sheets[name];
@@ -325,233 +346,41 @@ export const processBulkFile = async (file: File): Promise<DashboardData> => {
             if (rows.length > 0) allSbRows = [...allSbRows, ...rows];
         });
 
-        dashboardData.sbCampaigns = allSbRows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 if (entity) return entity === 'Campaign';
-                 const campaignId = getVal(r, ['Campaign ID', 'Campaign Id']);
-                 const adGroupId = getVal(r, ['Ad Group ID', 'Ad Group Id']);
-                 const name = getVal(r, ['Campaign Name']);
-                 return campaignId && !adGroupId && name;
-             }).map(r => {
-                const metrics = getMetrics(r);
-                const campaignId = String(getVal(r, ['Campaign ID', 'Campaign Id']));
-                return {
-                    campaignId: campaignId,
-                    name: getVal(r, ['Campaign Name']) || `Campaign ${campaignId}`,
-                    portfolioId: getVal(r, ['Portfolio ID', 'Portfolio Id']) ? String(getVal(r, ['Portfolio ID', 'Portfolio Id'])) : null,
-                    startDate: parseDate(getVal(r, ['Start Date'])),
-                    endDate: parseDate(getVal(r, ['End Date'])),
-                    budget: parseNum(getVal(r, ['Budget'])),
-                    budgetType: getVal(r, ['Budget Type']) as any,
-                    state: normalizeState(getVal(r, ['State'])),
-                    servingStatus: getVal(r, ['Campaign Serving Status']),
-                    adFormat: getVal(r, ['Ad Format']) as any || 'Product Collection',
-                    landingPageUrl: getVal(r, ['Landing Page URL']),
-                    bidOptimization: getVal(r, ['Bid Optimization']),
-                    ...metrics
-                };
-             });
+        dashboardData.sbCampaigns = allSbRows.filter(r => getVal(r, ['Entity']) === 'Campaign').map(r => ({
+            campaignId: String(getVal(r, ['Campaign ID'])),
+            name: getVal(r, ['Campaign Name']) || `SB ${getVal(r, ['Campaign ID'])}`,
+            portfolioId: getVal(r, ['Portfolio ID']) ? String(getVal(r, ['Portfolio ID'])) : null,
+            startDate: parseDate(getVal(r, ['Start Date'])),
+            endDate: parseDate(getVal(r, ['End Date'])),
+            budget: parseNum(getVal(r, ['Budget'])),
+            budgetType: getVal(r, ['Budget Type']) as any,
+            state: normalizeState(getVal(r, ['State'])),
+            servingStatus: String(getVal(r, ['Campaign Serving Status']) || ''),
+            adFormat: getVal(r, ['Ad Format']) as any || 'Product Collection',
+            ...getMetrics(r)
+        }));
 
-        dashboardData.sbPlacements = allSbRows.filter(r => {
-               const placement = String(getVal(r, ['Placement', 'Placement Type', 'Placement Name']) || '').trim();
-               const lower = placement.toLowerCase();
-               const isSbPlacement = lower.includes('top of search') || lower.includes('detail page') || lower.includes('product page') || lower.includes('home') || lower.includes('other') || lower.includes('rest of search');
-               const campaignId = getVal(r, ['Campaign ID', 'Campaign Id']);
-               return isSbPlacement && campaignId;
-            }).map(r => {
-                const metrics = getMetrics(r);
-                return {
-                    campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                    placement: normalizePlacementName(String(getVal(r, ['Placement', 'Placement Type', 'Placement Name']) || '')),
-                    percentage: parseNum(getVal(r, ['Percentage', 'Bid Adjustment'])), 
-                    ...metrics
-                };
-            });
-
-        dashboardData.sbAds = allSbRows.filter(r => {
-                const entity = getVal(r, ['Entity']);
-                if (entity && entity === 'Ad') return true;
-                const creative = getVal(r, ['Creative Headline', 'Headline', 'Brand Logo Asset ID']);
-                const adGroupId = getVal(r, ['Ad Group ID']);
-                return creative && adGroupId;
-             }).map(r => {
-                 const metrics = getMetrics(r);
-                 const asinsStr = getVal(r, ['Creative ASINs', 'Sold on Amazon']);
-                 return {
-                     adId: String(getVal(r, ['Ad ID', 'Ad Id']) || `AD-${Math.random().toString(36).substr(2,9)}`),
-                     campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                     adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                     name: getVal(r, ['Ad Name']),
-                     headline: getVal(r, ['Creative Headline', 'Headline']),
-                     brandLogoAssetId: getVal(r, ['Brand Logo Asset ID']),
-                     videoMediaIds: getVal(r, ['Video Media IDs', 'Media ID']),
-                     customImageAssetId: getVal(r, ['Custom Image Asset ID']),
-                     landingPageUrl: getVal(r, ['Landing Page URL']),
-                     creativeAsins: asinsStr ? String(asinsStr).split(',').map(s => s.trim()) : [],
-                     format: getVal(r, ['Ad Format']) || 'Legacy',
-                     ...metrics
-                 };
-             });
-
-        dashboardData.sbKeywords = allSbRows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 const keyword = getVal(r, ['Keyword Text']);
-                 if (entity) return entity === 'Keyword';
-                 return keyword && getVal(r, ['Match Type']);
-             }).map(r => {
-                 const metrics = getMetrics(r);
-                 return {
-                     keywordId: String(getVal(r, ['Keyword ID', 'Keyword Id']) || `KW-${Math.random()}`),
-                     keywordText: getVal(r, ['Keyword Text']),
-                     matchType: String(getVal(r, ['Match Type']) || '').toUpperCase(),
-                     bid: parseNum(getVal(r, ['Bid'])),
-                     campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                     adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                     state: normalizeState(getVal(r, ['State'])),
-                     ...metrics
-                 };
-             });
-
-        dashboardData.sbTargets = allSbRows.filter(r => {
-                 const entity = getVal(r, ['Entity']);
-                 const target = getVal(r, ['Product Targeting Expression']);
-                 if (entity) return entity === 'Product Targeting';
-                 return target;
-             }).map(r => {
-                 const metrics = getMetrics(r);
-                 return {
-                     targetId: String(getVal(r, ['Product Targeting ID', 'Target Id']) || `PT-${Math.random()}`),
-                     expression: getVal(r, ['Product Targeting Expression']),
-                     bid: parseNum(getVal(r, ['Bid'])),
-                     campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                     adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                     state: normalizeState(getVal(r, ['State'])),
-                     ...metrics
-                 };
-             });
-
-        const uniqueCampaigns = new Map();
-        dashboardData.sbCampaigns.forEach(c => {
-            if (!uniqueCampaigns.has(c.campaignId)) {
-                uniqueCampaigns.set(c.campaignId, c);
-            } else {
-                const existing = uniqueCampaigns.get(c.campaignId);
-                existing.spend += c.spend;
-                existing.sales += c.sales;
-                existing.orders += c.orders;
-                existing.clicks += c.clicks;
-                existing.impressions += c.impressions;
-            }
-        });
-        dashboardData.sbCampaigns = Array.from(uniqueCampaigns.values());
-        
         const sdSheetName = workbook.SheetNames.find(n => n.includes('Sponsored Display'));
         const sdSheet = sdSheetName ? workbook.Sheets[sdSheetName] : null;
         if (sdSheet) {
             const rows = findHeaderRowAndGetData(sdSheet, ['Campaign ID', 'Entity']);
-            dashboardData.sdCampaigns = rows.filter(r => {
-                  const entity = getVal(r, ['Entity']);
-                  if (entity) return entity === 'Campaign';
-                  return false;
-              }).map(r => {
-                 const metrics = getMetrics(r);
-                 return {
-                     campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                     name: getVal(r, ['Campaign Name']),
-                     portfolioId: getVal(r, ['Portfolio ID', 'Portfolio Id']) ? String(getVal(r, ['Portfolio ID', 'Portfolio Id'])) : null,
-                     tactic: getVal(r, ['Tactic']),
-                     costType: getVal(r, ['Cost Type']),
-                     state: normalizeState(getVal(r, ['State'])),
-                     viewableImpressions: parseNum(getVal(r, ['Viewable Impressions'])),
-                     viewSales: parseNum(getVal(r, ['Sales (Views & Clicks)', 'View Sales'])) || 0,
-                     viewOrders: parseNum(getVal(r, ['Orders (Views & Clicks)', 'View Orders'])) || 0,
-                     viewUnits: parseNum(getVal(r, ['Units (Views & Clicks)', 'View Units'])) || 0,
-                     ...metrics
-                 };
-              });
-
-            dashboardData.sdTargets = rows.filter(r => {
-                  const entity = getVal(r, ['Entity']);
-                  if (entity) return entity === 'Product Targeting' || entity === 'Audience';
-                  return getVal(r, ['Product Targeting Expression']) || getVal(r, ['Audience Expression']);
-              }).map(r => {
-                  const metrics = getMetrics(r);
-                  return {
-                      targetId: String(getVal(r, ['Targeting ID', 'Target Id']) || `SDT-${Math.random()}`),
-                      expression: getVal(r, ['Product Targeting Expression']) || getVal(r, ['Audience Expression']) || 'Unknown Target',
-                      bid: parseNum(getVal(r, ['Bid'])),
-                      campaignId: String(getVal(r, ['Campaign ID', 'Campaign Id'])),
-                      adGroupId: String(getVal(r, ['Ad Group ID', 'Ad Group Id'])),
-                      state: normalizeState(getVal(r, ['State'])),
-                      ...metrics
-                  };
-              });
+            dashboardData.sdCampaigns = rows.filter(r => getVal(r, ['Entity']) === 'Campaign').map(r => ({
+                 campaignId: String(getVal(r, ['Campaign ID'])),
+                 name: String(getVal(r, ['Campaign Name']) || `SD ${getVal(r, ['Campaign ID']) || ''}`),
+                 portfolioId: getVal(r, ['Portfolio ID']) ? String(getVal(r, ['Portfolio ID'])) : null,
+                 tactic: (getVal(r, ['Tactic']) === 'T00030' ? 'T00030' : 'T00020') as 'T00020' | 'T00030',
+                 costType: (getVal(r, ['Cost Type']) === 'vCPM' ? 'vCPM' : 'CPC') as 'CPC' | 'vCPM',
+                 state: normalizeState(getVal(r, ['State'])),
+                 viewableImpressions: parseNum(getVal(r, ['Viewable Impressions'])),
+                 viewSales: parseNum(getVal(r, ['Sales (Views & Clicks)'])) || 0,
+                 viewOrders: parseNum(getVal(r, ['Orders (Views & Clicks)'])) || 0,
+                 viewUnits: parseNum(getVal(r, ['Units (Views & Clicks)'])) || 0,
+                 ...getMetrics(r)
+            }));
         }
 
-        dashboardData.searchTerms = [];
-        const spStSheetName = workbook.SheetNames.find(n => {
-            const lower = n.toLowerCase();
-            return (lower.includes('sponsored products search term') || lower.includes('search term report')) && !lower.includes('sponsored brands') && !lower.includes('sb search term');
-        });
-        
-        if (spStSheetName) {
-            const rows = findHeaderRowAndGetData(workbook.Sheets[spStSheetName], ['Search Term', 'Customer Search Term', 'Impressions', 'Clicks']);
-            const spTerms = rows.map(r => {
-                const metrics = getMetrics(r);
-                const t1 = getVal(r, ['Targeting', 'Target', 'Target Value']);
-                const t2 = getVal(r, ['Keyword Text', 'Keyword']);
-                const t3 = getVal(r, ['Product Targeting Expression', 'Product Targeting', 'Targeting Expression']);
-                const finalTargeting = (t1 && String(t1).trim().length > 0) ? t1 : (t2 && String(t2).trim().length > 0) ? t2 : (t3 && String(t3).trim().length > 0) ? t3 : 'Unknown';
-                return {
-                    searchTerm: getVal(r, ['Customer Search Term', 'Search Term']),
-                    customerSearchTerm: getVal(r, ['Customer Search Term', 'Search Term']),
-                    targeting: finalTargeting,
-                    campaignName: getVal(r, ['Campaign Name']),
-                    adGroupName: getVal(r, ['Ad Group Name']),
-                    campaignId: getVal(r, ['Campaign ID', 'Campaign Id']),
-                    adGroupId: getVal(r, ['Ad Group ID', 'Ad Group Id']),
-                    matchType: getVal(r, ['Match Type']),
-                    type: 'SP' as const,
-                    ...metrics
-                };
-            }).filter(r => r.searchTerm);
-            dashboardData.searchTerms.push(...spTerms);
-        }
-
-        const sbStSheetName = workbook.SheetNames.find(n => {
-            const lower = n.toLowerCase();
-            return lower.includes('sponsored brands search term') || lower.includes('sb search term');
-        });
-        
-        if (sbStSheetName) {
-            const rows = findHeaderRowAndGetData(workbook.Sheets[sbStSheetName], ['Search Term', 'Customer Search Term', 'Impressions', 'Clicks']);
-            const sbTerms = rows.map(r => {
-                const metrics = getMetrics(r);
-                const t1 = getVal(r, ['Targeting', 'Target']);
-                const t2 = getVal(r, ['Keyword Text', 'Keyword']);
-                const finalTargeting = (t1 && String(t1).trim().length > 0) ? t1 : (t2 && String(t2).trim().length > 0) ? t2 : 'Unknown';
-                return {
-                    searchTerm: getVal(r, ['Customer Search Term', 'Search Term']),
-                    customerSearchTerm: getVal(r, ['Customer Search Term', 'Search Term']),
-                    targeting: finalTargeting,
-                    campaignName: getVal(r, ['Campaign Name']),
-                    adGroupName: getVal(r, ['Ad Group Name']),
-                    campaignId: getVal(r, ['Campaign ID', 'Campaign Id']),
-                    adGroupId: getVal(r, ['Ad Group ID', 'Ad Group Id']),
-                    matchType: getVal(r, ['Match Type']),
-                    type: 'SB' as const,
-                    ...metrics
-                };
-            }).filter(r => r.searchTerm);
-            dashboardData.searchTerms.push(...sbTerms);
-        }
-
-        if (dashboardData.spCampaigns.length === 0 && dashboardData.sbCampaigns.length === 0) {
-            console.warn("No campaigns found in file.");
-        }
         resolve(dashboardData);
       } catch (err) {
-        console.error("Error parsing file", err);
         reject(err);
       }
     };
