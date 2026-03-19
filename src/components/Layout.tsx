@@ -19,7 +19,11 @@ import {
   LogOut,
   Users,
   Crown,
-  Upload
+  Upload,
+  Wallet,
+  LineChart,
+  ShieldAlert,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
