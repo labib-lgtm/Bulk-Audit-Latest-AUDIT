@@ -8,6 +8,10 @@ import { SearchTermDashboard } from './SearchTermDashboard';
 import { DiagnosticsDashboard } from './DiagnosticsDashboard';
 import { SettingsDashboard } from './SettingsDashboard';
 import { AsinAuditDashboard } from './AsinAuditDashboard';
+import { DaypartingDashboard } from './DaypartingDashboard';
+import { ForecastingDashboard } from './ForecastingDashboard';
+import { CannibalizationDashboard } from './CannibalizationDashboard';
+import { ProfitDashboard } from './ProfitDashboard';
 
 export {
   ExecutiveDashboard,
@@ -18,5 +22,9 @@ export {
   SearchTermDashboard,
   DiagnosticsDashboard,
   SettingsDashboard,
-  AsinAuditDashboard
+  AsinAuditDashboard,
+  DaypartingDashboard,
+  ForecastingDashboard,
+  CannibalizationDashboard,
+  ProfitDashboard
 };
