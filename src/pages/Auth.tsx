@@ -73,7 +73,7 @@ const Auth = () => {
     } = {};
     const emailResult = emailSchema.safeParse(email);
     if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
+      newErrors.email = emailResult.error.issues[0].message;
     }
 
     // For signup, use strict validation; for login, just check minimum length
