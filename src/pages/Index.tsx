@@ -47,6 +47,21 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dataRestored, setDataRestored] = useState(false);
+  const [bulkEnabled, setBulkEnabled] = useState(true);
+  const [businessEnabled, setBusinessEnabled] = useState(true);
+  const [inventoryEnabled, setInventoryEnabled] = useState(true);
+  const [hourlyEnabled, setHourlyEnabled] = useState(true);
+
+  const downloadUrls = [
+    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: 'https://advertising.amazon.com/bulk-operations' },
+    { key: 'business', label: 'Business Report', enabled: businessEnabled, setEnabled: setBusinessEnabled, url: 'https://sellercentral.amazon.com/business-reports' },
+    { key: 'inventory', label: 'FBA Inventory', enabled: inventoryEnabled, setEnabled: setInventoryEnabled, url: 'https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth' },
+    { key: 'hourly', label: 'Hourly Data', enabled: hourlyEnabled, setEnabled: setHourlyEnabled, url: 'https://advertising.amazon.com/reports' },
+  ];
+
+  const handleOpenDownloadTabs = () => {
+    downloadUrls.filter(d => d.enabled).forEach(d => window.open(d.url, '_blank'));
+  };
 
   const currencySymbol = CURRENCY_SYMBOLS[settings.currencyCode] || '$';
 
