@@ -435,7 +435,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <Select value={marketplace} onValueChange={setMarketplace}>
-                    <SelectTrigger className="w-[110px] h-8 text-xs bg-background/50 border-border/50">
+                    <SelectTrigger className="w-[110px] h-8 text-xs text-foreground bg-background/50 border-border/50">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
