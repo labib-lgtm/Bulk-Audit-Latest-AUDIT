@@ -405,7 +405,7 @@ const Index = () => {
               disabled={!downloadUrls.some(d => d.enabled)}
               className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
             >
-              <ExternalLink size={14} /> Open {downloadUrls.filter(d => d.enabled).length} Tabs
+              <ExternalLink size={14} /> Open All Tabs
             </button>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
