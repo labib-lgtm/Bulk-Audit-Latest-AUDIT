@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Layout } from '../components/Layout';
 import { ExecutiveDashboard, PortfolioDashboard, AsinAuditDashboard, SPDashboard, SBDashboard, SDDashboard, SearchTermDashboard, DiagnosticsDashboard, SettingsDashboard, ProfitDashboard, DaypartingDashboard, ForecastingDashboard, CannibalizationDashboard } from '../views/Dashboards';
 import { TeamManagement } from '../views/TeamManagement';
@@ -6,7 +8,7 @@ import { processBulkFile, processBusinessReport, processInventoryReport, process
 import { saveState, loadState, clearState, exportWorkspace, importWorkspace } from '../services/persistence';
 import { generateMockData } from '../services/mockData';
 import { DashboardData, BusinessReportRow, AppSettings, ProductGoal, InventoryRow, HourlyPerformanceRow, Currency, ProductCost, ProfitSettings, CURRENCY_SYMBOLS } from '../types';
-import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle, X, CheckCircle, History, Package, Clock, Loader2, CloudUpload } from 'lucide-react';
+import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle, X, CheckCircle, History, Package, Clock, Loader2, CloudUpload, ExternalLink } from 'lucide-react';
 import lynxLogoWhite from '@/assets/lynx-logo-white.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -45,6 +47,21 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dataRestored, setDataRestored] = useState(false);
+  const [bulkEnabled, setBulkEnabled] = useState(true);
+  const [businessEnabled, setBusinessEnabled] = useState(true);
+  const [inventoryEnabled, setInventoryEnabled] = useState(true);
+  const [hourlyEnabled, setHourlyEnabled] = useState(true);
+
+  const downloadUrls = [
+    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: 'https://advertising.amazon.com/bulk-operations' },
+    { key: 'business', label: 'Business Report', enabled: businessEnabled, setEnabled: setBusinessEnabled, url: 'https://sellercentral.amazon.com/business-reports' },
+    { key: 'inventory', label: 'FBA Inventory', enabled: inventoryEnabled, setEnabled: setInventoryEnabled, url: 'https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth' },
+    { key: 'hourly', label: 'Hourly Data', enabled: hourlyEnabled, setEnabled: setHourlyEnabled, url: 'https://advertising.amazon.com/reports' },
+  ];
+
+  const handleOpenDownloadTabs = () => {
+    downloadUrls.filter(d => d.enabled).forEach(d => window.open(d.url, '_blank'));
+  };
 
   const currencySymbol = CURRENCY_SYMBOLS[settings.currencyCode] || '$';
 
@@ -377,6 +394,30 @@ const Index = () => {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Quick Download Tabs */}
+        <div className="max-w-2xl mx-auto mb-8 border border-border rounded-2xl p-5 bg-card/50 backdrop-blur animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Quick Download from Seller Central</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            {downloadUrls.map((item) => (
+              <div key={item.key} className="flex items-center gap-2">
+                <Switch
+                  id={`toggle-${item.key}`}
+                  checked={item.enabled}
+                  onCheckedChange={item.setEnabled}
+                />
+                <Label htmlFor={`toggle-${item.key}`} className="text-xs text-foreground cursor-pointer">{item.label}</Label>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={handleOpenDownloadTabs}
+            disabled={!downloadUrls.some(d => d.enabled)}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all disabled:opacity-50"
+          >
+            <ExternalLink size={16} /> Open Download Tabs
+          </button>
         </div>
 
         {/* Import Workspace */}
