@@ -8,7 +8,7 @@ import { processBulkFile, processBusinessReport, processInventoryReport, process
 import { saveState, loadState, clearState, exportWorkspace, importWorkspace } from '../services/persistence';
 import { generateMockData } from '../services/mockData';
 import { DashboardData, BusinessReportRow, AppSettings, ProductGoal, InventoryRow, HourlyPerformanceRow, Currency, ProductCost, ProfitSettings, CURRENCY_SYMBOLS } from '../types';
-import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle, X, CheckCircle, History, Package, Clock, Loader2, CloudUpload } from 'lucide-react';
+import { Upload, FileSpreadsheet, Zap, Shield, AlertCircle, X, CheckCircle, History, Package, Clock, Loader2, CloudUpload, ExternalLink } from 'lucide-react';
 import lynxLogoWhite from '@/assets/lynx-logo-white.png';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
