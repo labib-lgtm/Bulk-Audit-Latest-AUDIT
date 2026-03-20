@@ -1,34 +1,41 @@
 
 
-## Assessment: Sync is Complete
+## Add Quick-Open Download Tabs with Toggle Controls
 
-After a thorough comparison of all root-level files against `src/` files, **the full sync plan is complete**. All 23 items from the original plan have been implemented.
+### What we're building
+A section on the upload screen with 4 toggle switches (Bulk Operations, Business Report, FBA Inventory, Hourly Data) and a single "Open All" button that opens Amazon Seller Central download pages in new browser tabs for whichever toggles are enabled.
 
-### What is already synced
+### Changes to `src/pages/Index.tsx`
 
-| Area | Status |
-|------|--------|
-| `src/types.ts` — Currency, ProductCost, InventoryRow, HourlyPerformanceRow, DashboardData | Done |
-| `src/services/dataProcessor.ts` — processInventoryReport, processHourlyReport, detectCurrency | Done |
-| `src/services/mockData.ts` — inventory, hourly, profit mock data | Done |
-| `src/services/aiService.ts` — Gemini AI insights | Done |
-| `src/services/persistence.ts` — IndexedDB state persistence | Done |
-| `src/components/Widgets.tsx` — MetricCard, DataTable, SectionHeader | Done |
-| `src/components/ExportPreflightModal.tsx` — export validation modal | Done |
-| All 13 dashboard views (Executive, Profit, Portfolio, SP, SB, SD, SearchTerm x2, ASIN Audit, Dayparting, Forecasting, Cannibalization, Diagnostics, Settings) | Done |
-| `src/views/Dashboards.tsx` — barrel exports | Done |
-| `src/components/Layout.tsx` — all 14 nav items + AI panel + workspace save/load | Done |
-| `src/pages/Index.tsx` — 5 upload slots, persistence, demo data, all renderView cases | Done |
+1. **Add state** for 4 toggles, all defaulting to `true`:
+   - `bulkEnabled`, `businessEnabled`, `inventoryEnabled`, `hourlyEnabled`
 
-### Improvements in `src/` over root
+2. **Define URL mapping** for each file type pointing to Amazon Seller Central:
+   - Bulk Operations → `https://advertising.amazon.com/bulk-operations`
+   - Business Report → `https://sellercentral.amazon.com/business-reports`
+   - FBA Inventory → `https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth`
+   - Hourly Data → `https://advertising.amazon.com/reports`
 
-The `src/` version is actually **better** than the root `App.tsx` in several ways:
-- Uses **Supabase-based authentication** and `useUserRole()` hook instead of client-side `userRole` state
-- Has **Team Management** admin section (root does not)
-- Has a **landing page** and auth flow (root is a single-page app)
-- Uses **CSS custom properties** (design tokens) instead of hardcoded Tailwind colors
+3. **Add UI section** between the upload grid and the workspace import area:
+   - A row of 4 toggle switches (using the existing `Switch` component from `src/components/ui/switch.tsx`) with labels for each file type
+   - A prominent "Open Download Tabs" button that calls `window.open()` for each enabled toggle
+   - Styled consistently with the existing dark theme
 
-### No remaining sync gaps
+### UI Layout (below the 5 upload slots)
 
-There is nothing left to upgrade from the root-level codebase. The only differences are intentional improvements (auth, routing, landing page) that make the `src/` version more production-ready.
+```text
+┌─────────────────────────────────────────────────┐
+│  Quick Download from Seller Central             │
+│                                                 │
+│  [✓] Bulk Operations   [✓] Business Report      │
+│  [✓] FBA Inventory     [✓] Hourly Data          │
+│                                                 │
+│  [ 🔗 Open Download Tabs ]                      │
+└─────────────────────────────────────────────────┘
+```
+
+### Technical details
+- Uses `window.open(url, '_blank')` for each enabled toggle
+- Import `Switch` from `@/components/ui/switch` and `Label` from `@/components/ui/label`
+- No backend changes needed
 
