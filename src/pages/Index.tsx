@@ -397,27 +397,37 @@ const Index = () => {
         </div>
 
         {/* Quick Download Tabs */}
-        <div className="max-w-2xl mx-auto mb-8 border border-border rounded-2xl p-5 bg-card/50 backdrop-blur animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Quick Download from Seller Central</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+        <div className="max-w-5xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Quick Download from Seller Central</h3>
+            <button
+              onClick={handleOpenDownloadTabs}
+              disabled={!downloadUrls.some(d => d.enabled)}
+              className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
+            >
+              <ExternalLink size={14} /> Open {downloadUrls.filter(d => d.enabled).length} Tabs
+            </button>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {downloadUrls.map((item) => (
-              <div key={item.key} className="flex items-center gap-2">
+              <div
+                key={item.key}
+                className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
+                  item.enabled
+                    ? 'border-primary/40 bg-primary/5'
+                    : 'border-border bg-card/30 opacity-60'
+                }`}
+                onClick={() => item.setEnabled(!item.enabled)}
+              >
                 <Switch
                   id={`toggle-${item.key}`}
                   checked={item.enabled}
                   onCheckedChange={item.setEnabled}
                 />
-                <Label htmlFor={`toggle-${item.key}`} className="text-xs text-foreground cursor-pointer">{item.label}</Label>
+                <Label htmlFor={`toggle-${item.key}`} className="text-xs text-foreground cursor-pointer font-medium">{item.label}</Label>
               </div>
             ))}
           </div>
-          <button
-            onClick={handleOpenDownloadTabs}
-            disabled={!downloadUrls.some(d => d.enabled)}
-            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all disabled:opacity-50"
-          >
-            <ExternalLink size={16} /> Open Download Tabs
-          </button>
         </div>
 
         {/* Import Workspace */}
