@@ -420,15 +420,29 @@ const Index = () => {
 
         {/* Quick Download Tabs */}
         <div className="max-w-5xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-3">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Quick Download from Seller Central</h3>
-            <button
-              onClick={handleOpenDownloadTabs}
-              disabled={!downloadUrls.some(d => d.enabled)}
-              className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
-            >
-              <ExternalLink size={14} /> Open All Tabs
-            </button>
+            <div className="flex items-center gap-2">
+              <Select value={marketplace} onValueChange={setMarketplace}>
+                <SelectTrigger className="w-[110px] h-8 text-xs bg-card border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(marketplaceConfig).map(([code, { flag }]) => (
+                    <SelectItem key={code} value={code} className="text-xs">
+                      {flag} {code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <button
+                onClick={handleOpenDownloadTabs}
+                disabled={!downloadUrls.some(d => d.enabled)}
+                className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
+              >
+                <ExternalLink size={14} /> Open All Tabs
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {downloadUrls.map((item) => (
