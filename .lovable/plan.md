@@ -1,41 +1,45 @@
 
 
-## Add Quick-Open Download Tabs with Toggle Controls
+## Add Marketplace Selector to Quick Download Section
 
 ### What we're building
-A section on the upload screen with 4 toggle switches (Bulk Operations, Business Report, FBA Inventory, Hourly Data) and a single "Open All" button that opens Amazon Seller Central download pages in new browser tabs for whichever toggles are enabled.
+A dropdown selector next to the "Quick Download" header that lets users pick their Amazon marketplace (US, UK, DE, CA, IN, JP, etc.). The download URLs will dynamically swap domains based on the selected marketplace.
+
+### Marketplace domain mapping
+
+| Marketplace | Seller Central domain | Advertising domain |
+|---|---|---|
+| US | sellercentral.amazon.com | advertising.amazon.com |
+| UK | sellercentral.amazon.co.uk | advertising.amazon.co.uk |
+| DE | sellercentral.amazon.de | advertising.amazon.de |
+| FR | sellercentral.amazon.fr | advertising.amazon.fr |
+| ES | sellercentral.amazon.es | advertising.amazon.es |
+| IT | sellercentral.amazon.it | advertising.amazon.it |
+| CA | sellercentral.amazon.ca | advertising.amazon.ca |
+| MX | sellercentral.amazon.com.mx | advertising.amazon.com.mx |
+| IN | sellercentral.amazon.in | advertising.amazon.in |
+| JP | sellercentral.amazon.co.jp | advertising.amazon.co.jp |
+| AU | sellercentral.amazon.com.au | advertising.amazon.com.au |
+| AE | sellercentral.amazon.ae | advertising.amazon.ae |
+| BR | sellercentral.amazon.com.br | advertising.amazon.com.br |
 
 ### Changes to `src/pages/Index.tsx`
 
-1. **Add state** for 4 toggles, all defaulting to `true`:
-   - `bulkEnabled`, `businessEnabled`, `inventoryEnabled`, `hourlyEnabled`
+1. **Add marketplace state**: `const [marketplace, setMarketplace] = useState('US')`
 
-2. **Define URL mapping** for each file type pointing to Amazon Seller Central:
-   - Bulk Operations → `https://advertising.amazon.com/bulk-operations`
-   - Business Report → `https://sellercentral.amazon.com/business-reports`
-   - FBA Inventory → `https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth`
-   - Hourly Data → `https://advertising.amazon.com/reports`
+2. **Define marketplace config** as a constant object mapping marketplace codes to their `sellerCentral` and `advertising` base domains.
 
-3. **Add UI section** between the upload grid and the workspace import area:
-   - A row of 4 toggle switches (using the existing `Switch` component from `src/components/ui/switch.tsx`) with labels for each file type
-   - A prominent "Open Download Tabs" button that calls `window.open()` for each enabled toggle
-   - Styled consistently with the existing dark theme
+3. **Rebuild `downloadUrls`** dynamically using the selected marketplace's domains. The URL paths stay the same — only the domain portion changes (e.g., `sellercentral.amazon.com` becomes `sellercentral.amazon.co.uk`).
 
-### UI Layout (below the 5 upload slots)
+4. **Add a `Select` dropdown** (using the existing `@/components/ui/select` component) in the header row between the title and the "Open All Tabs" button, showing country flags (emoji) + marketplace code (e.g., "🇺🇸 US", "🇬🇧 UK").
+
+### UI Layout
 
 ```text
-┌─────────────────────────────────────────────────┐
-│  Quick Download from Seller Central             │
-│                                                 │
-│  [✓] Bulk Operations   [✓] Business Report      │
-│  [✓] FBA Inventory     [✓] Hourly Data          │
-│                                                 │
-│  [ 🔗 Open Download Tabs ]                      │
-└─────────────────────────────────────────────────┘
+Quick Download from Seller Central   [🇺🇸 US ▾]   [Open All Tabs]
 ```
 
-### Technical details
-- Uses `window.open(url, '_blank')` for each enabled toggle
-- Import `Switch` from `@/components/ui/switch` and `Label` from `@/components/ui/label`
+### Technical notes
 - No backend changes needed
+- Marketplace preference stored in component state only (resets on reload)
 
