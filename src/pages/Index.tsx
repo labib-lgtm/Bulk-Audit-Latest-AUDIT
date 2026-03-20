@@ -334,167 +334,168 @@ const Index = () => {
   }
 
   if (!bulkData) {
-    return <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 relative overflow-hidden dark">
-      <div className="absolute inset-0 bg-grid opacity-50" />
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[180px] animate-float-slow" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-brand-400/8 rounded-full blur-[150px] animate-float-slow" style={{ animationDelay: '-5s' }} />
+    const uploadSlots = [
+      { id: 'bulk', label: 'Bulk Operations', subtitle: 'Required', icon: CloudUpload, loaded: !!bulkData, loadedLabel: 'Bulk File Loaded', accept: '.xlsx,.xls', onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleBulkUpload(e, false), disabled: isLoading || !!bulkData, accentClass: 'primary' },
+      { id: 'business', label: 'Business Report', subtitle: 'Recommended', icon: FileSpreadsheet, loaded: !!businessReport, loadedLabel: 'Report Loaded', accept: '.xlsx,.csv', onChange: handleBusinessReportUpload, disabled: isLoading, accentClass: 'primary' },
+      { id: 'prev', label: 'Prev Period Bulk', subtitle: 'For Comparisons', icon: History, loaded: !!previousBulkData, loadedLabel: 'Prev Period Loaded', accept: '.xlsx,.xls', onChange: (e: React.ChangeEvent<HTMLInputElement>) => handleBulkUpload(e, true), disabled: isLoading || !!previousBulkData, accentClass: 'accent' },
+      { id: 'inventory', label: 'FBA Inventory', subtitle: 'For Stock Risk', icon: Package, loaded: !!inventoryReport, loadedLabel: 'Inventory Loaded', accept: '.csv,.txt,.xlsx', onChange: handleInventoryReportUpload, disabled: isLoading || !!inventoryReport, accentClass: 'primary' },
+      { id: 'hourly', label: 'Hourly Data', subtitle: 'For Dayparting', icon: Clock, loaded: !!hourlyReport, loadedLabel: 'Hourly Loaded', accept: '.xlsx,.csv', onChange: handleHourlyReportUpload, disabled: isLoading || !!hourlyReport, accentClass: 'primary' },
+    ];
 
-      <div className="relative z-10 max-w-5xl w-full text-center">
-        <div className="flex items-center justify-center mb-10 animate-fade-in">
-          <img src={lynxLogoWhite} alt="Lynx Media" className="h-16 w-auto" />
-        </div>
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center p-6 relative overflow-hidden dark">
+        {/* Background effects */}
+        <div className="absolute inset-0 bg-grid opacity-30" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/8 rounded-full blur-[200px]" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-brand-400/5 rounded-full blur-[180px]" />
 
-        <h1 className="text-2xl sm:text-3xl font-heading font-bold text-foreground mb-3 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          Amazon Advertising Analytics
-        </h1>
-        <p className="text-muted-foreground mb-12 max-w-md mx-auto animate-fade-in" style={{ animationDelay: '0.2s' }}>
-          Upload your files to unlock powerful insights across all your campaigns.
-        </p>
-
-        {error && <div className="mb-6 p-4 glass-dark rounded-2xl text-destructive text-sm flex items-center justify-center gap-3 border-destructive/30 animate-fade-in">
-          <AlertCircle size={18} /> {error}
-        </div>}
-
-        {/* 5 Upload Slots */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-          {/* 1. Bulk Operations */}
-          <div className="relative group">
-            <input type="file" accept=".xlsx,.xls" onChange={(e) => handleBulkUpload(e, false)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading || !!bulkData} />
-            <div className={`flex flex-col items-center justify-center h-40 px-3 border-2 border-dashed rounded-2xl transition-all duration-300 ${bulkData ? 'border-primary bg-primary/10' : 'border-border hover:border-primary hover:bg-primary/5'}`}>
-              {bulkData ? (
-                <><CheckCircle className="w-8 h-8 text-primary mb-2" /><span className="text-xs font-bold text-primary uppercase tracking-wider">Bulk File Loaded</span></>
-              ) : (
-                <><CloudUpload className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors mb-2" /><span className="text-xs font-bold text-foreground uppercase tracking-wider text-center">1. Bulk Operations</span><span className="text-[10px] text-muted-foreground mt-1">Required</span></>
-              )}
-            </div>
+        <div className="relative z-10 max-w-4xl w-full pt-12 pb-8">
+          {/* Header */}
+          <div className="text-center mb-14 animate-fade-in">
+            <img src={lynxLogoWhite} alt="Lynx Media" className="h-12 w-auto mx-auto mb-8 opacity-90" />
+            <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mb-3 tracking-tight">
+              Upload Your <span className="text-gradient">Data</span>
+            </h1>
+            <p className="text-muted-foreground text-sm max-w-md mx-auto leading-relaxed">
+              Drop your Amazon reports below to unlock powerful advertising insights.
+            </p>
           </div>
 
-          {/* 2. Business Report */}
-          <div className="relative group">
-            <input type="file" accept=".xlsx,.csv" onChange={handleBusinessReportUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading} />
-            <div className={`flex flex-col items-center justify-center h-40 px-3 border-2 border-dashed rounded-2xl transition-all duration-300 ${businessReport ? 'border-primary bg-primary/10' : 'border-border hover:border-primary hover:bg-primary/5'}`}>
-              {businessReport ? (
-                <><CheckCircle className="w-8 h-8 text-primary mb-2" /><span className="text-xs font-bold text-primary uppercase tracking-wider">Report Loaded</span></>
-              ) : (
-                <><FileSpreadsheet className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors mb-2" /><span className="text-xs font-bold text-foreground uppercase tracking-wider text-center">2. Business Report</span><span className="text-[10px] text-muted-foreground mt-1">Recommended</span></>
-              )}
+          {error && (
+            <div className="mb-8 p-4 glass-dark rounded-2xl text-destructive text-sm flex items-center justify-center gap-3 border border-destructive/30 animate-fade-in max-w-2xl mx-auto">
+              <AlertCircle size={18} /> {error}
             </div>
-          </div>
+          )}
 
-          {/* 3. Previous Period Bulk */}
-          <div className="relative group">
-            <input type="file" accept=".xlsx,.xls" onChange={(e) => handleBulkUpload(e, true)} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading || !!previousBulkData} />
-            <div className={`flex flex-col items-center justify-center h-40 px-3 border-2 border-dashed rounded-2xl transition-all duration-300 ${previousBulkData ? 'border-accent bg-accent/10' : 'border-border hover:border-accent hover:bg-accent/5'}`}>
-              {previousBulkData ? (
-                <><CheckCircle className="w-8 h-8 text-accent mb-2" /><span className="text-xs font-bold text-accent uppercase tracking-wider">Prev Period Loaded</span></>
-              ) : (
-                <><History className="w-8 h-8 text-muted-foreground group-hover:text-accent transition-colors mb-2" /><span className="text-xs font-bold text-foreground uppercase tracking-wider text-center">3. Prev Period Bulk</span><span className="text-[10px] text-muted-foreground mt-1">For Comparisons</span></>
-              )}
-            </div>
-          </div>
+          {/* Upload Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10 animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            {uploadSlots.map((slot, idx) => {
+              const Icon = slot.icon;
+              return (
+                <div key={slot.id} className="relative group" style={{ animationDelay: `${0.1 + idx * 0.05}s` }}>
+                  <input type="file" accept={slot.accept} onChange={slot.onChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={slot.disabled} />
+                  <div className={`relative flex flex-col items-center justify-center h-36 px-4 rounded-2xl border transition-all duration-300 overflow-hidden ${
+                    slot.loaded
+                      ? 'border-primary/50 bg-primary/10'
+                      : 'border-border/60 bg-card/40 hover:border-primary/40 hover:bg-card/70 group-hover:shadow-[0_0_40px_-12px_hsl(var(--primary)/0.2)]'
+                  }`}>
+                    {/* Subtle shimmer on hover */}
+                    {!slot.loaded && <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-shimmer" />}
+                    
+                    {slot.loaded ? (
+                      <>
+                        <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2.5">
+                          <CheckCircle className="w-5 h-5 text-primary" />
+                        </div>
+                        <span className="text-xs font-bold text-primary uppercase tracking-wider">{slot.loadedLabel}</span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-xl bg-muted/50 group-hover:bg-primary/10 flex items-center justify-center mb-2.5 transition-colors duration-300">
+                          <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors duration-300" />
+                        </div>
+                        <span className="text-xs font-semibold text-foreground uppercase tracking-wider text-center mb-1">
+                          {idx + 1}. {slot.label}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground font-medium">{slot.subtitle}</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
 
-          {/* 4. FBA Inventory */}
-          <div className="relative group">
-            <input type="file" accept=".csv,.txt,.xlsx" onChange={handleInventoryReportUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading || !!inventoryReport} />
-            <div className={`flex flex-col items-center justify-center h-40 px-3 border-2 border-dashed rounded-2xl transition-all duration-300 ${inventoryReport ? 'border-primary bg-primary/10' : 'border-border hover:border-primary hover:bg-primary/5'}`}>
-              {inventoryReport ? (
-                <><CheckCircle className="w-8 h-8 text-primary mb-2" /><span className="text-xs font-bold text-primary uppercase tracking-wider">Inventory Loaded</span></>
-              ) : (
-                <><Package className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors mb-2" /><span className="text-xs font-bold text-foreground uppercase tracking-wider text-center">4. FBA Inventory</span><span className="text-[10px] text-muted-foreground mt-1">For Stock Risk</span></>
-              )}
-            </div>
-          </div>
-
-          {/* 5. Hourly Data */}
-          <div className="relative group">
-            <input type="file" accept=".xlsx,.csv" onChange={handleHourlyReportUpload} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading || !!hourlyReport} />
-            <div className={`flex flex-col items-center justify-center h-40 px-3 border-2 border-dashed rounded-2xl transition-all duration-300 ${hourlyReport ? 'border-primary bg-primary/10' : 'border-border hover:border-primary hover:bg-primary/5'}`}>
-              {hourlyReport ? (
-                <><CheckCircle className="w-8 h-8 text-primary mb-2" /><span className="text-xs font-bold text-primary uppercase tracking-wider">Hourly Loaded</span></>
-              ) : (
-                <><Clock className="w-8 h-8 text-muted-foreground group-hover:text-primary transition-colors mb-2" /><span className="text-xs font-bold text-foreground uppercase tracking-wider text-center">5. Hourly Data</span><span className="text-[10px] text-muted-foreground mt-1">For Dayparting</span></>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Download Tabs */}
-        <div className="max-w-5xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <div className="flex items-center justify-between mb-3 gap-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Quick Download from Seller Central</h3>
-            <div className="flex items-center gap-2">
-              <Select value={marketplace} onValueChange={setMarketplace}>
-                <SelectTrigger className="w-[110px] h-8 text-xs bg-card border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.entries(marketplaceConfig).map(([code, { flag }]) => (
-                    <SelectItem key={code} value={code} className="text-xs">
-                      {flag} {code}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <button
-                onClick={handleOpenDownloadTabs}
-                disabled={!downloadUrls.some(d => d.enabled)}
-                className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
-              >
-                <ExternalLink size={14} /> Open All Tabs
-              </button>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {downloadUrls.map((item) => (
-              <div
-                key={item.key}
-                className={`flex items-center gap-3 p-3 rounded-xl border transition-all duration-200 cursor-pointer ${
-                  item.enabled
-                    ? 'border-primary/40 bg-primary/5'
-                    : 'border-border bg-card/30 opacity-60'
-                }`}
-                onClick={() => item.setEnabled(!item.enabled)}
-              >
-                <Switch
-                  id={`toggle-${item.key}`}
-                  checked={item.enabled}
-                  onCheckedChange={item.setEnabled}
-                />
-                <Label htmlFor={`toggle-${item.key}`} className="text-xs text-foreground cursor-pointer font-medium">{item.label}</Label>
+            {/* Demo Data Card */}
+            <div className="relative group cursor-pointer" onClick={() => !isLoading && loadDemoData()}>
+              <div className="flex flex-col items-center justify-center h-36 px-4 rounded-2xl border border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 hover:border-primary/50 transition-all duration-300">
+                <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-2.5">
+                  <Zap className="w-5 h-5 text-primary" />
+                </div>
+                <span className="text-xs font-bold text-primary uppercase tracking-wider">Load Demo Data</span>
+                <span className="text-[10px] text-muted-foreground font-medium mt-1">Try it instantly</span>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
 
-        {/* Import Workspace */}
-        <div className="max-w-lg mx-auto mb-8 border-t border-border pt-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
-          <div className="flex flex-col items-center">
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Or load existing workspace</p>
-            <div className="relative group w-full">
+          {isLoading && (
+            <div className="flex items-center justify-center text-muted-foreground font-bold mb-8 bg-card/60 py-3.5 rounded-xl animate-pulse border border-border/50 max-w-lg mx-auto">
+              <Loader2 className="animate-spin mr-3 w-5 h-5 text-primary" /> PROCESSING DATA...
+            </div>
+          )}
+
+          {/* Quick Download Section */}
+          <div className="max-w-4xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="rounded-2xl border border-border/50 bg-card/30 backdrop-blur-sm p-5">
+              <div className="flex items-center justify-between mb-4 gap-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                    <ExternalLink size={14} className="text-primary" />
+                  </div>
+                  <h3 className="text-xs font-bold text-foreground uppercase tracking-widest">Quick Download</h3>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Select value={marketplace} onValueChange={setMarketplace}>
+                    <SelectTrigger className="w-[110px] h-8 text-xs bg-background/50 border-border/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(marketplaceConfig).map(([code, { flag }]) => (
+                        <SelectItem key={code} value={code} className="text-xs">
+                          {flag} {code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <button
+                    onClick={handleOpenDownloadTabs}
+                    disabled={!downloadUrls.some(d => d.enabled)}
+                    className="flex items-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
+                  >
+                    <ExternalLink size={13} /> Open Tabs
+                  </button>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                {downloadUrls.map((item) => (
+                  <div
+                    key={item.key}
+                    className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-all duration-200 cursor-pointer ${
+                      item.enabled
+                        ? 'border-primary/30 bg-primary/5'
+                        : 'border-border/30 bg-background/30 opacity-50'
+                    }`}
+                    onClick={() => item.setEnabled(!item.enabled)}
+                  >
+                    <Switch
+                      id={`toggle-${item.key}`}
+                      checked={item.enabled}
+                      onCheckedChange={item.setEnabled}
+                      className="scale-90"
+                    />
+                    <Label htmlFor={`toggle-${item.key}`} className="text-[11px] text-foreground cursor-pointer font-medium leading-tight">{item.label}</Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Import Workspace */}
+          <div className="max-w-sm mx-auto animate-fade-in" style={{ animationDelay: '0.4s' }}>
+            <div className="relative group">
               <input type="file" accept=".lynx,.json" onChange={handleImportWorkspace} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" disabled={isLoading} />
-              <button className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-card border border-border rounded-xl text-sm font-bold text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
-                <Upload size={16} className="text-primary" />
-                Import Team Workspace File (.lynx)
+              <button className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-semibold text-muted-foreground hover:text-foreground transition-all border border-transparent hover:border-border/50 hover:bg-card/40">
+                <Upload size={14} className="text-primary" />
+                Import Workspace (.lynx)
               </button>
             </div>
           </div>
+
+          <p className="text-[11px] text-muted-foreground/60 mt-8 text-center animate-fade-in" style={{ animationDelay: '0.5s' }}>
+            🔒 Your data is processed locally. Nothing leaves your browser.
+          </p>
         </div>
-
-        {isLoading && (
-          <div className="flex items-center justify-center text-muted-foreground font-bold mb-6 bg-card py-3 rounded-xl animate-pulse border border-border">
-            <Loader2 className="animate-spin mr-3 w-5 h-5 text-primary" /> PROCESSING DATA...
-          </div>
-        )}
-
-        <button onClick={loadDemoData} disabled={isLoading} className="w-full max-w-lg mx-auto flex items-center justify-center gap-3 px-8 py-5 bg-primary text-primary-foreground font-heading font-bold text-lg rounded-2xl btn-glow transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 animate-fade-in" style={{ animationDelay: '0.5s' }}>
-          <Zap size={20} /> Load Demo Data
-        </button>
-
-        <p className="text-xs text-muted-foreground mt-8 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-          🔒 Your data is processed locally. Nothing is uploaded to any server.
-        </p>
       </div>
-    </div>;
+    );
   }
 
   return <Layout
