@@ -396,6 +396,30 @@ const Index = () => {
           </div>
         </div>
 
+        {/* Quick Download Tabs */}
+        <div className="max-w-2xl mx-auto mb-8 border border-border rounded-2xl p-5 bg-card/50 backdrop-blur animate-fade-in" style={{ animationDelay: '0.35s' }}>
+          <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Quick Download from Seller Central</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+            {downloadUrls.map((item) => (
+              <div key={item.key} className="flex items-center gap-2">
+                <Switch
+                  id={`toggle-${item.key}`}
+                  checked={item.enabled}
+                  onCheckedChange={item.setEnabled}
+                />
+                <Label htmlFor={`toggle-${item.key}`} className="text-xs text-foreground cursor-pointer">{item.label}</Label>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={handleOpenDownloadTabs}
+            disabled={!downloadUrls.some(d => d.enabled)}
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-primary text-primary-foreground rounded-xl text-sm font-bold hover:opacity-90 transition-all disabled:opacity-50"
+          >
+            <ExternalLink size={16} /> Open Download Tabs
+          </button>
+        </div>
+
         {/* Import Workspace */}
         <div className="max-w-lg mx-auto mb-8 border-t border-border pt-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <div className="flex flex-col items-center">
