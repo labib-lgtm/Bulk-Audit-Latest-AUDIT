@@ -60,7 +60,10 @@ const Index = () => {
   ];
 
   const handleOpenDownloadTabs = () => {
-    downloadUrls.filter(d => d.enabled).forEach(d => window.open(d.url, '_blank'));
+    const enabled = downloadUrls.filter(d => d.enabled);
+    enabled.forEach((d, i) => {
+      setTimeout(() => window.open(d.url, '_blank'), i * 300);
+    });
   };
 
   const currencySymbol = CURRENCY_SYMBOLS[settings.currencyCode] || '$';
