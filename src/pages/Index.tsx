@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Layout } from '../components/Layout';
 import { ExecutiveDashboard, PortfolioDashboard, AsinAuditDashboard, SPDashboard, SBDashboard, SDDashboard, SearchTermDashboard, DiagnosticsDashboard, SettingsDashboard, ProfitDashboard, DaypartingDashboard, ForecastingDashboard, CannibalizationDashboard } from '../views/Dashboards';
 import { TeamManagement } from '../views/TeamManagement';
@@ -51,12 +52,30 @@ const Index = () => {
   const [businessEnabled, setBusinessEnabled] = useState(true);
   const [inventoryEnabled, setInventoryEnabled] = useState(true);
   const [hourlyEnabled, setHourlyEnabled] = useState(true);
+  const [marketplace, setMarketplace] = useState('US');
 
+  const marketplaceConfig: Record<string, { flag: string; sellerCentral: string; advertising: string }> = {
+    US: { flag: '🇺🇸', sellerCentral: 'sellercentral.amazon.com', advertising: 'advertising.amazon.com' },
+    UK: { flag: '🇬🇧', sellerCentral: 'sellercentral.amazon.co.uk', advertising: 'advertising.amazon.co.uk' },
+    DE: { flag: '🇩🇪', sellerCentral: 'sellercentral.amazon.de', advertising: 'advertising.amazon.de' },
+    FR: { flag: '🇫🇷', sellerCentral: 'sellercentral.amazon.fr', advertising: 'advertising.amazon.fr' },
+    ES: { flag: '🇪🇸', sellerCentral: 'sellercentral.amazon.es', advertising: 'advertising.amazon.es' },
+    IT: { flag: '🇮🇹', sellerCentral: 'sellercentral.amazon.it', advertising: 'advertising.amazon.it' },
+    CA: { flag: '🇨🇦', sellerCentral: 'sellercentral.amazon.ca', advertising: 'advertising.amazon.ca' },
+    MX: { flag: '🇲🇽', sellerCentral: 'sellercentral.amazon.com.mx', advertising: 'advertising.amazon.com.mx' },
+    IN: { flag: '🇮🇳', sellerCentral: 'sellercentral.amazon.in', advertising: 'advertising.amazon.in' },
+    JP: { flag: '🇯🇵', sellerCentral: 'sellercentral.amazon.co.jp', advertising: 'advertising.amazon.co.jp' },
+    AU: { flag: '🇦🇺', sellerCentral: 'sellercentral.amazon.com.au', advertising: 'advertising.amazon.com.au' },
+    AE: { flag: '🇦🇪', sellerCentral: 'sellercentral.amazon.ae', advertising: 'advertising.amazon.ae' },
+    BR: { flag: '🇧🇷', sellerCentral: 'sellercentral.amazon.com.br', advertising: 'advertising.amazon.com.br' },
+  };
+
+  const mp = marketplaceConfig[marketplace];
   const downloadUrls = [
-    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: 'https://advertising.amazon.com/bulksheet/HomePage' },
-    { key: 'business', label: 'Business Report', enabled: businessEnabled, setEnabled: setBusinessEnabled, url: 'https://sellercentral.amazon.com/business-reports/ref=xx_sitemetric_favb_xx#/report?id=102%3ADetailSalesTrafficByChildItem&chartCols=&columns=' },
-    { key: 'inventory', label: 'FBA Inventory', enabled: inventoryEnabled, setEnabled: setInventoryEnabled, url: 'https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth' },
-    { key: 'hourly', label: 'Hourly Data', enabled: hourlyEnabled, setEnabled: setHourlyEnabled, url: 'https://advertising.amazon.com/reports' },
+    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: `https://${mp.advertising}/bulksheet/HomePage` },
+    { key: 'business', label: 'Business Report', enabled: businessEnabled, setEnabled: setBusinessEnabled, url: `https://${mp.sellerCentral}/business-reports/ref=xx_sitemetric_favb_xx#/report?id=102%3ADetailSalesTrafficByChildItem&chartCols=&columns=` },
+    { key: 'inventory', label: 'FBA Inventory', enabled: inventoryEnabled, setEnabled: setInventoryEnabled, url: `https://${mp.sellerCentral}/inventoryplanning/manageinventoryhealth` },
+    { key: 'hourly', label: 'Hourly Data', enabled: hourlyEnabled, setEnabled: setHourlyEnabled, url: `https://${mp.advertising}/reports` },
   ];
 
   const handleOpenDownloadTabs = () => {
@@ -401,15 +420,29 @@ const Index = () => {
 
         {/* Quick Download Tabs */}
         <div className="max-w-5xl mx-auto mb-8 animate-fade-in" style={{ animationDelay: '0.35s' }}>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 gap-3">
             <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Quick Download from Seller Central</h3>
-            <button
-              onClick={handleOpenDownloadTabs}
-              disabled={!downloadUrls.some(d => d.enabled)}
-              className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
-            >
-              <ExternalLink size={14} /> Open All Tabs
-            </button>
+            <div className="flex items-center gap-2">
+              <Select value={marketplace} onValueChange={setMarketplace}>
+                <SelectTrigger className="w-[110px] h-8 text-xs bg-card border-border">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(marketplaceConfig).map(([code, { flag }]) => (
+                    <SelectItem key={code} value={code} className="text-xs">
+                      {flag} {code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <button
+                onClick={handleOpenDownloadTabs}
+                disabled={!downloadUrls.some(d => d.enabled)}
+                className="flex items-center gap-2 py-2 px-5 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
+              >
+                <ExternalLink size={14} /> Open All Tabs
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {downloadUrls.map((item) => (
