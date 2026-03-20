@@ -53,7 +53,7 @@ const Index = () => {
   const [hourlyEnabled, setHourlyEnabled] = useState(true);
 
   const downloadUrls = [
-    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: 'https://advertising.amazon.com/bulk-operations' },
+    { key: 'bulk', label: 'Bulk Operations', enabled: bulkEnabled, setEnabled: setBulkEnabled, url: 'https://advertising.amazon.com/bulksheet/HomePage' },
     { key: 'business', label: 'Business Report', enabled: businessEnabled, setEnabled: setBusinessEnabled, url: 'https://sellercentral.amazon.com/business-reports/ref=xx_sitemetric_favb_xx#/report?id=102%3ADetailSalesTrafficByChildItem&chartCols=&columns=' },
     { key: 'inventory', label: 'FBA Inventory', enabled: inventoryEnabled, setEnabled: setInventoryEnabled, url: 'https://sellercentral.amazon.com/inventoryplanning/manageinventoryhealth' },
     { key: 'hourly', label: 'Hourly Data', enabled: hourlyEnabled, setEnabled: setHourlyEnabled, url: 'https://advertising.amazon.com/reports' },
