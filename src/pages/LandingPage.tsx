@@ -263,7 +263,7 @@ const LandingPage = () => {
         </motion.nav>
 
         {/* ─── 3. Hero Section ─── */}
-        <section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden">
+        <motion.section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden animate-reveal" style={{ y: heroY, opacity: heroOpacity }}
           {/* Rounded bottom clip */}
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" style={{ borderRadius: "0 0 3rem 3rem" }} aria-hidden="true" />
 
