@@ -5,82 +5,93 @@ import {
   ArrowRight, Check, X, Zap, Shield, Clock, TrendingUp,
   Phone, Mail, BarChart3, Target, Search, DollarSign,
   LineChart, PieChart, Layers, Brain, Upload, FileSpreadsheet,
-  Users, AlertTriangle, Sparkles, ChevronDown, ChevronUp,
+  Users, AlertTriangle, Sparkles, ChevronDown,
   Monitor, Gauge, Eye, Filter, CalendarClock, GitBranch,
   Lock, Globe
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
-import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, Variants, useScroll, useTransform, useMotionValueEvent, useSpring } from "framer-motion";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { motion, AnimatePresence, Variants, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 
-// ─── Animation variants ───
-const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-};
+/* ═══════════════════════════════════════════════════════
+   ANIMATION VARIANTS
+   ═══════════════════════════════════════════════════════ */
 const fadeInBlur: Variants = {
-  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
+  hidden: { opacity: 0, y: 40, filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
 };
-const heroLineReveal: Variants = {
-  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
 };
-const heroLineStagger: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.4 } }
-};
+
 const stagger: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.15 } }
+  visible: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.1 } }
 };
+
+const heroLineStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.18, delayChildren: 0.3 } }
+};
+
+const heroLineReveal: Variants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
+};
+
 const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25 } }
+  hidden: { opacity: 0, scale: 0.85 },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 300, damping: 24 } }
+};
+
+const slideInLeft: Variants = {
+  hidden: { opacity: 0, x: -60, filter: "blur(6px)" },
+  visible: { opacity: 1, x: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
+};
+
+const slideInRight: Variants = {
+  hidden: { opacity: 0, x: 60, filter: "blur(6px)" },
+  visible: { opacity: 1, x: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
 };
 
 const springHover = { type: "spring" as const, stiffness: 300, damping: 20 };
 
-// ─── Animated counter hook ───
-const useCountUp = (end: number, duration: number = 2000) => {
+/* ═══════════════════════════════════════════════════════
+   HOOKS & SUB-COMPONENTS
+   ═══════════════════════════════════════════════════════ */
+const useCountUp = (end: number, duration = 2000) => {
   const [count, setCount] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
+  const [started, setStarted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && !isVisible) setIsVisible(true);
-    }, { threshold: 0.3 });
+    const observer = new IntersectionObserver(([e]) => { if (e.isIntersecting && !started) setStarted(true); }, { threshold: 0.3 });
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [isVisible]);
+  }, [started]);
   useEffect(() => {
-    if (!isVisible) return;
-    let startTime: number;
-    const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(easeOut * end));
-      if (progress < 1) requestAnimationFrame(animate);
+    if (!started) return;
+    let start: number;
+    const tick = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * end));
+      if (p < 1) requestAnimationFrame(tick);
     };
-    requestAnimationFrame(animate);
-  }, [isVisible, end, duration]);
+    requestAnimationFrame(tick);
+  }, [started, end, duration]);
   return { count, ref };
 };
 
-// ─── Sub-components ───
-const ResultCard = ({ metric, suffix, description, icon: Icon }: {
-  metric: number; suffix: string; description: string; icon: React.ElementType;
-}) => {
-  const { count, ref } = useCountUp(metric, 1500);
+const ResultCard = ({ metric, suffix, description, icon: Icon }: { metric: number; suffix: string; description: string; icon: React.ElementType }) => {
+  const { count, ref } = useCountUp(metric, 1800);
   return (
     <motion.div ref={ref} variants={fadeInBlur}
-      whileHover={{ scale: 1.05, y: -4, transition: springHover }}
-      className="glass-card rounded-2xl p-8 text-center transition-all">
+      whileHover={{ scale: 1.04, y: -6, boxShadow: "0 0 50px -10px hsl(78 100% 50% / 0.2)", transition: springHover }}
+      className="glass-card rounded-2xl p-8 text-center">
       <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
-      <p className="text-5xl font-black text-foreground mb-1">
-        {count}<span className="text-2xl text-primary">{suffix}</span>
-      </p>
+      <p className="text-5xl font-black text-foreground mb-1">{count}<span className="text-2xl text-primary">{suffix}</span></p>
       <p className="text-muted-foreground text-sm">{description}</p>
     </motion.div>
   );
@@ -89,7 +100,13 @@ const ResultCard = ({ metric, suffix, description, icon: Icon }: {
 const FAQItem = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="glass-card rounded-xl overflow-hidden transition-all">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.5 }}
+      transition={{ duration: 0.5 }}
+      className="glass-card rounded-xl overflow-hidden"
+    >
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/20 transition-colors">
         <span className="font-semibold text-foreground pr-4">{q}</span>
         <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }} className="flex-shrink-0">
@@ -98,38 +115,109 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          >
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}>
             <p className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 };
 
-// ═══════════════════════════════════════════════════════
-// LANDING PAGE
-// ═══════════════════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════
+   STACKING CARD COMPONENT (AttendFlow-style sticky cards)
+   ═══════════════════════════════════════════════════════ */
+const StackingCard = ({ index, total, icon: Icon, step, title, desc, features }: {
+  index: number; total: number; icon: React.ElementType; step: string; title: string; desc: string; features?: string[];
+}) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const topOffset = 120 + index * 20;
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 80 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+      className="sticky mb-8"
+      style={{ top: `${topOffset}px`, zIndex: total - index }}
+    >
+      <div className="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-border/30 hover:border-primary/30 transition-all duration-500 shadow-2xl shadow-black/20">
+        <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
+          <div className="flex-1">
+            <span className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3 block">
+              {step}
+            </span>
+            <h3 className="text-2xl sm:text-3xl font-black text-foreground mb-3">{title}</h3>
+            <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-4">{desc}</p>
+            {features && (
+              <ul className="space-y-2">
+                {features.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="w-full lg:w-80 h-48 sm:h-56 rounded-xl bg-gradient-to-br from-primary/10 via-card to-card border border-border/20 flex items-center justify-center">
+            <Icon className="w-16 h-16 text-primary/30" />
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════
+   STICKY FEATURE SECTION (left text + right visual)
+   ═══════════════════════════════════════════════════════ */
+const StickyFeatureSection = ({ tag, title, desc, icon: Icon, children, reversed }: {
+  tag: string; title: string; desc: string; icon: React.ElementType; reversed?: boolean; children?: React.ReactNode;
+}) => (
+  <motion.div
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.25 }}
+    className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center py-16 sm:py-24"
+  >
+    <motion.div variants={reversed ? slideInRight : slideInLeft} className={reversed ? "lg:order-2" : ""}>
+      <span className="text-primary text-xs font-bold tracking-[0.2em] uppercase mb-3 block">{tag}</span>
+      <h3 className="text-2xl sm:text-4xl font-black text-foreground mb-4 leading-tight">{title}</h3>
+      <p className="text-muted-foreground text-base sm:text-lg leading-relaxed mb-6">{desc}</p>
+      <Button onClick={() => {}} variant="outline" className="rounded-full group">
+        Learn More <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </Button>
+    </motion.div>
+    <motion.div variants={reversed ? slideInLeft : slideInRight} className={reversed ? "lg:order-1" : ""}>
+      {children || (
+        <div className="glass-card rounded-2xl p-8 h-64 sm:h-80 flex items-center justify-center border border-border/20">
+          <Icon className="w-20 h-20 text-primary/20" />
+        </div>
+      )}
+    </motion.div>
+  </motion.div>
+);
+
+/* ═══════════════════════════════════════════════════════
+   MAIN LANDING PAGE
+   ═══════════════════════════════════════════════════════ */
 const LandingPage = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
 
   const { scrollY, scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollY, [0, 700], [0, 180]);
-  const heroOpacity = useTransform(scrollY, [0, 450], [1, 0.25]);
-  const bgY = useTransform(scrollY, [0, 900], [0, 240]);
+  const heroY = useTransform(scrollY, [0, 800], [0, 200]);
+  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0]);
+  const heroScale = useTransform(scrollY, [0, 500], [1, 0.95]);
   const navScale = useTransform(scrollY, [0, 120], [1, 0.97]);
-  const progressScale = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.25 });
-  const inViewViewport = { once: false, amount: 0.35 };
+  const progressScale = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 24);
-  });
+  useMotionValueEvent(scrollY, "change", (v) => setIsScrolled(v > 30));
 
-  // === FUNNEL CONTENT ===
-
+  // ── CONTENT DATA ──
   const problems = [
     "Spending 4+ hours every week pulling and formatting Amazon ad reports",
     "ACOS looks great but you're actually losing money after total ad spend",
@@ -139,46 +227,67 @@ const LandingPage = () => {
     "Hourly performance data buried — no dayparting insights whatsoever",
   ];
 
-  const dashboards = [
-    { icon: Gauge, name: "Executive Dashboard", desc: "Bird's-eye view with TACOS, total spend, revenue & profit across all campaign types" },
-    { icon: DollarSign, name: "Profit Dashboard", desc: "True profitability after COGS with product-level cost analysis and margin tracking" },
-    { icon: PieChart, name: "Portfolio Dashboard", desc: "Portfolio-level performance breakdown with budget allocation insights" },
-    { icon: Target, name: "SP Dashboard", desc: "Sponsored Products deep dive — targeting, placement & bid analysis" },
-    { icon: Monitor, name: "SB Dashboard", desc: "Sponsored Brands performance with headline search and video metrics" },
-    { icon: Eye, name: "SD Dashboard", desc: "Sponsored Display audience and retargeting analytics" },
-    { icon: Search, name: "Search Term Analytics", desc: "Find winning keywords, kill losers, and discover new opportunities" },
-    { icon: Filter, name: "Search Term Isolation", desc: "Isolate high-converting search terms for exact match campaigns" },
-    { icon: BarChart3, name: "ASIN Audit", desc: "Per-ASIN performance audit showing ad dependency and organic vs paid split" },
-    { icon: CalendarClock, name: "Dayparting", desc: "Hour-by-hour performance heatmaps to optimize bid schedules" },
-    { icon: LineChart, name: "Forecasting", desc: "AI-powered spend and revenue projections based on historical trends" },
-    { icon: GitBranch, name: "Cannibalization", desc: "Detect campaigns competing against each other for the same keywords" },
-    { icon: AlertTriangle, name: "Diagnostics", desc: "Automated health checks flagging wasted spend, low CTR & bidding issues" },
+  const painPills = [
+    "Lost ad spend?", "TACOS invisible?", "No dayparting?", "Keyword cannibalization?",
+    "Manual reporting?", "Wasted budget?", "No AI insights?", "Spreadsheet chaos?",
+    "ACOS misleading?", "No profit view?", "Buried data?", "Zero automation?",
   ];
 
-  const steps = [
-    { step: "1", title: "Download Your Bulk Files", desc: "30 seconds from Seller Central — bulk sheets, business reports, inventory & hourly data", icon: FileSpreadsheet },
-    { step: "2", title: "Upload to Lynx", desc: "Drag & drop up to 5 file types. Everything processes in your browser — zero data leaves your machine", icon: Upload },
-    { step: "3", title: "Get Insights Instantly", desc: "13 dashboards light up with TACOS, wasted spend analysis, AI recommendations & more", icon: Sparkles },
+  const stackingFeatures = [
+    {
+      step: "01 / 04", icon: Upload, title: "Upload in 30 Seconds",
+      desc: "Drag & drop your Seller Central bulk files. Everything processes in your browser — zero data leaves your machine. No API keys, no developer, no setup.",
+      features: ["Bulk campaign files", "Business reports", "Hourly performance data", "Inventory reports"],
+    },
+    {
+      step: "02 / 04", icon: Gauge, title: "See the Full Picture Instantly",
+      desc: "13 purpose-built dashboards light up with TACOS, true profitability, wasted spend detection, and cross-campaign analytics you can't get from Seller Central.",
+      features: ["Executive TACOS overview", "Profit dashboard with COGS", "Search term isolation", "Dayparting heatmaps"],
+    },
+    {
+      step: "03 / 04", icon: Brain, title: "AI-Powered Recommendations",
+      desc: "Our AI analyst reviews your data and suggests optimizations in plain English — bid adjustments, budget reallocation, keyword opportunities — all automated.",
+      features: ["Contextual bid suggestions", "Budget reallocation", "Keyword opportunities", "Wasted spend alerts"],
+    },
+    {
+      step: "04 / 04", icon: TrendingUp, title: "Optimize & Scale Profitably",
+      desc: "Use diagnostics to fix issues, forecasting to plan ahead, and cannibalization detection to stop campaigns fighting each other. Scale with confidence.",
+      features: ["Automated diagnostics", "AI forecasting", "Cannibalization detection", "Export & share reports"],
+    },
+  ];
+
+  const dashboards = [
+    { icon: Gauge, name: "Executive Dashboard", desc: "Bird's-eye view with TACOS, total spend, revenue & profit" },
+    { icon: DollarSign, name: "Profit Dashboard", desc: "True profitability after COGS with margin tracking" },
+    { icon: PieChart, name: "Portfolio Dashboard", desc: "Portfolio-level performance with budget allocation insights" },
+    { icon: Target, name: "SP Dashboard", desc: "Sponsored Products targeting, placement & bid analysis" },
+    { icon: Monitor, name: "SB Dashboard", desc: "Sponsored Brands headline search and video metrics" },
+    { icon: Eye, name: "SD Dashboard", desc: "Sponsored Display audience and retargeting analytics" },
+    { icon: Search, name: "Search Term Analytics", desc: "Find winners, kill losers, discover opportunities" },
+    { icon: Filter, name: "Search Term Isolation", desc: "Isolate high-converting terms for exact match" },
+    { icon: BarChart3, name: "ASIN Audit", desc: "Per-ASIN ad dependency and organic vs paid split" },
+    { icon: CalendarClock, name: "Dayparting", desc: "Hour-by-hour performance heatmaps" },
+    { icon: LineChart, name: "Forecasting", desc: "AI-powered spend and revenue projections" },
+    { icon: GitBranch, name: "Cannibalization", desc: "Detect campaigns competing for same keywords" },
+    { icon: AlertTriangle, name: "Diagnostics", desc: "Automated health checks and wasted spend flags" },
   ];
 
   const objections = [
-    { icon: Shield, q: "Is my data safe?", a: "100%. Files are processed entirely in your browser using client-side JavaScript. Nothing uploads to any server. Your data never leaves your machine." },
-    { icon: Zap, q: "Do I need API access?", a: "Nope. Just the bulk files you already download from Seller Central. No integrations, no developer, no API keys." },
-    { icon: Users, q: "Works for agencies?", a: "Built for agencies. Analyze any client's data in seconds, switch between workspaces, invite team members, and export branded reports." },
-    { icon: Clock, q: "How long does setup take?", a: "Zero setup. Upload your first file and see results in under 60 seconds. No onboarding calls, no configuration." },
-    { icon: Brain, q: "What about AI insights?", a: "Our AI analyst reviews your data and provides contextual recommendations — bid adjustments, budget reallocation, keyword opportunities — all automated." },
-    { icon: Layers, q: "What file types?", a: "Bulk campaign files, Business Reports, Previous Period comparisons, Inventory Reports, and Hourly Performance data. All standard Seller Central exports." },
+    { icon: Shield, q: "Is my data safe?", a: "100%. Files are processed entirely in your browser using client-side JavaScript. Nothing uploads to any server." },
+    { icon: Zap, q: "Do I need API access?", a: "Nope. Just the bulk files you already download from Seller Central. No integrations, no developer." },
+    { icon: Users, q: "Works for agencies?", a: "Built for agencies. Analyze any client's data in seconds, switch workspaces, invite team members." },
+    { icon: Clock, q: "How long does setup take?", a: "Zero setup. Upload your first file and see results in under 60 seconds." },
+    { icon: Brain, q: "What about AI insights?", a: "Our AI analyst provides contextual recommendations — bid adjustments, budget reallocation, keyword opportunities." },
+    { icon: Layers, q: "What file types?", a: "Bulk campaigns, Business Reports, Previous Period, Inventory, and Hourly Performance data." },
   ];
 
   const faqs = [
-    { q: "What dashboards are included?", a: "All 13 dashboards: Executive (TACOS overview), Profit (true profitability with COGS), Portfolio, Sponsored Products, Sponsored Brands, Sponsored Display, Search Term Analytics, Search Term Isolation, ASIN Audit, Dayparting (hourly heatmaps), Forecasting (AI projections), Cannibalization Detection, and Diagnostics (automated health checks). All included free." },
-    { q: "What file types can I upload?", a: "Five file types from Seller Central: Bulk Campaign Files (required — contains all campaign, ad group, keyword & bid data), Business Reports (for TACOS and organic vs paid analysis), Previous Period files (for trend comparisons), Inventory Reports (for stock-aware bidding insights), and Hourly Performance data (for dayparting optimization)." },
-    { q: "What is the AI Analyst and how does it work?", a: "The AI Analyst reviews your uploaded data and provides contextual recommendations in plain English — bid adjustments, budget reallocation suggestions, keyword opportunities, and wasted spend alerts. It's powered by Gemini AI and adapts its advice based on which dashboard you're viewing." },
-    { q: "How does the Profit Dashboard calculate true profitability?", a: "Upload your Business Report alongside the bulk file. The Profit Dashboard factors in your product costs (COGS), ad spend across all campaign types, and total revenue to show true margin — not just ACOS. You can set per-ASIN product costs in Settings for precise profit tracking." },
-    { q: "What does the Diagnostics dashboard flag?", a: "Diagnostics runs automated health checks across all campaigns: high-spend low-conversion keywords, campaigns with no impressions, bidding anomalies, ACOS outliers, budget-capped campaigns, and search terms with high clicks but zero orders. Each issue comes with a severity rating and recommended action." },
-    { q: "Can I save my analysis and come back later?", a: "Yes. Workspace Save & Load lets you export your entire analysis (all uploaded data, settings, product costs) as a single file. Reload it anytime to pick up exactly where you left off — perfect for weekly reporting or sharing with team members." },
-    { q: "How does Cannibalization Detection work?", a: "The tool cross-references your SP, SB, and SD campaigns to identify keywords and ASINs where multiple campaigns compete against each other. It shows you which campaigns are bidding on the same terms, the overlap percentage, and recommends which to pause or consolidate." },
-    { q: "What does the Dayparting dashboard show?", a: "Upload your Hourly Performance file and get hour-by-hour heatmaps showing clicks, spend, conversions, and ACOS by time of day. Identify your most profitable hours and optimize bid schedules to stop wasting budget during low-converting time slots." },
+    { q: "What dashboards are included?", a: "All 13 dashboards: Executive (TACOS overview), Profit (true profitability with COGS), Portfolio, Sponsored Products, Sponsored Brands, Sponsored Display, Search Term Analytics, Search Term Isolation, ASIN Audit, Dayparting, Forecasting, Cannibalization Detection, and Diagnostics." },
+    { q: "What file types can I upload?", a: "Five file types from Seller Central: Bulk Campaign Files (required), Business Reports, Previous Period files, Inventory Reports, and Hourly Performance data." },
+    { q: "How does the AI Analyst work?", a: "The AI Analyst reviews your uploaded data and provides contextual recommendations in plain English — bid adjustments, budget reallocation suggestions, keyword opportunities, and wasted spend alerts." },
+    { q: "How does the Profit Dashboard calculate true profitability?", a: "Upload your Business Report alongside the bulk file. The Profit Dashboard factors in your product costs (COGS), ad spend across all campaign types, and total revenue to show true margin." },
+    { q: "Can I save my analysis?", a: "Yes. Workspace Save & Load lets you export your entire analysis as a single file. Reload it anytime to pick up exactly where you left off." },
+    { q: "How does Cannibalization Detection work?", a: "The tool cross-references your SP, SB, and SD campaigns to identify keywords and ASINs where multiple campaigns compete against each other." },
   ];
 
   const tiers = [
@@ -187,57 +296,44 @@ const LandingPage = () => {
     { name: "Agency", price: "Coming Soon", period: "", features: ["Everything in Pro", "Team management", "Multi-client workspaces", "White-label exports", "Dedicated onboarding"], cta: "Contact Us", highlight: false },
   ];
 
-  const bentoFeatures = [
-    { icon: TrendingUp, title: "True TACOS Tracking", desc: "See real total ad cost of sales across SP, SB & SD combined — not just ACOS.", span: "lg:col-span-2" },
-    { icon: Brain, title: "AI-Powered Analyst", desc: "Get contextual bid, budget & keyword recommendations in plain English.", span: "lg:col-span-1" },
-    { icon: Lock, title: "100% Private", desc: "All processing happens in your browser. Zero data uploaded to any server.", span: "lg:col-span-1" },
-    { icon: CalendarClock, title: "Dayparting Heatmaps", desc: "Hour-by-hour performance visualization to optimize bid schedules.", span: "lg:col-span-1" },
-    { icon: AlertTriangle, title: "Auto Diagnostics", desc: "Automated health checks flag wasted spend, low CTR & bidding anomalies.", span: "lg:col-span-1" },
-    { icon: LineChart, title: "AI Forecasting", desc: "Predict future spend & revenue based on your historical campaign data.", span: "lg:col-span-1" },
-  ];
-
   const marketplaces = [
     "🇺🇸 US", "🇬🇧 UK", "🇩🇪 DE", "🇨🇦 CA", "🇯🇵 JP", "🇮🇳 IN", "🇫🇷 FR", "🇮🇹 IT", "🇪🇸 ES", "🇦🇺 AU", "🇲🇽 MX", "🇧🇷 BR", "🇸🇦 SA", "🇦🇪 AE", "🇸🇬 SG"
   ];
 
-  const fileTypes = [
-    { name: "Bulk Campaign", desc: "Core ad data — campaigns, ad groups, keywords, bids", required: true },
-    { name: "Business Report", desc: "Sales, sessions & conversion data for TACOS calculation", required: false },
-    { name: "Previous Period", desc: "Compare performance trends week-over-week or month-over-month", required: false },
-    { name: "Inventory Report", desc: "Stock levels & FBA data for inventory-aware bidding", required: false },
-    { name: "Hourly Performance", desc: "Hour-by-hour data for dayparting optimization", required: false },
+  const bentoFeatures = [
+    { icon: TrendingUp, title: "True TACOS Tracking", desc: "See real total ad cost of sales across SP, SB & SD combined.", span: "lg:col-span-2" },
+    { icon: Brain, title: "AI-Powered Analyst", desc: "Get contextual bid, budget & keyword recommendations in plain English.", span: "lg:col-span-1" },
+    { icon: Lock, title: "100% Private", desc: "All processing happens in your browser. Zero data uploaded.", span: "lg:col-span-1" },
+    { icon: CalendarClock, title: "Dayparting Heatmaps", desc: "Hour-by-hour performance visualization to optimize bid schedules.", span: "lg:col-span-1" },
+    { icon: AlertTriangle, title: "Auto Diagnostics", desc: "Automated health checks flag wasted spend, low CTR & bidding anomalies.", span: "lg:col-span-1" },
+    { icon: LineChart, title: "AI Forecasting", desc: "Predict future spend & revenue based on your historical data.", span: "lg:col-span-1" },
   ];
 
+  /* ═══════════════════════════════════════════════════════
+     RENDER
+     ═══════════════════════════════════════════════════════ */
   return (
     <>
       <Helmet>
         <title>Lynx Media | Stop Losing Money on Amazon Ads — See TRUE Profitability in 60 Seconds</title>
-        <meta name="description" content="Upload your Amazon bulk files. Get TACOS, cross-campaign analytics, AI insights & wasted spend analysis across 13 dashboards. No API. No setup. Free to start." />
+        <meta name="description" content="Upload your Amazon bulk files. Get TACOS, cross-campaign analytics, AI insights & wasted spend analysis across 13 dashboards. Free to start." />
       </Helmet>
 
       <div className="min-h-screen bg-background text-foreground dark">
-        {/* ─── 1. Site Frame ─── */}
+        {/* ─── Site Frame ─── */}
         <motion.div className="site-frame" aria-hidden="true"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.5 }} />
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2, delay: 0.5 }} />
 
-        {/* Scroll progress */}
-        <motion.div
-          aria-hidden="true"
+        {/* ─── Scroll Progress Bar ─── */}
+        <motion.div aria-hidden="true"
           className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left bg-gradient-to-r from-primary via-brand-400 to-primary"
-          style={{ scaleX: progressScale }}
-        />
+          style={{ scaleX: progressScale }} />
 
-        {/* ─── Background Effects ─── */}
-        <motion.div className="fixed inset-0 pointer-events-none" aria-hidden="true" style={{ y: bgY }}>
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-full blur-[120px]" />
-          <div className="absolute bottom-0 right-[-5%] w-[400px] h-[400px] bg-primary/8 rounded-full blur-[150px]" />
-        </motion.div>
-
-        {/* ─── 2. Floating Pill Nav ─── */}
+        {/* ─── Floating Nav ─── */}
         <motion.nav
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           style={{ scale: navScale }}
           className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 sm:px-6 py-3 rounded-full backdrop-blur-2xl transition-all duration-500 ${isScrolled ? "border border-primary/25 bg-background/90 shadow-[0_10px_40px_-12px_hsl(var(--primary)/0.45)]" : "border border-border/20 bg-background/70"}`}
         >
@@ -250,41 +346,43 @@ const LandingPage = () => {
               <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button onClick={() => navigate("/auth")} variant="ghost" size="sm"
-                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm">
-                Login
-              </Button>
-              <Button onClick={() => navigate("/auth")} size="sm"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 sm:px-5 text-xs sm:text-sm">
-                Get Started Free
-              </Button>
+              <Button onClick={() => navigate("/auth")} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs sm:text-sm">Login</Button>
+              <Button onClick={() => navigate("/auth")} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 sm:px-5 text-xs sm:text-sm">Get Started Free</Button>
             </div>
           </div>
         </motion.nav>
 
-        {/* ─── 3. Hero Section ─── */}
-        <motion.section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden animate-reveal" style={{ y: heroY, opacity: heroOpacity }}>
-          {/* Rounded bottom clip */}
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" style={{ borderRadius: "0 0 3rem 3rem" }} aria-hidden="true" />
+        {/* ═══════════════════════════════════════════════════════
+           HERO SECTION
+           ═══════════════════════════════════════════════════════ */}
+        <motion.section
+          className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden"
+          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
+        >
+          {/* Background orbs */}
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] md:w-[900px] h-[500px] md:h-[700px] bg-gradient-to-b from-primary/15 via-primary/5 to-transparent rounded-full blur-[150px] pointer-events-none" aria-hidden="true" />
+          <div className="absolute bottom-0 left-[-10%] w-[350px] h-[350px] bg-primary/10 rounded-full blur-[150px] pointer-events-none" aria-hidden="true" />
 
           <div className="relative z-10 max-w-5xl mx-auto text-center">
-            {/* Shimmer Badge */}
-            <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 shimmer-badge"
             >
               <Zap className="w-4 h-4" />
               Free Amazon PPC Analytics — No API Required
             </motion.div>
 
-            {/* Staggered headline with blur reveal */}
+            {/* Staggered Headline */}
             <motion.h1 variants={heroLineStagger} initial="hidden" animate="visible"
               className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
               <motion.span variants={heroLineReveal} className="block text-foreground/80">
                 Your Amazon Ads Are
               </motion.span>
               <motion.span variants={heroLineReveal}
-                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
-                style={{ textShadow: "0 0 40px hsl(78 100% 50% / 0.3)" }}>
+                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
                 Leaking Money.
               </motion.span>
               <motion.span variants={heroLineReveal} className="block text-foreground">
@@ -292,15 +390,24 @@ const LandingPage = () => {
               </motion.span>
             </motion.h1>
 
-            <motion.p initial={{ opacity: 0, y: 20, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
-              className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
+            {/* Subtitle */}
+            <motion.p
+              initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+              className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto"
+            >
               Upload your bulk files. Get <span className="text-foreground font-bold">13 analytics dashboards</span> with TACOS, AI insights & wasted spend detection in{" "}
               <span className="text-primary font-bold">60 seconds</span>.
             </motion.p>
 
-            {/* CTA Buttons with scale-in spring */}
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 25, delay: 1.0 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+            {/* CTA Buttons */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25, delay: 1.0 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-6"
+            >
               <Button onClick={() => navigate("/auth")} size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
                 Analyze My Ads Free
@@ -314,21 +421,20 @@ const LandingPage = () => {
             </motion.div>
 
             {/* Trust line */}
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.1 }}
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.2 }}
               className="text-muted-foreground text-xs sm:text-sm">
               ✓ Free forever &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds &nbsp;&nbsp; ✓ 100% browser-based
             </motion.p>
           </div>
 
-          {/* ─── 4. Glassmorphic Demo Mockup ─── */}
+          {/* Demo Mockup */}
           <motion.div
-            initial={{ opacity: 0, y: 80, scale: 0.95, filter: "blur(12px)" }}
+            initial={{ opacity: 0, y: 100, scale: 0.92, filter: "blur(16px)" }}
             animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-            transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
             className="relative mt-12 sm:mt-16 w-full max-w-5xl mx-auto px-4"
           >
             <div className="glass-card rounded-2xl sm:rounded-3xl p-2 sm:p-3">
-              {/* Browser dots */}
               <div className="flex items-center gap-2 px-3 py-2 border-b border-border/20">
                 <div className="flex gap-1.5">
                   <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
@@ -339,7 +445,6 @@ const LandingPage = () => {
                   <div className="h-5 rounded-full bg-muted/30 max-w-xs mx-auto" />
                 </div>
               </div>
-              {/* Screenshot placeholder */}
               <div className="rounded-xl overflow-hidden bg-card aspect-[16/9] flex items-center justify-center">
                 <div className="text-center">
                   <Monitor className="w-16 h-16 text-primary/30 mx-auto mb-4" />
@@ -348,14 +453,15 @@ const LandingPage = () => {
                 </div>
               </div>
             </div>
-            {/* Glow beneath */}
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full" aria-hidden="true" />
           </motion.div>
         </motion.section>
 
-        {/* ─── 5. Marketplace Logo Carousel ─── */}
+        {/* ═══════════════════════════════════════════════════════
+           MARKETPLACE CAROUSEL
+           ═══════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-20 px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur}>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.5 }} variants={fadeInBlur}>
             <p className="text-center text-muted-foreground text-sm mb-8">
               <Globe className="w-4 h-4 inline-block mr-2 text-primary" />
               Works with all Amazon marketplaces
@@ -370,31 +476,67 @@ const LandingPage = () => {
           </motion.div>
         </section>
 
+        {/* ═══════════════════════════════════════════════════════
+           PAIN POINT MARQUEE (Scrolling pills)
+           ═══════════════════════════════════════════════════════ */}
+        <section className="py-12 sm:py-16 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8 }}
+          >
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur}
+              className="text-center mb-8"
+            >
+              <p className="text-muted-foreground text-sm mb-2">Stuff That Shouldn't Happen in 2026</p>
+              <h2 className="text-2xl sm:text-3xl font-black">
+                Amazon Ads Shouldn't Be <span className="text-primary">This Hard.</span>
+              </h2>
+            </motion.div>
+            <div className="marquee max-w-6xl mx-auto">
+              <div className="marquee-track" style={{ animationDuration: "25s" }}>
+                {[...painPills, ...painPills].map((pill, i) => (
+                  <span key={i} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-destructive/8 border border-destructive/15 text-destructive text-sm font-medium whitespace-nowrap select-none">
+                    <X className="w-3.5 h-3.5" />
+                    {pill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
 
-          {/* ─── 6. Results Counter Strip ─── */}
-          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
+          {/* ═══════════════════════════════════════════════════════
+             RESULTS COUNTER STRIP
+             ═══════════════════════════════════════════════════════ */}
+          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
             className="mb-24 sm:mb-32 grid sm:grid-cols-3 gap-4 sm:gap-6">
             <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
             <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
             <ResultCard metric={13} suffix=" dashboards" description="from a single bulk file upload" icon={BarChart3} />
           </motion.section>
 
-          {/* ─── 7. Feature Bento Grid ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             FEATURE BENTO GRID
+             ═══════════════════════════════════════════════════════ */}
           <section id="features" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur} className="text-center mb-12 sm:mb-16">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12 sm:mb-16">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Why Sellers Choose Lynx</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black">
                 Everything You Need.<br /><span className="text-primary">Nothing You Don't.</span>
               </h2>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {bentoFeatures.map((feature, i) => (
                 <motion.div key={i} variants={fadeInBlur}
-                  whileHover={{ scale: 1.03, y: -6, boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.2)", transition: springHover }}
-                  className={`glass-card rounded-2xl p-6 sm:p-8 group cursor-default transition-all ${feature.span}`}>
+                  whileHover={{ scale: 1.03, y: -8, boxShadow: "0 0 50px -8px hsl(78 100% 50% / 0.2)", transition: springHover }}
+                  className={`glass-card rounded-2xl p-6 sm:p-8 group cursor-default ${feature.span}`}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
@@ -405,9 +547,11 @@ const LandingPage = () => {
             </motion.div>
           </section>
 
-          {/* ─── 8. Problem Agitation ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             PROBLEM AGITATION
+             ═══════════════════════════════════════════════════════ */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Problem</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Amazon Gives You Data. Not <span className="text-primary">Answers.</span>
@@ -416,9 +560,12 @@ const LandingPage = () => {
             </motion.div>
             <div className="space-y-3 max-w-2xl mx-auto">
               {problems.map((problem, i) => (
-                <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
-                  whileHover={{ x: 4, transition: springHover }}
-                  viewport={inViewViewport} transition={{ delay: i * 0.08 }}
+                <motion.div key={i}
+                  initial={{ opacity: 0, x: -40, filter: "blur(6px)" }}
+                  whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                  whileHover={{ x: 6, transition: springHover }}
+                  viewport={{ once: true, amount: 0.5 }}
+                  transition={{ delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
                     <X className="w-4 h-4 text-destructive" />
@@ -429,24 +576,70 @@ const LandingPage = () => {
             </div>
           </section>
 
-          {/* ─── 9. Dashboard Showcase ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             STACKING CARDS — HOW IT WORKS (AttendFlow-style)
+             ═══════════════════════════════════════════════════════ */}
+          <section id="how-it-works" className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12 sm:mb-16">
+              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">How It Works</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black">
+                From Upload to <span className="text-primary">Insight</span>
+              </h2>
+              <p className="text-muted-foreground text-lg mt-4 max-w-xl mx-auto">Four steps to profitable Amazon advertising. No API keys. No setup. No data leaves your browser.</p>
+            </motion.div>
+
+            <div className="relative">
+              {stackingFeatures.map((feature, i) => (
+                <StackingCard key={i} index={i} total={stackingFeatures.length} {...feature} />
+              ))}
+            </div>
+          </section>
+
+          {/* ═══════════════════════════════════════════════════════
+             STICKY FEATURE SECTIONS
+             ═══════════════════════════════════════════════════════ */}
+          <div className="mb-24 sm:mb-32 divide-y divide-border/10">
+            <StickyFeatureSection
+              tag="ANALYTICS"
+              title="See True Profitability, Not Just ACOS"
+              desc="ACOS lies to you. Our Profit Dashboard factors in COGS, total ad spend across all campaign types, and revenue to show true margin — the number that actually matters."
+              icon={DollarSign}
+            />
+            <StickyFeatureSection
+              tag="DAYPARTING"
+              title="Stop Burning Budget at 3 AM"
+              desc="Hour-by-hour performance heatmaps reveal exactly when your ads convert and when they're just burning cash. Optimize bid schedules with data, not guesses."
+              icon={CalendarClock}
+              reversed
+            />
+            <StickyFeatureSection
+              tag="INTELLIGENCE"
+              title="AI That Actually Understands Your Data"
+              desc="Our AI analyst doesn't just spit out generic tips. It reviews YOUR campaigns and gives contextual recommendations — bid adjustments, budget moves, keyword opportunities."
+              icon={Brain}
+            />
+          </div>
+
+          {/* ═══════════════════════════════════════════════════════
+             DASHBOARD SHOWCASE
+             ═══════════════════════════════════════════════════════ */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Solution</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 One Upload. <span className="text-primary">13 Dashboards.</span> Total Clarity.
               </h2>
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Lynx turns your existing bulk files into a full analytics suite that shows you exactly what's working, what's bleeding money, and what to fix next.
+                Lynx turns your existing bulk files into a full analytics suite.
               </p>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboards.map((d, i) => (
                 <motion.div key={i} variants={fadeInBlur}
-                  whileHover={{ scale: 1.04, y: -4, transition: springHover }}
-                  className="glass-card p-5 rounded-xl group transition-all">
+                  whileHover={{ scale: 1.04, y: -6, boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.15)", transition: springHover }}
+                  className="glass-card p-5 rounded-xl group">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                       <d.icon className="w-5 h-5 text-primary" />
@@ -460,9 +653,10 @@ const LandingPage = () => {
               ))}
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={inViewViewport}
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.5 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
               className="mt-8 text-center">
-              <p className="text-muted-foreground text-sm mb-4">Plus: <span className="text-primary font-semibold">AI-Powered Analyst</span> that reviews your data and suggests optimizations in plain English.</p>
+              <p className="text-muted-foreground text-sm mb-4">Plus: <span className="text-primary font-semibold">AI-Powered Analyst</span> that suggests optimizations in plain English.</p>
               <Button onClick={() => navigate("/dashboard")} variant="outline" className="rounded-full">
                 See All Dashboards with Demo Data
                 <ArrowRight className="ml-2 w-4 h-4" />
@@ -470,77 +664,23 @@ const LandingPage = () => {
             </motion.div>
           </section>
 
-          {/* ─── 10. How It Works ─── */}
-          <section id="how-it-works" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
-              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">How It Works</p>
-              <h2 className="text-3xl sm:text-4xl font-black">
-                Dead Simple. <span className="text-primary">3 Steps.</span>
-              </h2>
-            </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
-              className="grid sm:grid-cols-3 gap-6">
-              {steps.map((item, i) => (
-                <motion.div key={i} variants={scaleIn}
-                  whileHover={{ scale: 1.03, y: -4, transition: springHover }}
-                  className="relative glass-card p-6 sm:p-8 rounded-2xl text-center">
-                  <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
-                    {item.step}
-                  </div>
-                  <item.icon className="w-6 h-6 text-primary/40 mx-auto mb-3" />
-                  <h3 className="text-lg font-bold mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground text-sm">{item.desc}</p>
-                  {i < steps.length - 1 && (
-                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={inViewViewport} transition={{ delay: 0.6 + i * 0.2 }}>
-                      <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))}
-            </motion.div>
-          </section>
-
-          {/* ─── 11. File Types ─── */}
-          <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-10">
-              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Data Inputs</p>
-              <h2 className="text-3xl sm:text-4xl font-black mb-4">
-                5 File Types. <span className="text-primary">Complete Picture.</span>
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">Each file unlocks deeper analytics. Start with just the bulk file — add more for the full picture.</p>
-            </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
-              className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {fileTypes.map((file, i) => (
-                <motion.div key={i} variants={fadeInUp}
-                  whileHover={{ scale: 1.05, rotate: 1, transition: springHover }}
-                  className="glass-card p-4 rounded-xl text-center">
-                  <FileSpreadsheet className="w-6 h-6 text-primary mx-auto mb-2" />
-                  <h4 className="font-bold text-sm mb-1">{file.name}</h4>
-                  <p className="text-muted-foreground text-xs leading-relaxed">{file.desc}</p>
-                  {file.required && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">Required</span>}
-                </motion.div>
-              ))}
-            </motion.div>
-          </section>
-
-          {/* ─── 12. Pricing ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             PRICING
+             ═══════════════════════════════════════════════════════ */}
           <section id="pricing" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Pricing</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Start Free. <span className="text-primary">Scale When Ready.</span>
               </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">Get massive value for $0. Upgrade only when you need team features or AI recommendations.</p>
+              <p className="text-muted-foreground max-w-xl mx-auto">Get massive value for $0. Upgrade only when you need team features or AI.</p>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
               className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {tiers.map((tier, i) => (
                 <motion.div key={i} variants={fadeInBlur}
-                  whileHover={{ scale: tier.highlight ? 1.05 : 1.03, y: -4, boxShadow: tier.highlight ? "0 0 50px -10px hsl(78 100% 50% / 0.25)" : undefined, transition: springHover }}
-                  className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight
-                    ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60"
-                    : "border-border/30 glass-card"}`}>
+                  whileHover={{ scale: tier.highlight ? 1.05 : 1.03, y: -6, boxShadow: tier.highlight ? "0 0 60px -10px hsl(78 100% 50% / 0.25)" : undefined, transition: springHover }}
+                  className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60" : "border-border/30 glass-card"}`}>
                   <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
                   <p className="text-3xl font-black text-foreground mb-1">
                     {tier.price === "0" ? "$0" : tier.price}
@@ -563,16 +703,18 @@ const LandingPage = () => {
             </motion.div>
           </section>
 
-          {/* ─── 13. Objection Handling ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             OBJECTION HANDLING
+             ═══════════════════════════════════════════════════════ */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-black">"But what about..."</h2>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.15 }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {objections.map((obj, i) => (
                 <motion.div key={i} variants={fadeInBlur}
-                  whileHover={{ y: -4, transition: springHover }}
+                  whileHover={{ y: -6, boxShadow: "0 0 30px -8px hsl(78 100% 50% / 0.12)", transition: springHover }}
                   className="glass-card p-5 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <obj.icon className="w-5 h-5 text-primary" />
@@ -584,31 +726,35 @@ const LandingPage = () => {
             </motion.div>
           </section>
 
-          {/* ─── 14. FAQ ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             FAQ
+             ═══════════════════════════════════════════════════════ */}
           <section id="faq" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">FAQ</p>
-              <h2 className="text-3xl sm:text-4xl font-black">Frequently Asked Questions</h2>
+              <h2 className="text-3xl sm:text-4xl font-black">Everything you need to know</h2>
             </motion.div>
             <div className="max-w-2xl mx-auto space-y-3">
               {faqs.map((faq, i) => <FAQItem key={i} q={faq.q} a={faq.a} />)}
             </div>
           </section>
 
-          {/* ─── 15. Final CTA ─── */}
+          {/* ═══════════════════════════════════════════════════════
+             FINAL CTA
+             ═══════════════════════════════════════════════════════ */}
           <motion.section
-            initial={{ opacity: 0, scale: 0.96 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={inViewViewport}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden animate-glow-pulse">
+            initial={{ opacity: 0, scale: 0.94, filter: "blur(8px)" }}
+            whileInView={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden"
+          >
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.15),transparent_50%)]" aria-hidden="true" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,hsl(var(--primary)/0.08),transparent_60%)]" aria-hidden="true" />
             <div className="relative">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-4">Stop Guessing. Start Profiting.</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                Your Ads Are Leaking Money<br />
-                <span className="text-primary">Right Now.</span>
+                Your Ads Are Leaking Money<br /><span className="text-primary">Right Now.</span>
               </h2>
               <p className="text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
                 Upload your bulk file. See exactly where. Fix it today.
@@ -624,14 +770,14 @@ const LandingPage = () => {
                   Try Demo Data
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground mt-6">
-                No credit card required • 13 dashboards • Results in 60 seconds
-              </p>
+              <p className="text-sm text-muted-foreground mt-6">No credit card required • 13 dashboards • Results in 60 seconds</p>
             </div>
           </motion.section>
         </main>
 
-        {/* Footer */}
+        {/* ═══════════════════════════════════════════════════════
+           FOOTER
+           ═══════════════════════════════════════════════════════ */}
         <footer className="bg-[hsl(240,14%,8%)] pt-16 pb-6 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 mb-12">
@@ -692,10 +838,10 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="border-t border-border/20 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-              <p>©{new Date().getFullYear()} lynx media. All Rights Reserved</p>
+              <p>&copy;{new Date().getFullYear()} lynx media. All Rights Reserved</p>
               <div className="flex items-center gap-2">
                 <a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a>
-                <span className="text-primary">•</span>
+                <span className="text-primary">&bull;</span>
                 <a href="#" className="hover:text-foreground transition-colors">Terms and Conditions</a>
               </div>
             </div>
@@ -707,4 +853,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
