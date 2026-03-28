@@ -491,7 +491,9 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {fileTypes.map((file, i) => (
-                <motion.div key={i} variants={fadeInUp} className="glass-card p-4 rounded-xl text-center">
+                <motion.div key={i} variants={fadeInUp}
+                  whileHover={{ scale: 1.05, rotate: 1, transition: springHover }}
+                  className="glass-card p-4 rounded-xl text-center">
                   <FileSpreadsheet className="w-6 h-6 text-primary mx-auto mb-2" />
                   <h4 className="font-bold text-sm mb-1">{file.name}</h4>
                   <p className="text-muted-foreground text-xs leading-relaxed">{file.desc}</p>
