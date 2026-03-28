@@ -248,28 +248,28 @@ const LandingPage = () => {
 
           <div className="relative z-10 max-w-5xl mx-auto text-center">
             {/* Shimmer Badge */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
+            <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 shimmer-badge"
             >
               <Zap className="w-4 h-4" />
               Free Amazon PPC Analytics — No API Required
             </motion.div>
 
-            {/* Staggered headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-                className="block text-foreground/80">
+            {/* Staggered headline with blur reveal */}
+            <motion.h1 variants={heroLineStagger} initial="hidden" animate="visible"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
+              <motion.span variants={heroLineReveal} className="block text-foreground/80">
                 Your Amazon Ads Are
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}
-                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
+              <motion.span variants={heroLineReveal}
+                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
+                style={{ textShadow: "0 0 40px hsl(78 100% 50% / 0.3)" }}>
                 Leaking Money.
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}
-                className="block text-foreground">
+              <motion.span variants={heroLineReveal} className="block text-foreground">
                 We'll Show You Where.
               </motion.span>
-            </h1>
+            </motion.h1>
 
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.9 }}
               className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
