@@ -389,7 +389,7 @@ const LandingPage = () => {
               </h2>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {bentoFeatures.map((feature, i) => (
                 <motion.div key={i} variants={fadeInBlur}
