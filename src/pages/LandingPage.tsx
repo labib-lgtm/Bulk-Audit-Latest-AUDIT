@@ -396,6 +396,7 @@ const LandingPage = () => {
             <div className="space-y-3 max-w-2xl mx-auto">
               {problems.map((problem, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
+                  whileHover={{ x: 4, transition: springHover }}
                   viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                   className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
