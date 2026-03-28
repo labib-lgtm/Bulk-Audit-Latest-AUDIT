@@ -277,8 +277,8 @@ const LandingPage = () => {
               <span className="text-primary font-bold">60 seconds</span>.
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 1.0 }}
+            {/* CTA Buttons with scale-in spring */}
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 25, delay: 1.0 }}
               className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <Button onClick={() => navigate("/auth")} size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
