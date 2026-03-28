@@ -301,8 +301,8 @@ const LandingPage = () => {
 
           {/* ─── 4. Glassmorphic Demo Mockup ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 80, scale: 0.95, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative mt-12 sm:mt-16 w-full max-w-5xl mx-auto px-4"
           >
