@@ -261,4 +261,102 @@
     background-image: radial-gradient(hsl(var(--primary) / 0.15) 1px, transparent 1px);
     background-size: 24px 24px;
   }
+
+  /* Site frame overlay */
+  .site-frame {
+    position: fixed;
+    inset: 8px;
+    border: 1.5px solid hsl(var(--border) / 0.15);
+    border-radius: 1.5rem;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .site-frame::before,
+  .site-frame::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid hsl(var(--primary) / 0.3);
+  }
+
+  .site-frame::before {
+    top: -1px;
+    left: -1px;
+    border-right: none;
+    border-bottom: none;
+    border-radius: 1.5rem 0 0 0;
+  }
+
+  .site-frame::after {
+    top: -1px;
+    right: -1px;
+    border-left: none;
+    border-bottom: none;
+    border-radius: 0 1.5rem 0 0;
+  }
+
+  /* Shimmer badge */
+  .shimmer-badge {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.15) 50%,
+      transparent 100%
+    );
+    animation: shimmer-slide 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer-slide {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+
+  /* Marquee / infinite scroll carousel */
+  .marquee {
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee-scroll 30s linear infinite;
+    width: max-content;
+  }
+
+  @keyframes marquee-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Glass card enhanced */
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-xl border border-border/30;
+    box-shadow:
+      0 0 0 1px hsl(var(--border) / 0.05),
+      0 4px 24px -4px hsl(0 0% 0% / 0.3),
+      inset 0 1px 0 hsl(0 0% 100% / 0.03);
+  }
+
+  .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.25);
+    box-shadow:
+      0 0 0 1px hsl(var(--primary) / 0.1),
+      0 8px 40px -8px hsl(var(--primary) / 0.15),
+      inset 0 1px 0 hsl(0 0% 100% / 0.05);
+  }
 }
