@@ -18,10 +18,28 @@ const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
+const fadeInBlur: Variants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
+};
+const heroLineReveal: Variants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
+const heroLineStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.4 } }
+};
 const stagger: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.15 } }
 };
+const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25 } }
+};
+
+const springHover = { type: "spring" as const, stiffness: 300, damping: 20 };
 
 // ─── Animated counter hook ───
 const useCountUp = (end: number, duration: number = 2000) => {
@@ -56,7 +74,9 @@ const ResultCard = ({ metric, suffix, description, icon: Icon }: {
 }) => {
   const { count, ref } = useCountUp(metric, 1500);
   return (
-    <motion.div ref={ref} variants={fadeInUp} className="glass-card rounded-2xl p-8 text-center transition-all">
+    <motion.div ref={ref} variants={fadeInBlur}
+      whileHover={{ scale: 1.05, y: -4, transition: springHover }}
+      className="glass-card rounded-2xl p-8 text-center transition-all">
       <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
       <p className="text-5xl font-black text-foreground mb-1">
         {count}<span className="text-2xl text-primary">{suffix}</span>
@@ -72,14 +92,14 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
     <div className="glass-card rounded-xl overflow-hidden transition-all">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/20 transition-colors">
         <span className="font-semibold text-foreground pr-4">{q}</span>
-        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }} className="flex-shrink-0">
           <ChevronDown className={`w-5 h-5 ${open ? "text-primary" : "text-muted-foreground"}`} />
         </motion.div>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             <p className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed">{a}</p>
           </motion.div>
@@ -184,7 +204,8 @@ const LandingPage = () => {
 
       <div className="min-h-screen bg-background text-foreground dark">
         {/* ─── 1. Site Frame ─── */}
-        <div className="site-frame" aria-hidden="true" />
+        <motion.div className="site-frame" aria-hidden="true"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.5 }} />
 
         {/* ─── Background Effects ─── */}
         <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
@@ -227,37 +248,37 @@ const LandingPage = () => {
 
           <div className="relative z-10 max-w-5xl mx-auto text-center">
             {/* Shimmer Badge */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
+            <motion.div initial={{ opacity: 0, y: 20, filter: "blur(8px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 shimmer-badge"
             >
               <Zap className="w-4 h-4" />
               Free Amazon PPC Analytics — No API Required
             </motion.div>
 
-            {/* Staggered headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-                className="block text-foreground/80">
+            {/* Staggered headline with blur reveal */}
+            <motion.h1 variants={heroLineStagger} initial="hidden" animate="visible"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
+              <motion.span variants={heroLineReveal} className="block text-foreground/80">
                 Your Amazon Ads Are
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}
-                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
+              <motion.span variants={heroLineReveal}
+                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
+                style={{ textShadow: "0 0 40px hsl(78 100% 50% / 0.3)" }}>
                 Leaking Money.
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}
-                className="block text-foreground">
+              <motion.span variants={heroLineReveal} className="block text-foreground">
                 We'll Show You Where.
               </motion.span>
-            </h1>
+            </motion.h1>
 
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.9 }}
+            <motion.p initial={{ opacity: 0, y: 20, filter: "blur(6px)" }} animate={{ opacity: 1, y: 0, filter: "blur(0px)" }} transition={{ duration: 0.6, delay: 0.9, ease: [0.22, 1, 0.36, 1] }}
               className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
               Upload your bulk files. Get <span className="text-foreground font-bold">13 analytics dashboards</span> with TACOS, AI insights & wasted spend detection in{" "}
               <span className="text-primary font-bold">60 seconds</span>.
             </motion.p>
 
-            {/* CTA Buttons */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 1.0 }}
+            {/* CTA Buttons with scale-in spring */}
+            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring", stiffness: 400, damping: 25, delay: 1.0 }}
               className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <Button onClick={() => navigate("/auth")} size="lg"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
@@ -280,8 +301,8 @@ const LandingPage = () => {
 
           {/* ─── 4. Glassmorphic Demo Mockup ─── */}
           <motion.div
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 80, scale: 0.95, filter: "blur(12px)" }}
+            animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
             transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="relative mt-12 sm:mt-16 w-full max-w-5xl mx-auto px-4"
           >
@@ -350,7 +371,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {bentoFeatures.map((feature, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: 1.03, y: -6, boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.2)", transition: springHover }}
                   className={`glass-card rounded-2xl p-6 sm:p-8 group cursor-default transition-all ${feature.span}`}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-primary" />
@@ -374,6 +396,7 @@ const LandingPage = () => {
             <div className="space-y-3 max-w-2xl mx-auto">
               {problems.map((problem, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
+                  whileHover={{ x: 4, transition: springHover }}
                   viewport={{ once: true }} transition={{ delay: i * 0.08 }}
                   className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
@@ -400,7 +423,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboards.map((d, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: 1.04, y: -4, transition: springHover }}
                   className="glass-card p-5 rounded-xl group transition-all">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
@@ -436,7 +460,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-3 gap-6">
               {steps.map((item, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={scaleIn}
+                  whileHover={{ scale: 1.03, y: -4, transition: springHover }}
                   className="relative glass-card p-6 sm:p-8 rounded-2xl text-center">
                   <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
                     {item.step}
@@ -445,7 +470,9 @@ const LandingPage = () => {
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
                   <p className="text-muted-foreground text-sm">{item.desc}</p>
                   {i < steps.length - 1 && (
-                    <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 + i * 0.2 }}>
+                      <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                    </motion.div>
                   )}
                 </motion.div>
               ))}
@@ -464,7 +491,9 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {fileTypes.map((file, i) => (
-                <motion.div key={i} variants={fadeInUp} className="glass-card p-4 rounded-xl text-center">
+                <motion.div key={i} variants={fadeInUp}
+                  whileHover={{ scale: 1.05, rotate: 1, transition: springHover }}
+                  className="glass-card p-4 rounded-xl text-center">
                   <FileSpreadsheet className="w-6 h-6 text-primary mx-auto mb-2" />
                   <h4 className="font-bold text-sm mb-1">{file.name}</h4>
                   <p className="text-muted-foreground text-xs leading-relaxed">{file.desc}</p>
@@ -486,7 +515,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {tiers.map((tier, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: tier.highlight ? 1.05 : 1.03, y: -4, boxShadow: tier.highlight ? "0 0 50px -10px hsl(78 100% 50% / 0.25)" : undefined, transition: springHover }}
                   className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight
                     ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60"
                     : "border-border/30 glass-card"}`}>
@@ -520,7 +550,9 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {objections.map((obj, i) => (
-                <motion.div key={i} variants={fadeInUp} className="glass-card p-5 rounded-xl">
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ y: -4, transition: springHover }}
+                  className="glass-card p-5 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <obj.icon className="w-5 h-5 text-primary" />
                     <p className="font-bold text-sm">{obj.q}</p>
@@ -543,7 +575,12 @@ const LandingPage = () => {
           </section>
 
           {/* ─── 15. Final CTA ─── */}
-          <section className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden">
+          <motion.section
+            initial={{ opacity: 0, scale: 0.96 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden animate-glow-pulse">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.15),transparent_50%)]" aria-hidden="true" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,hsl(var(--primary)/0.08),transparent_60%)]" aria-hidden="true" />
             <div className="relative">
@@ -570,7 +607,7 @@ const LandingPage = () => {
                 No credit card required • 13 dashboards • Results in 60 seconds
               </p>
             </div>
-          </section>
+          </motion.section>
         </main>
 
         {/* Footer */}
