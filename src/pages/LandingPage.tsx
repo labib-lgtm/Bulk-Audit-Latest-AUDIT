@@ -373,7 +373,7 @@ const LandingPage = () => {
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
 
           {/* ─── 6. Results Counter Strip ─── */}
-          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
             className="mb-24 sm:mb-32 grid sm:grid-cols-3 gap-4 sm:gap-6">
             <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
             <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
