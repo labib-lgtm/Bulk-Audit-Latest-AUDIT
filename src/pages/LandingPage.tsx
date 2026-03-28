@@ -550,7 +550,9 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {objections.map((obj, i) => (
-                <motion.div key={i} variants={fadeInUp} className="glass-card p-5 rounded-xl">
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ y: -4, transition: springHover }}
+                  className="glass-card p-5 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <obj.icon className="w-5 h-5 text-primary" />
                     <p className="font-bold text-sm">{obj.q}</p>
