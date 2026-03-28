@@ -371,7 +371,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {bentoFeatures.map((feature, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: 1.03, y: -6, boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.2)", transition: springHover }}
                   className={`glass-card rounded-2xl p-6 sm:p-8 group cursor-default transition-all ${feature.span}`}>
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
                     <feature.icon className="w-6 h-6 text-primary" />
