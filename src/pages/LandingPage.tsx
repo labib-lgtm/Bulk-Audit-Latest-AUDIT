@@ -18,10 +18,28 @@ const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
 };
+const fadeInBlur: Variants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(8px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
+};
+const heroLineReveal: Variants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(6px)" },
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
+};
+const heroLineStagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.2, delayChildren: 0.4 } }
+};
 const stagger: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.15 } }
 };
+const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { type: "spring", stiffness: 400, damping: 25 } }
+};
+
+const springHover = { type: "spring" as const, stiffness: 300, damping: 20 };
 
 // ─── Animated counter hook ───
 const useCountUp = (end: number, duration: number = 2000) => {
