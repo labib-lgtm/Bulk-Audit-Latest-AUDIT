@@ -74,7 +74,9 @@ const ResultCard = ({ metric, suffix, description, icon: Icon }: {
 }) => {
   const { count, ref } = useCountUp(metric, 1500);
   return (
-    <motion.div ref={ref} variants={fadeInUp} className="glass-card rounded-2xl p-8 text-center transition-all">
+    <motion.div ref={ref} variants={fadeInBlur}
+      whileHover={{ scale: 1.05, y: -4, transition: springHover }}
+      className="glass-card rounded-2xl p-8 text-center transition-all">
       <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
       <p className="text-5xl font-black text-foreground mb-1">
         {count}<span className="text-2xl text-primary">{suffix}</span>
@@ -90,14 +92,14 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
     <div className="glass-card rounded-xl overflow-hidden transition-all">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/20 transition-colors">
         <span className="font-semibold text-foreground pr-4">{q}</span>
-        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }} className="flex-shrink-0">
           <ChevronDown className={`w-5 h-5 ${open ? "text-primary" : "text-muted-foreground"}`} />
         </motion.div>
       </button>
       <AnimatePresence>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             <p className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed">{a}</p>
           </motion.div>
