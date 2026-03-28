@@ -355,7 +355,7 @@ const LandingPage = () => {
 
         {/* ─── 5. Marketplace Logo Carousel ─── */}
         <section className="py-16 sm:py-20 px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+          <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur}
             <p className="text-center text-muted-foreground text-sm mb-8">
               <Globe className="w-4 h-4 inline-block mr-2 text-primary" />
               Works with all Amazon marketplaces
