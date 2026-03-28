@@ -204,7 +204,8 @@ const LandingPage = () => {
 
       <div className="min-h-screen bg-background text-foreground dark">
         {/* ─── 1. Site Frame ─── */}
-        <div className="site-frame" aria-hidden="true" />
+        <motion.div className="site-frame" aria-hidden="true"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.5 }} />
 
         {/* ─── Background Effects ─── */}
         <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
