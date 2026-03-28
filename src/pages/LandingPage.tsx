@@ -220,11 +220,18 @@ const LandingPage = () => {
         <motion.div className="site-frame" aria-hidden="true"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1, delay: 0.5 }} />
 
+        {/* Scroll progress */}
+        <motion.div
+          aria-hidden="true"
+          className="fixed top-0 left-0 right-0 h-[2px] z-[60] origin-left bg-gradient-to-r from-primary via-brand-400 to-primary"
+          style={{ scaleX: progressScale }}
+        />
+
         {/* ─── Background Effects ─── */}
-        <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+        <motion.div className="fixed inset-0 pointer-events-none" aria-hidden="true" style={{ y: bgY }}>
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-full blur-[120px]" />
           <div className="absolute bottom-0 right-[-5%] w-[400px] h-[400px] bg-primary/8 rounded-full blur-[150px]" />
-        </div>
+        </motion.div>
 
         {/* ─── 2. Floating Pill Nav ─── */}
         <motion.nav
