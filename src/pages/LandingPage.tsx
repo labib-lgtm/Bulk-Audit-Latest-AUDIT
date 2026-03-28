@@ -238,7 +238,8 @@ const LandingPage = () => {
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 sm:px-6 py-3 rounded-full border border-border/20 bg-background/70 backdrop-blur-2xl"
+          style={{ scale: navScale }}
+          className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 sm:px-6 py-3 rounded-full backdrop-blur-2xl transition-all duration-500 ${isScrolled ? "border border-primary/25 bg-background/90 shadow-[0_10px_40px_-12px_hsl(var(--primary)/0.45)]" : "border border-border/20 bg-background/70"}`}
         >
           <div className="flex items-center gap-4 sm:gap-8">
             <img src={lynxLogo} alt="Lynx Media" className="h-5 sm:h-6" />
