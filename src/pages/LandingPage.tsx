@@ -263,7 +263,7 @@ const LandingPage = () => {
         </motion.nav>
 
         {/* ─── 3. Hero Section ─── */}
-        <motion.section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden animate-reveal" style={{ y: heroY, opacity: heroOpacity }}
+        <motion.section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden animate-reveal" style={{ y: heroY, opacity: heroOpacity }}>
           {/* Rounded bottom clip */}
           <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" style={{ borderRadius: "0 0 3rem 3rem" }} aria-hidden="true" />
 
@@ -355,7 +355,7 @@ const LandingPage = () => {
 
         {/* ─── 5. Marketplace Logo Carousel ─── */}
         <section className="py-16 sm:py-20 px-4">
-          <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur}
+          <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur}>
             <p className="text-center text-muted-foreground text-sm mb-8">
               <Globe className="w-4 h-4 inline-block mr-2 text-primary" />
               Works with all Amazon marketplaces
@@ -418,7 +418,7 @@ const LandingPage = () => {
               {problems.map((problem, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
                   whileHover={{ x: 4, transition: springHover }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+                  viewport={inViewViewport} transition={{ delay: i * 0.08 }}
                   className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
                     <X className="w-4 h-4 text-destructive" />
@@ -431,7 +431,7 @@ const LandingPage = () => {
 
           {/* ─── 9. Dashboard Showcase ─── */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Solution</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 One Upload. <span className="text-primary">13 Dashboards.</span> Total Clarity.
@@ -441,7 +441,7 @@ const LandingPage = () => {
               </p>
             </motion.div>
 
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboards.map((d, i) => (
                 <motion.div key={i} variants={fadeInBlur}
@@ -460,7 +460,7 @@ const LandingPage = () => {
               ))}
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={inViewViewport}
               className="mt-8 text-center">
               <p className="text-muted-foreground text-sm mb-4">Plus: <span className="text-primary font-semibold">AI-Powered Analyst</span> that reviews your data and suggests optimizations in plain English.</p>
               <Button onClick={() => navigate("/dashboard")} variant="outline" className="rounded-full">
@@ -472,13 +472,13 @@ const LandingPage = () => {
 
           {/* ─── 10. How It Works ─── */}
           <section id="how-it-works" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">How It Works</p>
               <h2 className="text-3xl sm:text-4xl font-black">
                 Dead Simple. <span className="text-primary">3 Steps.</span>
               </h2>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid sm:grid-cols-3 gap-6">
               {steps.map((item, i) => (
                 <motion.div key={i} variants={scaleIn}
@@ -491,7 +491,7 @@ const LandingPage = () => {
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
                   <p className="text-muted-foreground text-sm">{item.desc}</p>
                   {i < steps.length - 1 && (
-                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 + i * 0.2 }}>
+                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={inViewViewport} transition={{ delay: 0.6 + i * 0.2 }}>
                       <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
                     </motion.div>
                   )}
@@ -502,14 +502,14 @@ const LandingPage = () => {
 
           {/* ─── 11. File Types ─── */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-10">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-10">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Data Inputs</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 5 File Types. <span className="text-primary">Complete Picture.</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">Each file unlocks deeper analytics. Start with just the bulk file — add more for the full picture.</p>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
               {fileTypes.map((file, i) => (
                 <motion.div key={i} variants={fadeInUp}
@@ -526,14 +526,14 @@ const LandingPage = () => {
 
           {/* ─── 12. Pricing ─── */}
           <section id="pricing" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Pricing</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Start Free. <span className="text-primary">Scale When Ready.</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">Get massive value for $0. Upgrade only when you need team features or AI recommendations.</p>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {tiers.map((tier, i) => (
                 <motion.div key={i} variants={fadeInBlur}
@@ -565,10 +565,10 @@ const LandingPage = () => {
 
           {/* ─── 13. Objection Handling ─── */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-black">"But what about..."</h2>
             </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={inViewViewport}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {objections.map((obj, i) => (
                 <motion.div key={i} variants={fadeInBlur}
@@ -586,7 +586,7 @@ const LandingPage = () => {
 
           {/* ─── 14. FAQ ─── */}
           <section id="faq" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">FAQ</p>
               <h2 className="text-3xl sm:text-4xl font-black">Frequently Asked Questions</h2>
             </motion.div>
@@ -599,7 +599,7 @@ const LandingPage = () => {
           <motion.section
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            viewport={inViewViewport}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden animate-glow-pulse">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.15),transparent_50%)]" aria-hidden="true" />
