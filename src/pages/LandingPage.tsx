@@ -515,7 +515,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {tiers.map((tier, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: tier.highlight ? 1.05 : 1.03, y: -4, boxShadow: tier.highlight ? "0 0 50px -10px hsl(78 100% 50% / 0.25)" : undefined, transition: springHover }}
                   className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight
                     ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60"
                     : "border-border/30 glass-card"}`}>
