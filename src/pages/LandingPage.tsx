@@ -6,13 +6,24 @@ import {
   Phone, Mail, BarChart3, Target, Search, DollarSign,
   LineChart, PieChart, Layers, Brain, Upload, FileSpreadsheet,
   Users, AlertTriangle, Sparkles, ChevronDown, ChevronUp,
-  Monitor, Gauge, Eye, Filter, CalendarClock, GitBranch
+  Monitor, Gauge, Eye, Filter, CalendarClock, GitBranch,
+  Lock, Globe
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
-// Animated counter hook
+// ─── Animation variants ───
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
+const stagger: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.15 } }
+};
+
+// ─── Animated counter hook ───
 const useCountUp = (end: number, duration: number = 2000) => {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -39,38 +50,36 @@ const useCountUp = (end: number, duration: number = 2000) => {
   return { count, ref };
 };
 
-// Result card
+// ─── Sub-components ───
 const ResultCard = ({ metric, suffix, description, icon: Icon }: {
   metric: number; suffix: string; description: string; icon: React.ElementType;
 }) => {
   const { count, ref } = useCountUp(metric, 1500);
   return (
-    <div ref={ref} className="text-center p-8 rounded-2xl bg-gradient-to-b from-card to-card/50 border border-border/50 hover:border-primary/30 transition-colors">
+    <motion.div ref={ref} variants={fadeInUp} className="glass-card rounded-2xl p-8 text-center transition-all">
       <Icon className="w-8 h-8 text-primary mx-auto mb-4" />
       <p className="text-5xl font-black text-foreground mb-1">
         {count}<span className="text-2xl text-primary">{suffix}</span>
       </p>
       <p className="text-muted-foreground text-sm">{description}</p>
-    </div>
+    </motion.div>
   );
 };
 
-// FAQ Item
 const FAQItem = ({ q, a }: { q: string; a: string }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="border border-border/50 rounded-xl overflow-hidden">
-      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/30 transition-colors">
+    <div className="glass-card rounded-xl overflow-hidden transition-all">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/20 transition-colors">
         <span className="font-semibold text-foreground pr-4">{q}</span>
-        {open ? <ChevronUp className="w-5 h-5 text-primary flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-muted-foreground flex-shrink-0" />}
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }} className="flex-shrink-0">
+          <ChevronDown className={`w-5 h-5 ${open ? "text-primary" : "text-muted-foreground"}`} />
+        </motion.div>
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.3 }}
           >
             <p className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed">{a}</p>
           </motion.div>
@@ -80,6 +89,9 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
   );
 };
 
+// ═══════════════════════════════════════════════════════
+// LANDING PAGE
+// ═══════════════════════════════════════════════════════
 const LandingPage = () => {
   const navigate = useNavigate();
 
@@ -142,6 +154,27 @@ const LandingPage = () => {
     { name: "Agency", price: "Coming Soon", period: "", features: ["Everything in Pro", "Team management", "Multi-client workspaces", "White-label exports", "Dedicated onboarding"], cta: "Contact Us", highlight: false },
   ];
 
+  const bentoFeatures = [
+    { icon: TrendingUp, title: "True TACOS Tracking", desc: "See real total ad cost of sales across SP, SB & SD combined — not just ACOS.", span: "lg:col-span-2" },
+    { icon: Brain, title: "AI-Powered Analyst", desc: "Get contextual bid, budget & keyword recommendations in plain English.", span: "lg:col-span-1" },
+    { icon: Lock, title: "100% Private", desc: "All processing happens in your browser. Zero data uploaded to any server.", span: "lg:col-span-1" },
+    { icon: CalendarClock, title: "Dayparting Heatmaps", desc: "Hour-by-hour performance visualization to optimize bid schedules.", span: "lg:col-span-1" },
+    { icon: AlertTriangle, title: "Auto Diagnostics", desc: "Automated health checks flag wasted spend, low CTR & bidding anomalies.", span: "lg:col-span-1" },
+    { icon: LineChart, title: "AI Forecasting", desc: "Predict future spend & revenue based on your historical campaign data.", span: "lg:col-span-1" },
+  ];
+
+  const marketplaces = [
+    "🇺🇸 US", "🇬🇧 UK", "🇩🇪 DE", "🇨🇦 CA", "🇯🇵 JP", "🇮🇳 IN", "🇫🇷 FR", "🇮🇹 IT", "🇪🇸 ES", "🇦🇺 AU", "🇲🇽 MX", "🇧🇷 BR", "🇸🇦 SA", "🇦🇪 AE", "🇸🇬 SG"
+  ];
+
+  const fileTypes = [
+    { name: "Bulk Campaign", desc: "Core ad data — campaigns, ad groups, keywords, bids", required: true },
+    { name: "Business Report", desc: "Sales, sessions & conversion data for TACOS calculation", required: false },
+    { name: "Previous Period", desc: "Compare performance trends week-over-week or month-over-month", required: false },
+    { name: "Inventory Report", desc: "Stock levels & FBA data for inventory-aware bidding", required: false },
+    { name: "Hourly Performance", desc: "Hour-by-hour data for dayparting optimization", required: false },
+  ];
+
   return (
     <>
       <Helmet>
@@ -150,106 +183,199 @@ const LandingPage = () => {
       </Helmet>
 
       <div className="min-h-screen bg-background text-foreground dark">
-        {/* Background */}
-        <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-gradient-to-b from-primary/8 via-primary/3 to-transparent rounded-full blur-3xl" />
+        {/* ─── 1. Site Frame ─── */}
+        <div className="site-frame" aria-hidden="true" />
+
+        {/* ─── Background Effects ─── */}
+        <div className="fixed inset-0 pointer-events-none" aria-hidden="true">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent rounded-full blur-[120px]" />
+          <div className="absolute bottom-0 right-[-5%] w-[400px] h-[400px] bg-primary/8 rounded-full blur-[150px]" />
         </div>
 
-        {/* Nav */}
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-border/10">
-          <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-            <img alt="Lynx Media" src="/lovable-uploads/800abbfd-bcd1-4375-8093-7d5199c45706.png" className="h-8 w-auto object-contain" />
-            <div className="flex items-center gap-3">
-              <Button onClick={() => navigate("/auth")} variant="ghost" className="text-muted-foreground hover:text-foreground hidden sm:inline-flex">Login</Button>
-              <Button onClick={() => navigate("/auth")} className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-full px-6">
+        {/* ─── 2. Floating Pill Nav ─── */}
+        <motion.nav
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-5 sm:px-6 py-3 rounded-full border border-border/20 bg-background/70 backdrop-blur-2xl"
+        >
+          <div className="flex items-center gap-4 sm:gap-8">
+            <img src={lynxLogo} alt="Lynx Media" className="h-5 sm:h-6" />
+            <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
+              <a href="#features" className="hover:text-foreground transition-colors">Features</a>
+              <a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a>
+              <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
+              <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button onClick={() => navigate("/auth")} variant="ghost" size="sm"
+                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm">
+                Login
+              </Button>
+              <Button onClick={() => navigate("/auth")} size="sm"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 sm:px-5 text-xs sm:text-sm">
                 Get Started Free
               </Button>
             </div>
           </div>
-        </nav>
+        </motion.nav>
 
-        <main className="relative max-w-5xl mx-auto px-6 pt-32 pb-20">
+        {/* ─── 3. Hero Section ─── */}
+        <section className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 pt-24 pb-0 overflow-hidden">
+          {/* Rounded bottom clip */}
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" style={{ borderRadius: "0 0 3rem 3rem" }} aria-hidden="true" />
 
-          {/* ===== SECTION 1: HERO — The Hook ===== */}
-          <section className="mb-28 text-center">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8"
+          <div className="relative z-10 max-w-5xl mx-auto text-center">
+            {/* Shimmer Badge */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8 shimmer-badge"
             >
               <Zap className="w-4 h-4" />
               Free Amazon PPC Analytics — No API Required
             </motion.div>
 
-            <h1 className="text-5xl sm:text-6xl md:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="block text-foreground/80">
+            {/* Staggered headline */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.05] mb-8 tracking-tight">
+              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
+                className="block text-foreground/80">
                 Your Amazon Ads Are
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
-                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent"
-              >
+              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }}
+                className="block bg-gradient-to-r from-primary via-primary to-brand-400 bg-clip-text text-transparent">
                 Leaking Money.
               </motion.span>
-              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="block text-foreground">
+              <motion.span initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.8 }}
+                className="block text-foreground">
                 We'll Show You Where.
               </motion.span>
             </h1>
 
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.7 }}
-              className="text-xl sm:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto"
-            >
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.9 }}
+              className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-10 leading-relaxed max-w-2xl mx-auto">
               Upload your bulk files. Get <span className="text-foreground font-bold">13 analytics dashboards</span> with TACOS, AI insights & wasted spend detection in{" "}
               <span className="text-primary font-bold">60 seconds</span>.
-              <br />
-              <span className="text-sm text-muted-foreground/70 mt-2 block">No API. No setup. No data leaves your browser.</span>
             </motion.p>
 
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-            >
+            {/* CTA Buttons */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 1.0 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
               <Button onClick={() => navigate("/auth")} size="lg"
-                className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-10 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
-              >
+                className="bg-primary text-primary-foreground hover:bg-primary/90 text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
                 Analyze My Ads Free
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button onClick={() => navigate("/dashboard")} variant="outline" size="lg"
-                className="text-lg px-10 py-7 rounded-xl border-border/50 hover:bg-muted"
-              >
+                className="text-base sm:text-lg px-8 sm:px-10 py-6 sm:py-7 rounded-full border-border/50 hover:bg-muted/50">
                 Try Demo Data
                 <Sparkles className="ml-2 w-5 h-5" />
               </Button>
             </motion.div>
 
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1 }}
-              className="text-muted-foreground text-sm mt-6"
-            >
-              ✓ Free forever tier &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds &nbsp;&nbsp; ✓ 100% browser-based
+            {/* Trust line */}
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.1 }}
+              className="text-muted-foreground text-xs sm:text-sm">
+              ✓ Free forever &nbsp;&nbsp; ✓ No credit card &nbsp;&nbsp; ✓ Results in 60 seconds &nbsp;&nbsp; ✓ 100% browser-based
             </motion.p>
-          </section>
+          </div>
 
-          {/* ===== SECTION 2: RESULTS — Social Proof / Outcomes ===== */}
-          <section className="mb-28">
-            <div className="grid sm:grid-cols-3 gap-4">
-              <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
-              <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
-              <ResultCard metric={13} suffix=" dashboards" description="from a single bulk file upload" icon={BarChart3} />
+          {/* ─── 4. Glassmorphic Demo Mockup ─── */}
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            className="relative mt-12 sm:mt-16 w-full max-w-5xl mx-auto px-4"
+          >
+            <div className="glass-card rounded-2xl sm:rounded-3xl p-2 sm:p-3">
+              {/* Browser dots */}
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-border/20">
+                <div className="flex gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-destructive/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-warning/60" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-success/60" />
+                </div>
+                <div className="flex-1 mx-4">
+                  <div className="h-5 rounded-full bg-muted/30 max-w-xs mx-auto" />
+                </div>
+              </div>
+              {/* Screenshot placeholder */}
+              <div className="rounded-xl overflow-hidden bg-card aspect-[16/9] flex items-center justify-center">
+                <div className="text-center">
+                  <Monitor className="w-16 h-16 text-primary/30 mx-auto mb-4" />
+                  <p className="text-muted-foreground text-sm">Executive Dashboard Preview</p>
+                  <p className="text-muted-foreground/50 text-xs mt-1">13 dashboards • TACOS • AI Insights</p>
+                </div>
+              </div>
             </div>
+            {/* Glow beneath */}
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full" aria-hidden="true" />
+          </motion.div>
+        </section>
+
+        {/* ─── 5. Marketplace Logo Carousel ─── */}
+        <section className="py-16 sm:py-20 px-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
+            <p className="text-center text-muted-foreground text-sm mb-8">
+              <Globe className="w-4 h-4 inline-block mr-2 text-primary" />
+              Works with all Amazon marketplaces
+            </p>
+            <div className="marquee max-w-4xl mx-auto">
+              <div className="marquee-track">
+                {[...marketplaces, ...marketplaces].map((mp, i) => (
+                  <span key={i} className="text-lg sm:text-xl text-muted-foreground/60 whitespace-nowrap font-medium select-none">{mp}</span>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
+
+          {/* ─── 6. Results Counter Strip ─── */}
+          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="mb-24 sm:mb-32 grid sm:grid-cols-3 gap-4 sm:gap-6">
+            <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
+            <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
+            <ResultCard metric={13} suffix=" dashboards" description="from a single bulk file upload" icon={BarChart3} />
+          </motion.section>
+
+          {/* ─── 7. Feature Bento Grid ─── */}
+          <section id="features" className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12 sm:mb-16">
+              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Why Sellers Choose Lynx</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black">
+                Everything You Need.<br /><span className="text-primary">Nothing You Don't.</span>
+              </h2>
+            </motion.div>
+
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+              {bentoFeatures.map((feature, i) => (
+                <motion.div key={i} variants={fadeInUp}
+                  className={`glass-card rounded-2xl p-6 sm:p-8 group cursor-default transition-all ${feature.span}`}>
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                    <feature.icon className="w-6 h-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
           </section>
 
-          {/* ===== SECTION 3: PROBLEM AGITATION ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 8. Problem Agitation ─── */}
+          <section className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Problem</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Amazon Gives You Data. Not <span className="text-primary">Answers.</span>
               </h2>
               <p className="text-muted-foreground text-lg max-w-xl mx-auto">If any of these sound familiar, you're leaving money on the table.</p>
-            </div>
+            </motion.div>
             <div className="space-y-3 max-w-2xl mx-auto">
               {problems.map((problem, i) => (
                 <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                  className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10"
-                >
+                  className="flex items-center gap-4 p-4 rounded-xl bg-destructive/5 border border-destructive/10">
                   <div className="w-8 h-8 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
                     <X className="w-4 h-4 text-destructive" />
                   </div>
@@ -259,9 +385,9 @@ const LandingPage = () => {
             </div>
           </section>
 
-          {/* ===== SECTION 4: SOLUTION — The Value Bomb ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 9. Dashboard Showcase ─── */}
+          <section className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Solution</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 One Upload. <span className="text-primary">13 Dashboards.</span> Total Clarity.
@@ -269,14 +395,13 @@ const LandingPage = () => {
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                 Lynx turns your existing bulk files into a full analytics suite that shows you exactly what's working, what's bleeding money, and what to fix next.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboards.map((d, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.05 }}
-                  className="p-5 rounded-xl bg-card border border-border/50 hover:border-primary/20 transition-all hover:shadow-lg hover:shadow-primary/5 group"
-                >
+                <motion.div key={i} variants={fadeInUp}
+                  className="glass-card p-5 rounded-xl group transition-all">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
                       <d.icon className="w-5 h-5 text-primary" />
@@ -288,11 +413,10 @@ const LandingPage = () => {
                   </div>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-              className="mt-8 text-center"
-            >
+              className="mt-8 text-center">
               <p className="text-muted-foreground text-sm mb-4">Plus: <span className="text-primary font-semibold">AI-Powered Analyst</span> that reviews your data and suggests optimizations in plain English.</p>
               <Button onClick={() => navigate("/dashboard")} variant="outline" className="rounded-full">
                 See All Dashboards with Demo Data
@@ -301,77 +425,71 @@ const LandingPage = () => {
             </motion.div>
           </section>
 
-          {/* ===== SECTION 5: HOW IT WORKS — 3 Steps ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 10. How It Works ─── */}
+          <section id="how-it-works" className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">How It Works</p>
               <h2 className="text-3xl sm:text-4xl font-black">
                 Dead Simple. <span className="text-primary">3 Steps.</span>
               </h2>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-6">
+            </motion.div>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid sm:grid-cols-3 gap-6">
               {steps.map((item, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                  className="relative p-6 rounded-2xl bg-card border border-border/50 text-center"
-                >
+                <motion.div key={i} variants={fadeInUp}
+                  className="relative glass-card p-6 sm:p-8 rounded-2xl text-center">
                   <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
                     {item.step}
                   </div>
                   <item.icon className="w-6 h-6 text-primary/40 mx-auto mb-3" />
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
                   <p className="text-muted-foreground text-sm">{item.desc}</p>
-                  {i < steps.length - 1 && <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />}
+                  {i < steps.length - 1 && (
+                    <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                  )}
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
 
-          {/* ===== SECTION 6: 5 UPLOAD TYPES ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-10">
+          {/* ─── 11. File Types ─── */}
+          <section className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-10">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Data Inputs</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 5 File Types. <span className="text-primary">Complete Picture.</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">Each file unlocks deeper analytics. Start with just the bulk file — add more for the full picture.</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {[
-                { name: "Bulk Campaign", desc: "Core ad data — campaigns, ad groups, keywords, bids", required: true },
-                { name: "Business Report", desc: "Sales, sessions & conversion data for TACOS calculation", required: false },
-                { name: "Previous Period", desc: "Compare performance trends week-over-week or month-over-month", required: false },
-                { name: "Inventory Report", desc: "Stock levels & FBA data for inventory-aware bidding", required: false },
-                { name: "Hourly Performance", desc: "Hour-by-hour data for dayparting optimization", required: false },
-              ].map((file, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                  className="p-4 rounded-xl bg-card border border-border/50 text-center"
-                >
+            </motion.div>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+              {fileTypes.map((file, i) => (
+                <motion.div key={i} variants={fadeInUp} className="glass-card p-4 rounded-xl text-center">
                   <FileSpreadsheet className="w-6 h-6 text-primary mx-auto mb-2" />
                   <h4 className="font-bold text-sm mb-1">{file.name}</h4>
                   <p className="text-muted-foreground text-xs leading-relaxed">{file.desc}</p>
                   {file.required && <span className="inline-block mt-2 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">Required</span>}
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
 
-          {/* ===== SECTION 7: ASCENSION — Pricing Tiers ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 12. Pricing ─── */}
+          <section id="pricing" className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Pricing</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Start Free. <span className="text-primary">Scale When Ready.</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto">Get massive value for $0. Upgrade only when you need team features or AI recommendations.</p>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            </motion.div>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
               {tiers.map((tier, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                  className={`p-6 rounded-2xl border ${tier.highlight ? "border-primary bg-gradient-to-b from-primary/10 to-card shadow-lg shadow-primary/10" : "border-border/50 bg-card"}`}
-                >
+                <motion.div key={i} variants={fadeInUp}
+                  className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight
+                    ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60"
+                    : "border-border/30 glass-card"}`}>
                   <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
                   <p className="text-3xl font-black text-foreground mb-1">
                     {tier.price === "0" ? "$0" : tier.price}
@@ -386,26 +504,23 @@ const LandingPage = () => {
                     ))}
                   </ul>
                   <Button onClick={() => navigate("/auth")}
-                    className={`w-full rounded-xl ${tier.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90" : "bg-muted text-foreground hover:bg-muted/80"}`}
-                  >
+                    className={`w-full rounded-xl ${tier.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90 btn-glow" : "bg-muted text-foreground hover:bg-muted/80"}`}>
                     {tier.cta}
                   </Button>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
 
-          {/* ===== SECTION 8: OBJECTION HANDLING ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 13. Objection Handling ─── */}
+          <section className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <h2 className="text-3xl sm:text-4xl font-black">"But what about..."</h2>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            </motion.div>
+            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {objections.map((obj, i) => (
-                <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                  className="p-5 rounded-xl bg-card border border-border/50"
-                >
+                <motion.div key={i} variants={fadeInUp} className="glass-card p-5 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <obj.icon className="w-5 h-5 text-primary" />
                     <p className="font-bold text-sm">{obj.q}</p>
@@ -413,23 +528,24 @@ const LandingPage = () => {
                   <p className="text-muted-foreground text-xs leading-relaxed">{obj.a}</p>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
           </section>
 
-          {/* ===== SECTION 9: FAQ ===== */}
-          <section className="mb-28">
-            <div className="text-center mb-12">
+          {/* ─── 14. FAQ ─── */}
+          <section id="faq" className="mb-24 sm:mb-32">
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">FAQ</p>
               <h2 className="text-3xl sm:text-4xl font-black">Frequently Asked Questions</h2>
-            </div>
+            </motion.div>
             <div className="max-w-2xl mx-auto space-y-3">
               {faqs.map((faq, i) => <FAQItem key={i} q={faq.q} a={faq.a} />)}
             </div>
           </section>
 
-          {/* ===== SECTION 10: FINAL CTA — Ascension ===== */}
-          <section className="text-center p-10 sm:p-14 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.1),transparent_50%)]" />
+          {/* ─── 15. Final CTA ─── */}
+          <section className="mb-20 text-center p-10 sm:p-16 rounded-3xl bg-gradient-to-br from-primary/15 via-card to-card border border-primary/20 relative overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.15),transparent_50%)]" aria-hidden="true" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,hsl(var(--primary)/0.08),transparent_60%)]" aria-hidden="true" />
             <div className="relative">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-4">Stop Guessing. Start Profiting.</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
@@ -441,14 +557,12 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={() => navigate("/auth")} size="lg"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-xl shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02]"
-                >
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
                   Analyze My Ads Free
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
                 <Button onClick={() => navigate("/dashboard")} variant="outline" size="lg"
-                  className="text-lg px-8 py-7 rounded-xl border-border/50 hover:bg-muted"
-                >
+                  className="text-lg px-8 py-7 rounded-full border-border/50 hover:bg-muted/50">
                   Try Demo Data
                 </Button>
               </div>
