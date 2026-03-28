@@ -1,47 +1,76 @@
 
 
-## Redesign Landing Page (AttendFlow-inspired)
+## Upgrade Section-by-Section Animations (AttendFlow-Style)
 
-Only `src/pages/LandingPage.tsx` and `src/index.css` will be modified. No dashboard or Index page changes.
+The current landing page uses basic `fadeInUp` and `stagger` variants everywhere. The plan upgrades **each section** with distinct, polished animations matching AttendFlow's patterns.
 
-### Structure (mapping AttendFlow sections to Lynx content)
+### Section-by-Section Animation Spec
 
-1. **Decorative site frame** -- Rounded border around viewport with corner accents (CSS only)
-2. **Floating pill nav** -- Rounded-pill navbar (centered, glassmorphic) with logo, Feature/FAQ links, Login + Get Started CTA
-3. **Hero section** -- Rounded-bottom container with gradient background. Social proof shimmer badge ("Free Amazon PPC Analytics"), staggered line-by-line headline reveal, sub-text, dual CTA buttons, trust indicators
-4. **Glassmorphic demo mockup** -- Overlapping card below hero with a browser-frame style screenshot placeholder showing dashboard preview
-5. **Marketplace logo carousel** -- Infinite scrolling strip of Amazon marketplace flags (US, UK, DE, CA, JP, IN, etc.) with "Works with all Amazon marketplaces" label
-6. **Results counter strip** -- 3 animated counter cards (4+ hrs saved, 23% waste reduction, 13 dashboards)
-7. **Feature bento grid** ("Why Sellers Choose Lynx") -- 6 asymmetric glassmorphic cards: TACOS, AI Analyst, Privacy, Dayparting, Diagnostics, Forecasting with icon + hover glow
-8. **Problem agitation** -- Keep existing content, restyle with AttendFlow's cleaner card layout
-9. **Dashboard showcase** -- 13 dashboard cards in 3-column grid (existing content, refined styling)
-10. **How it works** -- 3-step horizontal cards with connecting arrows
-11. **5 file types** -- Compact card grid (existing content)
-12. **Pricing** -- 3-tier cards (existing content, refined with AttendFlow border/shadow style)
-13. **Objection handling** -- 6 cards grid (existing content)
-14. **FAQ accordion** -- Existing FAQs with smoother accordion animation
-15. **Final CTA** -- Gradient section with radial glow
-16. **Footer** -- Keep existing footer exactly as-is
+| # | Section | Current Animation | Upgraded Animation |
+|---|---------|------------------|--------------------|
+| 1 | **Site frame** | Static CSS | Fade-in on page load (opacity 0→1 over 1s with 0.5s delay) |
+| 2 | **Floating nav** | None | Slide down from -20px + fade-in on mount, `backdrop-blur` transition on scroll |
+| 3 | **Hero badge** | Basic fadeInUp | `fadeInBlur`: opacity 0→1, y 20→0, filter blur(8px)→blur(0), 0.6s ease-out |
+| 4 | **Hero headline** | Single fadeInUp | **Line-by-line stagger**: each line reveals independently with 0.2s delay between lines, blur(6px)→clear |
+| 5 | **Hero CTA buttons** | Basic fade | Scale-in from 0.9→1 + opacity, with spring physics (`stiffness: 400, damping: 25`) |
+| 6 | **Demo mockup** | opacity+y(60) | Scale 0.95→1 + y(80→0) + blur(12px→0), custom cubic-bezier, 0.8s duration, 1s delay |
+| 7 | **Marketplace carousel** | CSS marquee only | Add `whileInView` fade-in for the label; marquee already has CSS `@keyframes` |
+| 8 | **Result counters** | fadeInUp + stagger | Add `whileHover={{ scale: 1.05, y: -4 }}` with spring transition; keep count-up animation |
+| 9 | **Bento grid cards** | fadeInUp + stagger | `fadeInBlur` (blur entrance) + `whileHover={{ scale: 1.03, y: -6, boxShadow: "0 0 40px hsl(78 100% 50%/0.15)" }}` with spring transition |
+| 10 | **Problem items** | x(-20) slide-in | Keep staggered slide-in; add subtle `whileHover={{ x: 4 }}` nudge |
+| 11 | **Dashboard cards** | fadeInUp + stagger | `fadeInBlur` + `whileHover={{ scale: 1.04, y: -4 }}` spring hover |
+| 12 | **How It Works steps** | fadeInUp + stagger | Scale-in from 0.9 + connecting arrow fade-in separately with longer delay |
+| 13 | **File type cards** | fadeInUp + stagger | Add `whileHover={{ scale: 1.05, rotate: 1 }}` micro-interaction |
+| 14 | **Pricing cards** | fadeInUp + stagger | `fadeInBlur` + highlighted card gets a `whileHover={{ scale: 1.05 }}` with glow shadow |
+| 15 | **Objection cards** | fadeInUp + stagger | `fadeInBlur` + `whileHover={{ y: -4 }}` |
+| 16 | **FAQ accordion** | AnimatePresence height | Add spring physics (`type: "spring", stiffness: 300, damping: 25`) to open/close; icon rotation gets spring too |
+| 17 | **Final CTA** | None (static) | `whileInView` scale 0.96→1 + opacity with radial glow pulse (`@keyframes glow-pulse`) |
+| 18 | **Footer** | No changes | No changes |
 
-### CSS additions (`src/index.css`)
+### New Animation Variants to Add
 
-- `.site-frame` -- 12px inset border with rounded corners, pointer-events-none overlay
-- `.shimmer-badge` -- Animated shimmer gradient on social proof pill
-- `.marquee` / `.marquee-track` -- Infinite horizontal scroll for marketplace carousel
-- `.glass-card` -- Enhanced glassmorphic card variant with layered borders
+```text
+fadeInBlur:
+  hidden:  { opacity: 0, y: 30, filter: "blur(8px)" }
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7 } }
 
-### Animation patterns
+heroLineReveal:
+  hidden:  { opacity: 0, y: 20, filter: "blur(6px)" }
+  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5 } }
+  (parent stagger: 0.2s between lines)
 
-- Hero text: staggered `framer-motion` line reveals (0.2s delay between lines)
-- Bento cards: `whileInView` fade-up with stagger
-- Marketplace carousel: CSS `@keyframes marquee` infinite scroll
-- FAQ: `AnimatePresence` with height + opacity
-- All sections: `whileInView` with `viewport={{ once: true }}`
+scaleSpring:
+  whileHover: { scale: 1.03, y: -6 }
+  transition: { type: "spring", stiffness: 300, damping: 20 }
 
-### What stays unchanged
-- All content arrays (problems, dashboards, steps, objections, faqs, tiers)
-- Footer content and structure
-- Navigation routes (`/auth`, `/dashboard`)
-- SEO helmet tags
-- **No changes to any dashboard or Index page files**
+cardGlowHover:
+  whileHover: { 
+    scale: 1.03, 
+    boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.2)" 
+  }
+```
+
+### CSS Additions (`src/index.css`)
+
+- `@keyframes glow-pulse` for the final CTA radial glow pulsing
+- `.animate-reveal` class for hero section clip-path/scale entrance
+- Update `.glass-card:hover` to include `transform: translateY(-2px)` as CSS fallback
+
+### Hero Text Restructure
+
+Current hero headline is a single `<h1>` block. Will be split into 3-4 `<motion.span>` elements wrapped in a stagger container so each line animates independently:
+
+```text
+Line 1: "Stop Guessing."         → delay 0.0s
+Line 2: "Start Seeing."          → delay 0.2s  
+Line 3: "Your Amazon PPC"        → delay 0.4s
+Line 4: "Analytics Suite"        → delay 0.6s (gradient text)
+```
+
+### Files Modified
+- `src/pages/LandingPage.tsx` — all animation variants + per-section motion props
+- `src/index.css` — glow-pulse keyframe, reveal animation, glass-card hover refinement
+
+### No Changes To
+- Dashboard pages, Index.tsx, routing, content data arrays, footer
 
