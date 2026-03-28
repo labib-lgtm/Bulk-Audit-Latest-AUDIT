@@ -351,7 +351,7 @@ const LandingPage = () => {
             {/* Glow beneath */}
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full" aria-hidden="true" />
           </motion.div>
-        </section>
+        </motion.section>
 
         {/* ─── 5. Marketplace Logo Carousel ─── */}
         <section className="py-16 sm:py-20 px-4">
