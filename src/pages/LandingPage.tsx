@@ -114,6 +114,19 @@ const FAQItem = ({ q, a }: { q: string; a: string }) => {
 // ═══════════════════════════════════════════════════════
 const LandingPage = () => {
   const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const { scrollY, scrollYProgress } = useScroll();
+  const heroY = useTransform(scrollY, [0, 700], [0, 180]);
+  const heroOpacity = useTransform(scrollY, [0, 450], [1, 0.25]);
+  const bgY = useTransform(scrollY, [0, 900], [0, 240]);
+  const navScale = useTransform(scrollY, [0, 120], [1, 0.97]);
+  const progressScale = useSpring(scrollYProgress, { stiffness: 140, damping: 28, mass: 0.25 });
+  const inViewViewport = { once: false, amount: 0.35 };
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 24);
+  });
 
   // === FUNNEL CONTENT ===
 
