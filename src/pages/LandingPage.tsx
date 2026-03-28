@@ -382,7 +382,7 @@ const LandingPage = () => {
 
           {/* ─── 7. Feature Bento Grid ─── */}
           <section id="features" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12 sm:mb-16">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur} className="text-center mb-12 sm:mb-16">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Why Sellers Choose Lynx</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black">
                 Everything You Need.<br /><span className="text-primary">Nothing You Don't.</span>
