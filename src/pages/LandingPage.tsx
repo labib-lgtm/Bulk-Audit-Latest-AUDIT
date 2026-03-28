@@ -607,7 +607,7 @@ const LandingPage = () => {
                 No credit card required • 13 dashboards • Results in 60 seconds
               </p>
             </div>
-          </section>
+          </motion.section>
         </main>
 
         {/* Footer */}
