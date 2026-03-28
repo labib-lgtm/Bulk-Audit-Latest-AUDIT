@@ -423,7 +423,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {dashboards.map((d, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={fadeInBlur}
+                  whileHover={{ scale: 1.04, y: -4, transition: springHover }}
                   className="glass-card p-5 rounded-xl group transition-all">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary/20 transition-colors">
