@@ -407,7 +407,7 @@ const LandingPage = () => {
 
           {/* ─── 8. Problem Agitation ─── */}
           <section className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="text-center mb-12">
+            <motion.div initial="hidden" whileInView="visible" viewport={inViewViewport} variants={fadeInBlur} className="text-center mb-12">
               <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">The Problem</p>
               <h2 className="text-3xl sm:text-4xl font-black mb-4">
                 Amazon Gives You Data. Not <span className="text-primary">Answers.</span>
