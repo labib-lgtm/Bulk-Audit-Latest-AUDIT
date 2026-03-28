@@ -451,7 +451,7 @@ const Index = () => {
                     disabled={!downloadUrls.some(d => d.enabled)}
                     className="flex items-center gap-2 py-2 px-4 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:opacity-90 transition-all disabled:opacity-50"
                   >
-                    <ExternalLink size={13} /> Open Tabs
+                    <ExternalLink size={13} /> Open Enabled Tabs
                   </button>
                 </div>
               </div>
