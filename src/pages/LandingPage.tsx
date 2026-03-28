@@ -460,7 +460,8 @@ const LandingPage = () => {
             <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true }}
               className="grid sm:grid-cols-3 gap-6">
               {steps.map((item, i) => (
-                <motion.div key={i} variants={fadeInUp}
+                <motion.div key={i} variants={scaleIn}
+                  whileHover={{ scale: 1.03, y: -4, transition: springHover }}
                   className="relative glass-card p-6 sm:p-8 rounded-2xl text-center">
                   <div className="w-14 h-14 rounded-full bg-primary text-primary-foreground font-black text-xl flex items-center justify-center mx-auto mb-4">
                     {item.step}
@@ -469,7 +470,9 @@ const LandingPage = () => {
                   <h3 className="text-lg font-bold mb-2">{item.title}</h3>
                   <p className="text-muted-foreground text-sm">{item.desc}</p>
                   {i < steps.length - 1 && (
-                    <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                    <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 + i * 0.2 }}>
+                      <ArrowRight className="hidden sm:block absolute top-1/2 -right-5 w-4 h-4 text-muted-foreground/30" />
+                    </motion.div>
                   )}
                 </motion.div>
               ))}
