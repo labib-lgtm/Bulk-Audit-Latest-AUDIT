@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
 import { useEffect, useState, useRef } from "react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { motion, AnimatePresence, Variants, useScroll, useTransform, useMotionValueEvent, useSpring } from "framer-motion";
 
 // ─── Animation variants ───
 const fadeInUp: Variants = {
