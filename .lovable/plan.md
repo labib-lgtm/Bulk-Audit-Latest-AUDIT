@@ -1,33 +1,20 @@
 
 
-## Fix ScrollTextReveal Scroll Sync and Spacing
+## Fix Stacking Cards — Each Card Covers the Previous One
 
-**Problem**: The word-by-word reveal is not properly synchronized with scrolling, and there's excessive spacing around the section.
+**Problem**: Currently card 1 has the highest z-index and card 4 the lowest. This means later cards slide *behind* earlier ones. The user wants the opposite: card 2 covers card 1, card 3 covers card 2, etc.
 
-### Root Causes
+### Change — `src/pages/LandingPage.tsx` (StackingCard component, line 147)
 
-1. **Scroll offset `["start start", "end start"]`** means tracking starts when container top hits viewport top and ends when container bottom hits viewport top. With a very tall container (`totalWords * 3 = ~120vh`), the progress spreads too thin across too much scroll distance.
-2. **No overlap in word ranges** — each word occupies a tiny `1/totalWords` slice, making transitions feel abrupt rather than smooth.
-3. **Container height formula** `totalWords * 3` is excessive for ~40 words, creating unnecessary scroll distance.
+**Single fix**: Reverse the z-index so later cards stack on top of earlier ones:
 
-### Changes — `src/components/landing/ScrollTextReveal.tsx`
+```
+// Before
+style={{ top: `${topOffset}px`, zIndex: total - index }}
 
-1. **Reduce container height** to `200vh` (fixed) — enough for the animation without excessive scrolling.
-2. **Fix scroll offset** to `["start 0.35", "end start"]` so the reveal begins when the section is near center and completes as it scrolls out.
-3. **Add overlapping word ranges** — each word starts revealing slightly before the previous one finishes, creating a smoother wave effect:
-   ```
-   start = (index / totalWords) * 0.85
-   end = start + (1 / totalWords) * 1.5
-   ```
-4. **Remove fade-out at end** — let the section scroll away naturally instead of fading.
-5. **Increase base opacity** from `0.15` to `0.12` for dimmed words (matching the reference's contrast).
+// After  
+style={{ top: `${topOffset}px`, zIndex: index + 1 }}
+```
 
-### Changes — `src/pages/LandingPage.tsx`
-
-6. **Remove any extra padding/margin** around the `<ScrollTextReveal>` wrapper to tighten spacing between adjacent sections.
-
-### Technical Details
-
-- The key fix is ensuring `scrollYProgress` maps 0→1 across a reasonable scroll distance (~200vh) with the offset tuned so the animation starts mid-viewport entry.
-- Overlapping ranges prevent the "popcorn" effect where words snap on one-at-a-time too quickly.
+This ensures as you scroll, each new card rises above the previous one, creating the layered stacking effect shown in the reference image.
 
