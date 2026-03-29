@@ -1,76 +1,33 @@
 
 
-## Upgrade Section-by-Section Animations (AttendFlow-Style)
+## Fix ScrollTextReveal Scroll Sync and Spacing
 
-The current landing page uses basic `fadeInUp` and `stagger` variants everywhere. The plan upgrades **each section** with distinct, polished animations matching AttendFlow's patterns.
+**Problem**: The word-by-word reveal is not properly synchronized with scrolling, and there's excessive spacing around the section.
 
-### Section-by-Section Animation Spec
+### Root Causes
 
-| # | Section | Current Animation | Upgraded Animation |
-|---|---------|------------------|--------------------|
-| 1 | **Site frame** | Static CSS | Fade-in on page load (opacity 0→1 over 1s with 0.5s delay) |
-| 2 | **Floating nav** | None | Slide down from -20px + fade-in on mount, `backdrop-blur` transition on scroll |
-| 3 | **Hero badge** | Basic fadeInUp | `fadeInBlur`: opacity 0→1, y 20→0, filter blur(8px)→blur(0), 0.6s ease-out |
-| 4 | **Hero headline** | Single fadeInUp | **Line-by-line stagger**: each line reveals independently with 0.2s delay between lines, blur(6px)→clear |
-| 5 | **Hero CTA buttons** | Basic fade | Scale-in from 0.9→1 + opacity, with spring physics (`stiffness: 400, damping: 25`) |
-| 6 | **Demo mockup** | opacity+y(60) | Scale 0.95→1 + y(80→0) + blur(12px→0), custom cubic-bezier, 0.8s duration, 1s delay |
-| 7 | **Marketplace carousel** | CSS marquee only | Add `whileInView` fade-in for the label; marquee already has CSS `@keyframes` |
-| 8 | **Result counters** | fadeInUp + stagger | Add `whileHover={{ scale: 1.05, y: -4 }}` with spring transition; keep count-up animation |
-| 9 | **Bento grid cards** | fadeInUp + stagger | `fadeInBlur` (blur entrance) + `whileHover={{ scale: 1.03, y: -6, boxShadow: "0 0 40px hsl(78 100% 50%/0.15)" }}` with spring transition |
-| 10 | **Problem items** | x(-20) slide-in | Keep staggered slide-in; add subtle `whileHover={{ x: 4 }}` nudge |
-| 11 | **Dashboard cards** | fadeInUp + stagger | `fadeInBlur` + `whileHover={{ scale: 1.04, y: -4 }}` spring hover |
-| 12 | **How It Works steps** | fadeInUp + stagger | Scale-in from 0.9 + connecting arrow fade-in separately with longer delay |
-| 13 | **File type cards** | fadeInUp + stagger | Add `whileHover={{ scale: 1.05, rotate: 1 }}` micro-interaction |
-| 14 | **Pricing cards** | fadeInUp + stagger | `fadeInBlur` + highlighted card gets a `whileHover={{ scale: 1.05 }}` with glow shadow |
-| 15 | **Objection cards** | fadeInUp + stagger | `fadeInBlur` + `whileHover={{ y: -4 }}` |
-| 16 | **FAQ accordion** | AnimatePresence height | Add spring physics (`type: "spring", stiffness: 300, damping: 25`) to open/close; icon rotation gets spring too |
-| 17 | **Final CTA** | None (static) | `whileInView` scale 0.96→1 + opacity with radial glow pulse (`@keyframes glow-pulse`) |
-| 18 | **Footer** | No changes | No changes |
+1. **Scroll offset `["start start", "end start"]`** means tracking starts when container top hits viewport top and ends when container bottom hits viewport top. With a very tall container (`totalWords * 3 = ~120vh`), the progress spreads too thin across too much scroll distance.
+2. **No overlap in word ranges** — each word occupies a tiny `1/totalWords` slice, making transitions feel abrupt rather than smooth.
+3. **Container height formula** `totalWords * 3` is excessive for ~40 words, creating unnecessary scroll distance.
 
-### New Animation Variants to Add
+### Changes — `src/components/landing/ScrollTextReveal.tsx`
 
-```text
-fadeInBlur:
-  hidden:  { opacity: 0, y: 30, filter: "blur(8px)" }
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7 } }
+1. **Reduce container height** to `200vh` (fixed) — enough for the animation without excessive scrolling.
+2. **Fix scroll offset** to `["start 0.35", "end start"]` so the reveal begins when the section is near center and completes as it scrolls out.
+3. **Add overlapping word ranges** — each word starts revealing slightly before the previous one finishes, creating a smoother wave effect:
+   ```
+   start = (index / totalWords) * 0.85
+   end = start + (1 / totalWords) * 1.5
+   ```
+4. **Remove fade-out at end** — let the section scroll away naturally instead of fading.
+5. **Increase base opacity** from `0.15` to `0.12` for dimmed words (matching the reference's contrast).
 
-heroLineReveal:
-  hidden:  { opacity: 0, y: 20, filter: "blur(6px)" }
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5 } }
-  (parent stagger: 0.2s between lines)
+### Changes — `src/pages/LandingPage.tsx`
 
-scaleSpring:
-  whileHover: { scale: 1.03, y: -6 }
-  transition: { type: "spring", stiffness: 300, damping: 20 }
+6. **Remove any extra padding/margin** around the `<ScrollTextReveal>` wrapper to tighten spacing between adjacent sections.
 
-cardGlowHover:
-  whileHover: { 
-    scale: 1.03, 
-    boxShadow: "0 0 40px -8px hsl(78 100% 50% / 0.2)" 
-  }
-```
+### Technical Details
 
-### CSS Additions (`src/index.css`)
-
-- `@keyframes glow-pulse` for the final CTA radial glow pulsing
-- `.animate-reveal` class for hero section clip-path/scale entrance
-- Update `.glass-card:hover` to include `transform: translateY(-2px)` as CSS fallback
-
-### Hero Text Restructure
-
-Current hero headline is a single `<h1>` block. Will be split into 3-4 `<motion.span>` elements wrapped in a stagger container so each line animates independently:
-
-```text
-Line 1: "Stop Guessing."         → delay 0.0s
-Line 2: "Start Seeing."          → delay 0.2s  
-Line 3: "Your Amazon PPC"        → delay 0.4s
-Line 4: "Analytics Suite"        → delay 0.6s (gradient text)
-```
-
-### Files Modified
-- `src/pages/LandingPage.tsx` — all animation variants + per-section motion props
-- `src/index.css` — glow-pulse keyframe, reveal animation, glass-card hover refinement
-
-### No Changes To
-- Dashboard pages, Index.tsx, routing, content data arrays, footer
+- The key fix is ensuring `scrollYProgress` maps 0→1 across a reasonable scroll distance (~200vh) with the offset tuned so the animation starts mid-viewport entry.
+- Overlapping ranges prevent the "popcorn" effect where words snap on one-at-a-time too quickly.
 
