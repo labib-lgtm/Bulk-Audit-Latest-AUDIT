@@ -144,7 +144,7 @@ const StackingCard = ({ index, total, icon: Icon, step, title, desc, features }:
       viewport={{ once: true, amount: 0.3 }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       className="sticky mb-8"
-      style={{ top: `${topOffset}px`, zIndex: total - index }}
+      style={{ top: `${topOffset}px`, zIndex: index + 1 }}
     >
       <div className="glass-card rounded-2xl sm:rounded-3xl p-6 sm:p-10 border border-border/30 hover:border-primary/30 transition-all duration-500 shadow-2xl shadow-black/20">
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-10 items-start">
