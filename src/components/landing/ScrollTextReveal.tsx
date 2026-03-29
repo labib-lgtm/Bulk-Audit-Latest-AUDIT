@@ -8,8 +8,7 @@ interface WordProps {
 }
 
 const RevealWord = ({ word, range, scrollYProgress }: WordProps) => {
-  const opacity = useTransform(scrollYProgress, range, [0.1, 1]);
-
+  const opacity = useTransform(scrollYProgress, range, [0.15, 1]);
   const isEmoji = /[✦✧⚡★●◆✶✹]/.test(word);
 
   return (
@@ -40,13 +39,14 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
 
   const totalWords = allWords.length;
 
-  // Build word ranges: each word reveals over a portion of scroll
-  // Words start revealing early and finish quickly for a tight sync
   const getWordRange = (index: number): [number, number] => {
     const start = index / totalWords;
     const end = (index + 1) / totalWords;
     return [start, end];
   };
+
+  // Fade out entire section at the very end of scroll
+  const sectionOpacity = useTransform(scrollYProgress, [0.85, 1], [1, 0]);
 
   let globalIndex = 0;
 
@@ -54,7 +54,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
     <div
       ref={containerRef}
       className="relative"
-      style={{ height: `${Math.max(200, totalWords * 4)}vh` }}
+      style={{ height: `${Math.max(150, totalWords * 3)}vh` }}
     >
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         {/* Background glow */}
@@ -62,20 +62,23 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 70% 50% at 50% 50%, hsl(var(--primary) / 0.2) 0%, transparent 70%)",
+              "radial-gradient(ellipse 70% 50% at 50% 50%, hsl(var(--primary) / 0.15) 0%, transparent 70%)",
           }}
         />
 
         {/* Content */}
-        <div className="relative max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
+        <motion.div
+          className="relative max-w-4xl mx-auto px-6 sm:px-10 lg:px-16"
+          style={{ opacity: sectionOpacity }}
+        >
           {paragraphs.map((paragraph, pIndex) => {
             const words = paragraph.split(" ");
 
             return (
               <p
                 key={pIndex}
-                className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium leading-[1.4] tracking-[-0.01em] text-foreground ${
-                  pIndex > 0 ? "mt-8 sm:mt-10" : ""
+                className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-[1.35] tracking-[-0.01em] text-foreground ${
+                  pIndex > 0 ? "mt-6 sm:mt-8" : ""
                 }`}
                 style={{ fontFamily: "'Sora', sans-serif" }}
               >
@@ -94,7 +97,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
               </p>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
