@@ -653,6 +653,11 @@ const LandingPage = () => {
           </motion.section>
 
           {/* ═══════════════════════════════════════════════════════
+             FEATURE SHOWCASE SECTIONS
+             ═══════════════════════════════════════════════════════ */}
+          <FeatureShowcaseSection features={featureShowcases} />
+
+          {/* ═══════════════════════════════════════════════════════
              FEATURE BENTO GRID
              ═══════════════════════════════════════════════════════ */}
           <section id="features" className="mb-24 sm:mb-32">
