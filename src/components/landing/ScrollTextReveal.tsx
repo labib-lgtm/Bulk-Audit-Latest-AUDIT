@@ -40,8 +40,10 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
   const totalWords = allWords.length;
 
   const getWordRange = (index: number): [number, number] => {
-    const start = (index / totalWords) * 0.85;
-    const end = Math.min(start + (1 / totalWords) * 1.5, 1);
+    const wordSpan = 0.08;
+    const usableRange = 1 - wordSpan;
+    const start = (index / (totalWords - 1)) * usableRange;
+    const end = start + wordSpan;
     return [start, end];
   };
 
