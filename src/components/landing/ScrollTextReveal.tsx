@@ -56,14 +56,6 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
       style={{ height: "200vh" }}
     >
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
-        {/* Background glow */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 50% at 50% 50%, hsl(var(--primary) / 0.15) 0%, transparent 70%)",
-          }}
-        />
 
         {/* Content */}
         <div className="relative max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
