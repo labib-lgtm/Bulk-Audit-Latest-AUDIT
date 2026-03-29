@@ -459,6 +459,16 @@ const LandingPage = () => {
         </motion.section>
 
         {/* ═══════════════════════════════════════════════════════
+           SCROLL TEXT REVEAL
+           ═══════════════════════════════════════════════════════ */}
+        <ScrollTextReveal
+          paragraphs={[
+            "Amazon PPC got too complicated. ✦ Too many campaigns. Too many spreadsheets. ✦ Too many disconnected metrics. ✦ What should feel simple — optimizing bids, tracking ACOS, finding wasted spend — ended up scattered everywhere.",
+            "So we stripped it back. ✦ And organized everything around one thing: Your profitability. ✦"
+          ]}
+        />
+
+        {/* ═══════════════════════════════════════════════════════
            MARKETPLACE CAROUSEL
            ═══════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-20 px-4">
