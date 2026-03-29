@@ -366,6 +366,7 @@ const LandingPage = () => {
   ];
 
 
+  const objections = [
     { icon: Shield, q: "Is my data safe?", a: "100%. Files are processed entirely in your browser using client-side JavaScript. Nothing uploads to any server." },
     { icon: Zap, q: "Do I need API access?", a: "Nope. Just the bulk files you already download from Seller Central. No integrations, no developer." },
     { icon: Users, q: "Works for agencies?", a: "Built for agencies. Analyze any client's data in seconds, switch workspaces, invite team members." },
