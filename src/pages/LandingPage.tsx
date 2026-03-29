@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
 import ScrollTextReveal from "@/components/landing/ScrollTextReveal";
+import ZoomTunnel from "@/components/landing/ZoomTunnel";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence, Variants, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 
