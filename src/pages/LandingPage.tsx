@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
 import ScrollTextReveal from "@/components/landing/ScrollTextReveal";
+import ZoomTunnel from "@/components/landing/ZoomTunnel";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence, Variants, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 
@@ -550,6 +551,11 @@ const LandingPage = () => {
             </motion.div>
           </motion.div>
         </section>
+
+        {/* ═══════════════════════════════════════════════════════
+           ZOOM TUNNEL
+           ═══════════════════════════════════════════════════════ */}
+        <ZoomTunnel />
 
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
 
