@@ -10,6 +10,7 @@ import {
   Lock, Globe
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
+import ScrollTextReveal from "@/components/landing/ScrollTextReveal";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence, Variants, useScroll, useTransform, useSpring, useMotionValueEvent } from "framer-motion";
 
@@ -456,6 +457,16 @@ const LandingPage = () => {
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full" aria-hidden="true" />
           </motion.div>
         </motion.section>
+
+        {/* ═══════════════════════════════════════════════════════
+           SCROLL TEXT REVEAL
+           ═══════════════════════════════════════════════════════ */}
+        <ScrollTextReveal
+          paragraphs={[
+            "Amazon PPC got too complicated. ✦ Too many campaigns. Too many spreadsheets. ✦ Too many disconnected metrics. ✦ What should feel simple — optimizing bids, tracking ACOS, finding wasted spend — ended up scattered everywhere.",
+            "So we stripped it back. ✦ And organized everything around one thing: Your profitability. ✦"
+          ]}
+        />
 
         {/* ═══════════════════════════════════════════════════════
            MARKETPLACE CAROUSEL
