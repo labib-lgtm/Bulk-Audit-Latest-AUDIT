@@ -8,7 +8,7 @@ interface WordProps {
 }
 
 const RevealWord = ({ word, range, scrollYProgress }: WordProps) => {
-  const opacity = useTransform(scrollYProgress, range, [0.15, 1]);
+  const opacity = useTransform(scrollYProgress, range, [0.12, 1]);
   const isEmoji = /[✦✧⚡★●◆✶✹]/.test(word);
 
   return (
@@ -30,7 +30,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
 
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"],
+    offset: ["start 0.35", "end start"],
   });
 
   const allWords = useMemo(() => {
@@ -40,13 +40,10 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
   const totalWords = allWords.length;
 
   const getWordRange = (index: number): [number, number] => {
-    const start = index / totalWords;
-    const end = (index + 1) / totalWords;
+    const start = (index / totalWords) * 0.85;
+    const end = Math.min(start + (1 / totalWords) * 1.5, 1);
     return [start, end];
   };
-
-  // Fade out entire section at the very end of scroll
-  const sectionOpacity = useTransform(scrollYProgress, [0.85, 1], [1, 0]);
 
   let globalIndex = 0;
 
@@ -54,7 +51,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
     <div
       ref={containerRef}
       className="relative"
-      style={{ height: `${Math.max(150, totalWords * 3)}vh` }}
+      style={{ height: "200vh" }}
     >
       <div className="sticky top-0 h-screen flex items-center justify-center overflow-hidden">
         {/* Background glow */}
@@ -67,10 +64,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
         />
 
         {/* Content */}
-        <motion.div
-          className="relative max-w-4xl mx-auto px-6 sm:px-10 lg:px-16"
-          style={{ opacity: sectionOpacity }}
-        >
+        <div className="relative max-w-4xl mx-auto px-6 sm:px-10 lg:px-16">
           {paragraphs.map((paragraph, pIndex) => {
             const words = paragraph.split(" ");
 
@@ -97,7 +91,7 @@ const ScrollTextReveal = ({ paragraphs }: ScrollTextRevealProps) => {
               </p>
             );
           })}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
