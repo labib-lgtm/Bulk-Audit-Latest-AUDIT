@@ -53,25 +53,33 @@ const ZoomTunnel = () => {
             viewBox="0 0 1000 600"
             preserveAspectRatio="xMidYMid slice"
           >
-            {LINES.map((angle, i) => {
-              const rad = (angle * Math.PI) / 180;
-              const cx = 500, cy = 300;
-              const len = 800;
-              const x2 = cx + Math.cos(rad) * len;
-              const y2 = cy + Math.sin(rad) * len;
-              return (
-                <line
-                  key={i}
-                  x1={cx}
-                  y1={cy}
-                  x2={x2}
-                  y2={y2}
-                  stroke="hsl(var(--primary))"
-                  strokeWidth="0.8"
-                  opacity="0.5"
-                />
-              );
-            })}
+            <defs>
+              <mask id="line-mask">
+                <rect width="1000" height="600" fill="white" />
+                <ellipse cx="500" cy="300" rx="220" ry="80" fill="black" />
+              </mask>
+            </defs>
+            <g mask="url(#line-mask)">
+              {LINES.map((angle, i) => {
+                const rad = (angle * Math.PI) / 180;
+                const cx = 500, cy = 300;
+                const len = 800;
+                const x2 = cx + Math.cos(rad) * len;
+                const y2 = cy + Math.sin(rad) * len;
+                return (
+                  <line
+                    key={i}
+                    x1={cx}
+                    y1={cy}
+                    x2={x2}
+                    y2={y2}
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="0.8"
+                    opacity="0.5"
+                  />
+                );
+              })}
+            </g>
           </svg>
 
           {/* Nested rectangles */}
