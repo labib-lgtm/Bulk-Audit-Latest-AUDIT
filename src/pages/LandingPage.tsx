@@ -229,9 +229,18 @@ const LandingPage = () => {
   ];
 
   const painPills = [
-    "Lost ad spend?", "TACOS invisible?", "No dayparting?", "Keyword cannibalization?",
-    "Manual reporting?", "Wasted budget?", "No AI insights?", "Spreadsheet chaos?",
-    "ACOS misleading?", "No profit view?", "Buried data?", "Zero automation?",
+    { icon: DollarSign, label: "Lost ad spend?" },
+    { icon: Eye, label: "TACOS invisible?" },
+    { icon: CalendarClock, label: "No dayparting?" },
+    { icon: GitBranch, label: "Keyword cannibalization?" },
+    { icon: FileSpreadsheet, label: "Manual reporting?" },
+    { icon: AlertTriangle, label: "Wasted budget?" },
+    { icon: Brain, label: "No AI insights?" },
+    { icon: Layers, label: "Spreadsheet chaos?" },
+    { icon: Target, label: "ACOS misleading?" },
+    { icon: PieChart, label: "No profit view?" },
+    { icon: Search, label: "Buried data?" },
+    { icon: Gauge, label: "Zero automation?" },
   ];
 
   const stackingFeatures = [
@@ -490,32 +499,55 @@ const LandingPage = () => {
         {/* ═══════════════════════════════════════════════════════
            PAIN POINT MARQUEE (Scrolling pills)
            ═══════════════════════════════════════════════════════ */}
-        <section className="py-12 sm:py-16 overflow-hidden">
+        <section className="py-20 sm:py-28 px-4 sm:px-6">
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial="hidden"
+            whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
-            transition={{ duration: 0.8 }}
+            variants={stagger}
+            className="max-w-5xl mx-auto"
           >
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur}
-              className="text-center mb-8"
-            >
-              <p className="text-muted-foreground text-sm mb-2">Stuff That Shouldn't Happen in 2026</p>
-              <h2 className="text-2xl sm:text-3xl font-black">
-                Amazon Ads Shouldn't Be <span className="text-primary">This Hard.</span>
-              </h2>
+            {/* Badge */}
+            <motion.div variants={fadeInUp} className="flex justify-center mb-6">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/60 border border-border text-sm font-medium text-foreground">
+                <AlertTriangle className="w-4 h-4" />
+                Stuff That Shouldn't Happen in 2026
+              </span>
             </motion.div>
-            <div className="marquee max-w-6xl mx-auto">
-              <div className="marquee-track" style={{ animationDuration: "25s" }}>
-                {[...painPills, ...painPills].map((pill, i) => (
-                  <span key={i} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-destructive/8 border border-destructive/15 text-destructive text-sm font-medium whitespace-nowrap select-none">
-                    <X className="w-3.5 h-3.5" />
-                    {pill}
-                  </span>
-                ))}
-              </div>
-            </div>
+
+            {/* Headline */}
+            <motion.h2 variants={fadeInUp} className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+              Amazon Ads shouldn't be{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">this hard</span>.
+            </motion.h2>
+
+            {/* Subtitle */}
+            <motion.p variants={fadeInUp} className="text-center text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto mb-12">
+              Your campaigns deserve better than scattered spreadsheets, hidden TACOS, and manual chaos.
+            </motion.p>
+
+            {/* Pain pill grid */}
+            <motion.div
+              variants={stagger}
+              className="flex flex-wrap justify-center gap-3 sm:gap-4 max-w-4xl mx-auto"
+            >
+              {painPills.map((pill, i) => {
+                const Icon = pill.icon;
+                return (
+                  <motion.span
+                    key={i}
+                    variants={fadeInUp}
+                    whileHover={{ scale: 1.05, transition: { type: "spring", stiffness: 400, damping: 15 } }}
+                    className="inline-flex items-center gap-2.5 px-5 py-3 rounded-full bg-card border border-border/60 text-sm sm:text-base font-medium text-foreground shadow-sm cursor-default select-none hover:border-primary/30 hover:shadow-md transition-colors"
+                  >
+                    <span className="flex items-center justify-center w-7 h-7 rounded-full bg-primary/10">
+                      <Icon className="w-3.5 h-3.5 text-primary" />
+                    </span>
+                    {pill.label}
+                  </motion.span>
+                );
+              })}
+            </motion.div>
           </motion.div>
         </section>
 
