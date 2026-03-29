@@ -229,9 +229,18 @@ const LandingPage = () => {
   ];
 
   const painPills = [
-    "Lost ad spend?", "TACOS invisible?", "No dayparting?", "Keyword cannibalization?",
-    "Manual reporting?", "Wasted budget?", "No AI insights?", "Spreadsheet chaos?",
-    "ACOS misleading?", "No profit view?", "Buried data?", "Zero automation?",
+    { icon: DollarSign, label: "Lost ad spend?" },
+    { icon: Eye, label: "TACOS invisible?" },
+    { icon: CalendarClock, label: "No dayparting?" },
+    { icon: GitBranch, label: "Keyword cannibalization?" },
+    { icon: FileSpreadsheet, label: "Manual reporting?" },
+    { icon: AlertTriangle, label: "Wasted budget?" },
+    { icon: Brain, label: "No AI insights?" },
+    { icon: Layers, label: "Spreadsheet chaos?" },
+    { icon: Target, label: "ACOS misleading?" },
+    { icon: PieChart, label: "No profit view?" },
+    { icon: Search, label: "Buried data?" },
+    { icon: Gauge, label: "Zero automation?" },
   ];
 
   const stackingFeatures = [
