@@ -25,7 +25,9 @@ import {
   ShieldAlert,
   Clock,
   Sparkles,
-  Loader2
+  Loader2,
+  PanelLeftClose,
+  PanelLeftOpen
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
