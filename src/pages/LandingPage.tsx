@@ -870,7 +870,7 @@ const LandingPage = () => {
         {/* ═══════════════════════════════════════════════════════
            FOOTER
            ═══════════════════════════════════════════════════════ */}
-        <footer className="bg-[hsl(240,14%,8%)] pt-16 pb-6 px-6">
+        <footer className="bg-black pt-16 pb-6 px-6">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 mb-12">
               <div className="lg:col-span-1">
