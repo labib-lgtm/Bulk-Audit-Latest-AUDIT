@@ -183,12 +183,12 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-sidebar transform transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'} border-r border-sidebar-border flex flex-col`}>
+      <aside className={`fixed inset-y-0 left-0 z-50 bg-sidebar transform transition-all duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${isSidebarCollapsed ? 'w-[72px]' : 'w-72'} ${isMobileMenuOpen ? 'translate-x-0 w-72' : '-translate-x-full'} border-r border-sidebar-border flex flex-col`}>
         
         {/* Logo Area */}
-        <div className="flex items-center justify-between h-20 px-6 border-b border-sidebar-border shrink-0">
-          <div className="flex items-center">
-            <img src={lynxLogoWhite} alt="Lynx Media" className="h-10 w-auto" />
+        <div className="flex items-center justify-between h-20 px-4 border-b border-sidebar-border shrink-0">
+          <div className={`flex items-center overflow-hidden transition-all duration-300 ${isSidebarCollapsed && !isMobileMenuOpen ? 'w-10 justify-center' : ''}`}>
+            <img src={lynxLogoWhite} alt="Lynx Media" className={`transition-all duration-300 ${isSidebarCollapsed && !isMobileMenuOpen ? 'h-8 w-auto' : 'h-10 w-auto'}`} />
           </div>
           <button 
             onClick={() => setIsMobileMenuOpen(false)} 
@@ -198,14 +198,28 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           </button>
         </div>
 
+        {/* Collapse Toggle - Desktop only */}
+        <div className="hidden lg:flex justify-end px-2 py-2 shrink-0">
+          <button
+            onClick={toggleSidebar}
+            className="w-8 h-8 flex items-center justify-center rounded-lg text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all"
+            title={isSidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isSidebarCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
+        </div>
+
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-          <div className="px-3 mb-4 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
-            Dashboards
-          </div>
+        <nav className="flex-1 px-2 py-2 space-y-1 overflow-y-auto custom-scrollbar">
+          {!isSidebarCollapsed && (
+            <div className="px-3 mb-4 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
+              Dashboards
+            </div>
+          )}
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
+            const collapsed = isSidebarCollapsed && !isMobileMenuOpen;
             return (
               <button
                 key={item.id}
@@ -213,21 +227,22 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                   setCurrentView(item.id);
                   setIsMobileMenuOpen(false);
                 }}
-                className={`relative flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                className={`relative flex items-center w-full ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'} text-sm font-medium rounded-xl transition-all duration-200 group ${
                   isActive
                     ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_30px_-5px_hsl(var(--sidebar-primary)/0.5)]'
                     : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                 }`}
+                title={collapsed ? item.label : undefined}
               >
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all ${
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${collapsed ? '' : 'mr-3'} transition-all ${
                   isActive 
                     ? 'bg-sidebar-primary-foreground/10' 
                     : 'bg-transparent group-hover:bg-sidebar-primary/10'
                 }`}>
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                 </div>
-                <span className="truncate">{item.label}</span>
-                {isActive && (
+                {!collapsed && <span className="truncate">{item.label}</span>}
+                {isActive && !collapsed && (
                   <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary-foreground rounded-r-full" />
                 )}
               </button>
@@ -237,12 +252,15 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           {/* Admin Section */}
           {isAdmin && (
             <>
-              <div className="px-3 mb-4 mt-8 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
-                Admin
-              </div>
+              {!isSidebarCollapsed && (
+                <div className="px-3 mb-4 mt-8 text-[10px] font-bold text-sidebar-foreground/60 uppercase tracking-[0.2em] font-heading">
+                  Admin
+                </div>
+              )}
               {ADMIN_NAV_ITEMS.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id;
+                const collapsed = isSidebarCollapsed && !isMobileMenuOpen;
                 return (
                   <button
                     key={item.id}
@@ -250,21 +268,22 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
                       setCurrentView(item.id);
                       setIsMobileMenuOpen(false);
                     }}
-                    className={`relative flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 group ${
+                    className={`relative flex items-center w-full ${collapsed ? 'justify-center px-0 py-2.5' : 'px-3 py-2.5'} text-sm font-medium rounded-xl transition-all duration-200 group ${
                       isActive
                         ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-[0_0_30px_-5px_hsl(var(--sidebar-primary)/0.5)]'
                         : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
                     }`}
+                    title={collapsed ? item.label : undefined}
                   >
-                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center mr-3 transition-all ${
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${collapsed ? '' : 'mr-3'} transition-all ${
                       isActive 
                         ? 'bg-sidebar-primary-foreground/10' 
                         : 'bg-transparent group-hover:bg-sidebar-primary/10'
                     }`}>
                       <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/60 group-hover:text-sidebar-primary'}`} strokeWidth={isActive ? 2.5 : 2} />
                     </div>
-                    <span className="truncate">{item.label}</span>
-                    {isActive && (
+                    {!collapsed && <span className="truncate">{item.label}</span>}
+                    {isActive && !collapsed && (
                       <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-sidebar-primary-foreground rounded-r-full" />
                     )}
                   </button>
@@ -274,8 +293,8 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           )}
         </nav>
         
-        {/* Workspace Controls */}
-        {(onExport || onImport) && (
+        {/* Workspace Controls - hidden when collapsed */}
+        {(onExport || onImport) && !isSidebarCollapsed && (
           <div className="px-3 pb-3 shrink-0">
             <div className="bg-sidebar-accent/50 rounded-2xl p-3 border border-sidebar-border/50 mb-2">
               <div className="flex items-center gap-2 mb-3 px-1">
@@ -298,8 +317,8 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
           </div>
         )}
 
-        {/* Reset Button */}
-        {onReset && (
+        {/* Reset Button - hidden when collapsed */}
+        {onReset && !isSidebarCollapsed && (
           <div className="px-3 pb-3 shrink-0">
             <button
               onClick={onReset}
@@ -312,36 +331,51 @@ export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, chi
 
         {/* User / Footer */}
         <div className="p-3 border-t border-sidebar-border shrink-0">
-          <div className="flex items-center gap-3 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border/50">
-            <div className="relative">
+          {isSidebarCollapsed && !isMobileMenuOpen ? (
+            <div className="flex flex-col items-center gap-2">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-brand-600 flex items-center justify-center text-sm font-bold text-sidebar-primary-foreground">
                 {user?.email?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-sidebar" />
+              <button
+                onClick={signOut}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all"
+                title="Sign out"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.email || 'User'}</p>
-              <div className="flex items-center gap-1.5 mt-0.5">
-                {isAdmin ? (
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500/50 text-amber-400 bg-amber-500/10 font-medium">
-                    <Crown className="w-2.5 h-2.5 mr-1" />
-                    Admin
-                  </Badge>
-                ) : (
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-sidebar-primary/50 text-sidebar-primary bg-sidebar-primary/10 font-medium">
-                    {role || 'User'}
-                  </Badge>
-                )}
+          ) : (
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-sidebar-accent/50 border border-sidebar-border/50">
+              <div className="relative">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sidebar-primary to-brand-600 flex items-center justify-center text-sm font-bold text-sidebar-primary-foreground">
+                  {user?.email?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-sidebar" />
               </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.email || 'User'}</p>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  {isAdmin ? (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-amber-500/50 text-amber-400 bg-amber-500/10 font-medium">
+                      <Crown className="w-2.5 h-2.5 mr-1" />
+                      Admin
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-sidebar-primary/50 text-sidebar-primary bg-sidebar-primary/10 font-medium">
+                      {role || 'User'}
+                    </Badge>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={signOut}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all"
+                title="Sign out"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
-            <button
-              onClick={signOut}
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all"
-              title="Sign out"
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
+          )}
         </div>
       </aside>
 
