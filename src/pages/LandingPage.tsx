@@ -10,6 +10,7 @@ import {
   Lock, Globe
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
+import dashboardPreview from "@/assets/dashboard-preview.jpg";
 import ScrollTextReveal from "@/components/landing/ScrollTextReveal";
 import ZoomTunnel from "@/components/landing/ZoomTunnel";
 import FeatureShowcaseSection from "@/components/landing/FeatureShowcaseSection";
@@ -539,12 +540,14 @@ const LandingPage = () => {
                   <div className="h-5 rounded-full bg-muted/30 max-w-xs mx-auto" />
                 </div>
               </div>
-              <div className="rounded-xl overflow-hidden bg-card aspect-[16/9] flex items-center justify-center">
-                <div className="text-center">
-                  <Monitor className="w-16 h-16 text-primary/30 mx-auto mb-4" />
-                  <p className="text-muted-foreground text-sm">Executive Dashboard Preview</p>
-                  <p className="text-muted-foreground/50 text-xs mt-1">13 dashboards • TACOS • AI Insights</p>
-                </div>
+              <div className="rounded-xl overflow-hidden bg-card aspect-[16/9]">
+                <img 
+                  src={dashboardPreview} 
+                  alt="Executive Dashboard Preview showing Amazon PPC analytics with spend, sales, ACOS, and ROAS metrics"
+                  className="w-full h-full object-cover object-top"
+                  width={1920}
+                  height={1080}
+                />
               </div>
             </div>
             <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-3/4 h-16 bg-primary/10 blur-[60px] rounded-full" aria-hidden="true" />
