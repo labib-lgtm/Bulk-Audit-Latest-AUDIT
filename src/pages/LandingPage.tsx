@@ -437,7 +437,7 @@ const LandingPage = () => {
             <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
               <a href="#features" className="hover:text-foreground transition-colors">Features</a>
               <a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a>
-              <a href="#pricing" className="hover:text-foreground transition-colors">Pricing</a>
+              
               <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
@@ -645,15 +645,6 @@ const LandingPage = () => {
 
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
 
-          {/* ═══════════════════════════════════════════════════════
-             RESULTS COUNTER STRIP
-             ═══════════════════════════════════════════════════════ */}
-          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-            className="mb-24 sm:mb-32 grid sm:grid-cols-3 gap-4 sm:gap-6">
-            <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
-            <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
-            <ResultCard metric={13} suffix=" dashboards" description="from a single bulk file upload" icon={BarChart3} />
-          </motion.section>
 
           {/* ═══════════════════════════════════════════════════════
              FEATURE SHOWCASE SECTIONS
@@ -801,45 +792,6 @@ const LandingPage = () => {
                 See All Dashboards with Demo Data
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
-            </motion.div>
-          </section>
-
-          {/* ═══════════════════════════════════════════════════════
-             PRICING
-             ═══════════════════════════════════════════════════════ */}
-          <section id="pricing" className="mb-24 sm:mb-32">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }} variants={fadeInBlur} className="text-center mb-12">
-              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-3">Pricing</p>
-              <h2 className="text-3xl sm:text-4xl font-black mb-4">
-                Start Free. <span className="text-primary">Scale When Ready.</span>
-              </h2>
-              <p className="text-muted-foreground max-w-xl mx-auto">Get massive value for $0. Upgrade only when you need team features or AI.</p>
-            </motion.div>
-            <motion.div variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}
-              className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              {tiers.map((tier, i) => (
-                <motion.div key={i} variants={fadeInBlur}
-                  whileHover={{ scale: tier.highlight ? 1.05 : 1.03, y: -6, boxShadow: tier.highlight ? "0 0 60px -10px hsl(78 100% 50% / 0.25)" : undefined, transition: springHover }}
-                  className={`p-6 sm:p-8 rounded-2xl border transition-all ${tier.highlight ? "border-primary glass-card shadow-lg shadow-primary/10 bg-gradient-to-b from-primary/10 to-card/60" : "border-border/30 glass-card"}`}>
-                  <h3 className="text-lg font-bold mb-2">{tier.name}</h3>
-                  <p className="text-3xl font-black text-foreground mb-1">
-                    {tier.price === "0" ? "$0" : tier.price}
-                    {tier.period && <span className="text-sm font-normal text-muted-foreground">{tier.period}</span>}
-                  </p>
-                  <ul className="space-y-2 mt-4 mb-6">
-                    {tier.features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-2 text-sm">
-                        <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                        <span className="text-muted-foreground">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button onClick={() => navigate("/auth")}
-                    className={`w-full rounded-xl ${tier.highlight ? "bg-primary text-primary-foreground hover:bg-primary/90 btn-glow" : "bg-muted text-foreground hover:bg-muted/80"}`}>
-                    {tier.cta}
-                  </Button>
-                </motion.div>
-              ))}
             </motion.div>
           </section>
 
