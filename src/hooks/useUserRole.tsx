@@ -57,27 +57,19 @@ export const useUserRole = () => {
         .on(
           'postgres_changes',
           {
-            event: 'DELETE',
-            schema: 'public',
-            table: 'user_roles',
-            filter: `user_id=eq.${user.id}`,
-          },
-          () => {
-            console.log('Access revoked - role deleted');
-            setRole(null);
-          }
-        )
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
+            event: '*',
             schema: 'public',
             table: 'user_roles',
             filter: `user_id=eq.${user.id}`,
           },
           (payload) => {
-            console.log('Role updated:', payload.new);
-            setRole((payload.new as { role: AppRole }).role);
+            if (payload.eventType === 'DELETE') {
+              console.log('Access revoked - role deleted');
+              setRole(null);
+            } else if (payload.eventType === 'UPDATE') {
+              console.log('Role updated:', payload.new);
+              setRole((payload.new as { role: AppRole }).role);
+            }
           }
         )
         .subscribe();
