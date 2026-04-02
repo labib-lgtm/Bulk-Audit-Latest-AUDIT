@@ -879,11 +879,11 @@ const LandingPage = () => {
                   We'll take you from stuttering sales to #1 in your product category. All while maintaining your brand identity and integrity.
                 </p>
                 <div className="space-y-3 mb-6">
-                  <a href="tel:+17372831902" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Phone className="w-4 h-4 text-primary" /> +1 (737) 283-1902
+                  <a href="tel:+14375751731" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Phone className="w-4 h-4 text-primary" /> +1 (437) 575-1731
                   </a>
-                  <a href="mailto:hello@lynxmedia.com" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                    <Mail className="w-4 h-4 text-primary" /> hello@lynxmedia.com
+                  <a href="mailto:labib@lynxmedia.co" className="flex items-center gap-3 text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    <Mail className="w-4 h-4 text-primary" /> labib@lynxmedia.co
                   </a>
                 </div>
                 <div className="flex gap-3">
