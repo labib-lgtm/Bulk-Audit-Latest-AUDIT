@@ -67,12 +67,22 @@ const ADMIN_NAV_ITEMS = [
 
 export const Layout: React.FC<LayoutProps> = ({ currentView, setCurrentView, children, onReupload, onReset, onExport, onImport }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
+    return localStorage.getItem('sidebar-collapsed') === 'true';
+  });
   const [isAiPanelOpen, setIsAiPanelOpen] = useState(false);
   const [aiAdvice, setAiAdvice] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { user, signOut } = useAuth();
   const { isAdmin, role, hasAccess, isLoading } = useUserRole();
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => {
+      localStorage.setItem('sidebar-collapsed', String(!prev));
+      return !prev;
+    });
+  };
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
