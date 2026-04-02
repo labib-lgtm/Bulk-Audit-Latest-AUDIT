@@ -44,10 +44,16 @@ export const useUserRole = () => {
 
     // Set up realtime listener for access revocation
     const setupRealtimeListener = () => {
-      if (!user || channelRef.current) return;
+      if (!user) return;
 
-      channelRef.current = supabase
-        .channel(`user-role-${user.id}`)
+      // Clean up any existing channel first
+      if (channelRef.current) {
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+
+      const channel = supabase
+        .channel(`user-role-${user.id}-${Date.now()}`)
         .on(
           'postgres_changes',
           {
@@ -75,6 +81,8 @@ export const useUserRole = () => {
           }
         )
         .subscribe();
+
+      channelRef.current = channel;
     };
 
     if (!authLoading) {
