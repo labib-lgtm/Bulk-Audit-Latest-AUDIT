@@ -645,15 +645,6 @@ const LandingPage = () => {
 
         <main className="relative max-w-6xl mx-auto px-4 sm:px-6">
 
-          {/* ═══════════════════════════════════════════════════════
-             RESULTS COUNTER STRIP
-             ═══════════════════════════════════════════════════════ */}
-          <motion.section variants={stagger} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}
-            className="mb-24 sm:mb-32 grid sm:grid-cols-3 gap-4 sm:gap-6">
-            <ResultCard metric={4} suffix="+ hrs" description="saved per week on PPC reporting" icon={Clock} />
-            <ResultCard metric={23} suffix="%" description="average reduction in wasted ad spend" icon={TrendingUp} />
-            <ResultCard metric={13} suffix=" dashboards" description="from a single bulk file upload" icon={BarChart3} />
-          </motion.section>
 
           {/* ═══════════════════════════════════════════════════════
              FEATURE SHOWCASE SECTIONS
