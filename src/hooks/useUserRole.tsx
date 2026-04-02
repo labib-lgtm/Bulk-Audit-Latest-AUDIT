@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
@@ -9,22 +9,29 @@ export const useUserRole = () => {
   const [role, setRole] = useState<AppRole | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const mountedRef = useRef(false);
 
-  // Fetch role and set up realtime listener
   useEffect(() => {
-    const fetchRole = async () => {
-      if (!user) {
-        setRole(null);
-        setIsLoading(false);
-        return;
-      }
+    mountedRef.current = true;
 
+    if (authLoading) return;
+
+    if (!user) {
+      setRole(null);
+      setIsLoading(false);
+      return;
+    }
+
+    // Fetch role
+    const fetchRole = async () => {
       try {
         const { data, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
           .maybeSingle();
+
+        if (!mountedRef.current) return;
 
         if (error) {
           console.error('Error fetching user role:', error);
@@ -36,62 +43,50 @@ export const useUserRole = () => {
         }
       } catch (err) {
         console.error('Error fetching user role:', err);
-        setRole(null);
+        if (mountedRef.current) setRole(null);
       } finally {
-        setIsLoading(false);
+        if (mountedRef.current) setIsLoading(false);
       }
     };
 
-    // Set up realtime listener for access revocation
-    const setupRealtimeListener = () => {
-      if (!user) return;
+    fetchRole();
 
-      // Clean up any existing channel first
-      if (channelRef.current) {
-        supabase.removeChannel(channelRef.current);
-        channelRef.current = null;
+    // Set up realtime - build channel fully before subscribing
+    const channelName = `user-role-${user.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const channel = supabase.channel(channelName);
+    
+    channel.on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'user_roles',
+        filter: `user_id=eq.${user.id}`,
+      },
+      (payload) => {
+        if (!mountedRef.current) return;
+        if (payload.eventType === 'DELETE') {
+          setRole(null);
+        } else if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+          setRole((payload.new as { role: AppRole }).role);
+        }
       }
+    );
 
-      const channel = supabase
-        .channel(`user-role-${user.id}-${Date.now()}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'user_roles',
-            filter: `user_id=eq.${user.id}`,
-          },
-          (payload) => {
-            if (payload.eventType === 'DELETE') {
-              console.log('Access revoked - role deleted');
-              setRole(null);
-            } else if (payload.eventType === 'UPDATE') {
-              console.log('Role updated:', payload.new);
-              setRole((payload.new as { role: AppRole }).role);
-            }
-          }
-        )
-        .subscribe();
-
-      channelRef.current = channel;
-    };
-
-    if (!authLoading) {
-      fetchRole();
-      setupRealtimeListener();
-    }
+    channel.subscribe();
+    channelRef.current = channel;
 
     return () => {
+      mountedRef.current = false;
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current);
         channelRef.current = null;
       }
     };
-  }, [user, authLoading]);
+  }, [user?.id, authLoading]);
 
   const hasAccess = role !== null;
-  
+
   return {
     role,
     isAdmin: role === 'admin',
