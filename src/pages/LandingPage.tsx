@@ -435,14 +435,14 @@ const LandingPage = () => {
           <div className="flex items-center gap-4 sm:gap-8">
             <img src={lynxLogo} alt="Lynx Media" className="h-5 sm:h-6" />
             <div className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
-              <a href="#features" className="hover:text-foreground transition-colors">Features</a>
-              <a href="#how-it-works" className="hover:text-foreground transition-colors">How It Works</a>
-              
-              <a href="#faq" className="hover:text-foreground transition-colors">FAQ</a>
+              <a href="#" className="hover:text-foreground transition-colors">Home</a>
+              <a href="#" className="hover:text-foreground transition-colors">Services</a>
+              <a href="#" className="hover:text-foreground transition-colors">Case Studies</a>
+              <a href="#" className="hover:text-foreground transition-colors">About Us</a>
+              <a href="#" className="hover:text-foreground transition-colors">Free Audit</a>
             </div>
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button onClick={() => navigate("/auth")} variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground text-xs sm:text-sm">Login</Button>
-              <Button onClick={() => navigate("/auth")} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 sm:px-5 text-xs sm:text-sm">Get Started Free</Button>
+              <Button onClick={() => navigate("/auth")} size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-4 sm:px-5 text-xs sm:text-sm">Get a Free Audit</Button>
             </div>
           </div>
         </motion.nav>
