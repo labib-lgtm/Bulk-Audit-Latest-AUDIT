@@ -844,25 +844,34 @@ const LandingPage = () => {
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.15),transparent_50%)]" aria-hidden="true" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,hsl(var(--primary)/0.08),transparent_60%)]" aria-hidden="true" />
             <div className="relative">
-              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-4">Stop Guessing. Start Profiting.</p>
+              <p className="text-primary text-xs font-medium tracking-[0.2em] uppercase mb-4">For Serious Amazon Sellers Only</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4">
-                Your Ads Are Leaking Money<br /><span className="text-primary">Right Now.</span>
+                You Just Found The Leaks.<br /><span className="text-primary">Now Let Us Plug Them For You.</span>
               </h2>
-              <p className="text-xl text-muted-foreground mb-8 max-w-lg mx-auto">
-                Upload your bulk file. See exactly where. Fix it today.
+              <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+                In 30 minutes, we'll map out a custom strategy to scale your brand — based on the exact data from your audit. No fluff. No generic advice. Just a clear path to profitable growth.
               </p>
+              <div className="flex flex-col items-center gap-3 mb-8 max-w-md mx-auto text-left">
+                {[
+                  "Custom scaling roadmap for your brand",
+                  "Identify your #1 profit multiplier",
+                  "Competitor gap analysis",
+                  "90-day action plan to dominate your category",
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 w-full">
+                    <Check className="w-5 h-5 text-primary flex-shrink-0" />
+                    <span className="text-foreground text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button onClick={() => navigate("/auth")} size="lg"
                   className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-12 py-7 font-bold rounded-full shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:scale-[1.02] btn-glow">
-                  Analyze My Ads Free
+                  Book Your Free Strategy Call
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Button>
-                <Button onClick={() => navigate("/dashboard")} variant="outline" size="lg"
-                  className="text-lg px-8 py-7 rounded-full border-border/50 hover:bg-muted/50">
-                  Try Demo Data
-                </Button>
               </div>
-              <p className="text-sm text-muted-foreground mt-6">No credit card required • 13 dashboards • Results in 60 seconds</p>
+              <p className="text-sm text-muted-foreground mt-6">Free • No obligation • 30-minute call</p>
             </div>
           </motion.section>
         </main>
