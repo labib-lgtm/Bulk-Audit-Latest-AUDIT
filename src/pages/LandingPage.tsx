@@ -10,7 +10,7 @@ import {
   Lock, Globe
 } from "lucide-react";
 import lynxLogo from "@/assets/lynx_media_logo_HQ_final.png";
-import dashboardPreview from "@/assets/dashboard-preview.jpg";
+import dashboardPreview from "@/assets/dashboard-preview.png";
 import ScrollTextReveal from "@/components/landing/ScrollTextReveal";
 import ZoomTunnel from "@/components/landing/ZoomTunnel";
 import FeatureShowcaseSection from "@/components/landing/FeatureShowcaseSection";
