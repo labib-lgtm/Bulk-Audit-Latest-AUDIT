@@ -40,7 +40,7 @@ export const TeamManagement: React.FC = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        console.error('No session found');
+        if (import.meta.env.DEV) console.error('No session found');
         return;
       }
       
@@ -53,7 +53,7 @@ export const TeamManagement: React.FC = () => {
       if (error) throw error;
       setTeamMembers(data?.teamMembers || []);
     } catch (err) {
-      console.error('Error fetching team members:', err);
+      if (import.meta.env.DEV) console.error('Error fetching team members:', err);
       toast.error('Failed to load team members');
     }
   };
@@ -69,7 +69,7 @@ export const TeamManagement: React.FC = () => {
       if (error) throw error;
       setInvitations(data || []);
     } catch (err) {
-      console.error('Error fetching invitations:', err);
+      if (import.meta.env.DEV) console.error('Error fetching invitations:', err);
       toast.error('Failed to load invitations');
     }
   };
@@ -100,7 +100,7 @@ export const TeamManagement: React.FC = () => {
       toast.success('Role updated successfully');
       fetchTeamMembers();
     } catch (err) {
-      console.error('Error updating role:', err);
+      if (import.meta.env.DEV) console.error('Error updating role:', err);
       toast.error('Failed to update role');
     }
   };
@@ -122,7 +122,7 @@ export const TeamManagement: React.FC = () => {
       toast.success('User removed successfully');
       fetchTeamMembers();
     } catch (err) {
-      console.error('Error removing user:', err);
+      if (import.meta.env.DEV) console.error('Error removing user:', err);
       toast.error('Failed to remove user');
     }
   };
@@ -139,7 +139,7 @@ export const TeamManagement: React.FC = () => {
       toast.success('Invitation cancelled');
       fetchInvitations();
     } catch (err) {
-      console.error('Error cancelling invitation:', err);
+      if (import.meta.env.DEV) console.error('Error cancelling invitation:', err);
       toast.error('Failed to cancel invitation');
     }
   };
@@ -159,7 +159,7 @@ export const TeamManagement: React.FC = () => {
       toast.success(`Invitation resent to ${invitation.email}`);
       fetchInvitations();
     } catch (err) {
-      console.error('Error resending invitation:', err);
+      if (import.meta.env.DEV) console.error('Error resending invitation:', err);
       toast.error('Failed to resend invitation');
     }
   };

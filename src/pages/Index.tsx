@@ -150,7 +150,7 @@ const Index = () => {
             }
           }
         } catch (err) {
-          console.error(err);
+          if (import.meta.env.DEV) console.error(err);
           setError("Failed to parse the Bulk Operations file. Please ensure it is valid.");
         } finally {
           setIsLoading(false);
@@ -171,7 +171,7 @@ const Index = () => {
         const report = await processBusinessReport(file);
         setBusinessReport(report);
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) console.error(err);
         setError("Failed to parse the Business Report. Ensure it contains Child ASIN data.");
       } finally {
         setIsLoading(false);
@@ -189,7 +189,7 @@ const Index = () => {
         const report = await processInventoryReport(file);
         setInventoryReport(report);
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) console.error(err);
         setError("Failed to parse FBA Inventory Report.");
       } finally {
         setIsLoading(false);
@@ -207,7 +207,7 @@ const Index = () => {
         const report = await processHourlyReport(file);
         setHourlyReport(report);
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) console.error(err);
         setError("Failed to parse Hourly Performance Report.");
       } finally {
         setIsLoading(false);
@@ -240,7 +240,7 @@ const Index = () => {
           setCurrentView('executive');
         }
       } catch (err) {
-        console.error(err);
+        if (import.meta.env.DEV) console.error(err);
         setError("Failed to import workspace file. It may be corrupted.");
       } finally {
         setIsLoading(false);
