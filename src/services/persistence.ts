@@ -59,7 +59,7 @@ export const saveState = async (state: Partial<AppState>): Promise<void> => {
       tx.onerror = () => reject(tx.error);
     });
   } catch (e) {
-    console.error("Failed to save state to DB", e);
+    if (import.meta.env.DEV) console.error("Failed to save state to DB", e);
   }
 };
 
@@ -83,7 +83,7 @@ export const loadState = async (): Promise<Partial<AppState>> => {
 
     return results;
   } catch (e) {
-    console.error("Failed to load state from DB", e);
+    if (import.meta.env.DEV) console.error("Failed to load state from DB", e);
     return {};
   }
 };
